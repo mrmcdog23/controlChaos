@@ -1,11 +1,9 @@
 """ Control chaos hud node for camera information """
 import sys
-import math
 import maya.api.OpenMaya as om
 import maya.api.OpenMayaUI as omui
 import maya.api.OpenMayaRender as omr
 import maya.api.OpenMayaAnim as omanim
-import pymel.core as pm
 
 
 # plugin information
@@ -39,12 +37,6 @@ class objectSpeedHUDNode(omui.MPxLocatorNode):
     DRAW_DB_CLASSIFICATION = 'drawdb/geometry/objectSpeedHUD'
     DRAW_REGISTRANT_ID = 'objectSpeedHUDNode'
 
-    TEXT_ATTRIBUTES = [
-        'top_left_text', 'top_center_text', 'top_right_text',
-        'bottom_left_text', 'bottom_center_text', 'bottom_right_text'
-    ]
-    TEXT_POSITION_NUMBER = 6
-
     def __init__(self):
         omui.MPxLocatorNode.__init__(self)
 
@@ -74,41 +66,26 @@ class objectSpeedHUDNode(omui.MPxLocatorNode):
         enum_attr = om.MFnEnumAttribute()
         compound_fn = om.MFnCompoundAttribute()
 
-        for text_attribute in cls.TEXT_ATTRIBUTES:
-            string_data = string_attr.create(text_attribute)
-            attr = typed_attr.create(text_attribute, text_attribute, om.MFnData.kString, string_data)
-            typed_attr.hidden = True
-            cls.addAttribute(attr)
-
         # top text font
-        cls.top_text_font = enum_attr.create('top_text_font', 'top_text_font', 0)
+        cls.text_font = enum_attr.create('text_font', 'text_font', 0)
         for index, font_name in enumerate(FONT_LIST):
             enum_attr.addField(font_name, index)
 
         # add the overall text scale
-        cls.overall_text_scale = numeric_attr.create('overall_text_scale', 'overall_text_scale', om.MFnNumericData.kFloat, 1.0)
-        numeric_attr.setMin(0.5)
-        numeric_attr.setMax(2.0)
-        cls.addAttribute(cls.overall_text_scale)
+        cls.font_size = numeric_attr.create('font_size', 'font_size', om.MFnNumericData.kInt, 12)
+        numeric_attr.setMin(1)
+        numeric_attr.setMax(40)
+        cls.addAttribute(cls.font_size)
 
         # top text controls
-        cls.top_text_font_weight = enum_attr.create('top_text_font_weight', 'top_text_font_weight', 2)
+        cls.font_weight = enum_attr.create('font_weight', 'font_weight', 2)
         font_weights = list(FONT_WEIGHT_MAP.keys())
         for index, font_weight in enumerate(font_weights):
             enum_attr.addField(font_weight, index)
 
-        # top text colour
-        cls.top_text_color = numeric_attr.createColor('top_text_color', 'top_text_color')
-        numeric_attr.default = (1.0, 1.0, 1.0)
 
-
-        # add all top text controls to compound
-        cls.top_text_controls = compound_fn.create("Top Text Controls", "top_text_controls")
-        cls.addAttribute(cls.top_text_font)
-        cls.addAttribute(cls.top_text_font_weight)
-        compound_fn.addChild(cls.top_text_color)
-        cls.addAttribute(cls.top_text_controls)
-
+        cls.addAttribute(cls.text_font)
+        cls.addAttribute(cls.font_weight)
 
         # 6. distance to actor
         cls.show_object_speed1 = numeric_attr.create(
@@ -301,6 +278,22 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         
         data.text_fields = [0, 1, 2, 3, 4, 5]
         speed_hud_node = om.MFnDagNode(obj_path)
+        
+        # text scale
+        data.font_size = speed_hud_node.findPlug('font_size', False).asInt()
+        
+        # Get top text font
+        text_font_plug = speed_hud_node.findPlug('text_font', False)
+        enum_fn = om.MFnEnumAttribute(text_font_plug.attribute())
+        data.text_font = enum_fn.fieldName(text_font_plug.asInt())
+
+        # get text font weight
+        font_weight_plug = speed_hud_node.findPlug('font_weight', False)
+        font_weight_attr = om.MFnEnumAttribute(font_weight_plug.attribute())
+        data.font_weight = FONT_WEIGHT_MAP.get(
+            font_weight_attr.fieldName(font_weight_plug.asShort())
+        )
+
 
         object_name1 = speed_hud_node.findPlug('object_name1', False).asString()
         text_x_offset1 = speed_hud_node.findPlug('text_x_offset1', False).asFloat()
@@ -310,7 +303,6 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         object_speed1 = self.get_object_speed(object_name1)
         speed_text_colour1 = self.get_colour_attribute(speed_hud_node, "speed_text_colour1")
         data.text_fields[0] = [screen_pos1, object_speed1, speed_text_colour1]
-
 
         '''
         speed_hud_node = om.MFnDagNode(obj_path)
@@ -324,9 +316,9 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         data.bottom_text_scale = speed_hud_node.findPlug('bottom_text_scale', False).asFloat()
 
         # Get top text font
-        top_text_font_plug = speed_hud_node.findPlug('top_text_font', False)
-        enum_fn = om.MFnEnumAttribute(top_text_font_plug.attribute())
-        data.top_text_font = enum_fn.fieldName(top_text_font_plug.asInt())
+        text_font_plug = speed_hud_node.findPlug('text_font', False)
+        enum_fn = om.MFnEnumAttribute(text_font_plug.attribute())
+        data.text_font = enum_fn.fieldName(text_font_plug.asInt())
 
         # Get bottom text font
         bottom_text_font_plug = speed_hud_node.findPlug('bottom_text_font', False)
@@ -334,7 +326,7 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         data.bottom_text_font = enum_fn.fieldName(bottom_text_font_plug.asInt())
 
         # general scale
-        data.overall_text_scale = speed_hud_node.findPlug('overall_text_scale', False).asFloat()
+        data.font_size = speed_hud_node.findPlug('font_size', False).asFloat()
         data.text_y_offset = speed_hud_node.findPlug('text_y_offset', False).asFloat()
 
         # get the text colours
@@ -344,13 +336,6 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         top_text_color_a = speed_hud_node.findPlug('top_text_alpha', False).asFloat()
         data.top_text_color = om.MColor(
             (top_text_color_r, top_text_color_g, top_text_color_b, top_text_color_a)
-        )
-
-        # get top text font weight
-        top_text_font_weight_plug = speed_hud_node.findPlug('top_text_font_weight', False)
-        top_text_font_weight_attr = om.MFnEnumAttribute(top_text_font_weight_plug.attribute())
-        data.top_text_font_weight = FONT_WEIGHT_MAP.get(
-            top_text_font_weight_attr.fieldName(top_text_font_weight_plug.asShort())
         )
 
 
@@ -379,9 +364,11 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
             return
 
         draw_manager.beginDrawable()
+        draw_manager.setFontName(data.text_font)
+        draw_manager.setFontWeight(data.font_weight)
+        draw_manager.setFontSize(data.font_size)
         mpoint, object_speed, speed_text_colour1 = data.text_fields[0]
         draw_manager.setColor(speed_text_colour1)
-
 
         self.draw_text(
             draw_manager, mpoint,
@@ -390,7 +377,7 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         draw_manager.endDrawable()
         '''
         #if not data.crop_enabled:
-        border_height = int(0.1 * mask_height * data.overall_text_scale)
+        border_height = int(0.1 * mask_height * data.font_size)
 
         if border_height <= 0:
             om.MGlobal.displayWarning(
@@ -403,8 +390,8 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         # draw mask
         draw_manager.beginDrawable()
 
-        draw_manager.setFontName(data.top_text_font)
-        draw_manager.setFontWeight(data.top_text_font_weight)
+        draw_manager.setFontName(data.text_font)
+        draw_manager.setFontWeight(data.font_weight)
         draw_manager.setColor(data.top_text_color)
         draw_manager.setFontSize(int(border_height * 0.25 * data.top_text_scale))
 
