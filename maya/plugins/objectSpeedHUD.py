@@ -135,171 +135,21 @@ class objectSpeedHUDNode(omui.MPxLocatorNode):
         compound_fn.addChild(cls.top_text_padding)
         cls.addAttribute(cls.top_text_controls)
 
-        cls.bottom_text_color = numeric_attr.createColor('bottom_text_color', 'bottom_text_color')
-        numeric_attr.default = (1.0, 1.0, 1.0)
-
-        # top text font
-        cls.bottom_text_font = enum_attr.create('bottom_text_font', 'bottom_text_font', 0)
-        for index, font_name in enumerate(FONT_LIST):
-            enum_attr.addField(font_name, index)
-
-        cls.bottom_text_font_weight = enum_attr.create('bottom_text_font_weight', 'bottom_text_font_weight', 0)
-        font_weights = list(FONT_WEIGHT_MAP.keys())
-        for index, font_weight in enumerate(font_weights):
-            enum_attr.addField(font_weight, index)
-
-        # add bottom alpha
-        cls.bottom_text_alpha = numeric_attr.create(
-            'bottom_text_alpha', 'bottom_text_alpha', om.MFnNumericData.kFloat, 1.0
-        )
-        numeric_attr.setMin(0.0)
-        numeric_attr.setMax(1.0)
-
-        # add all top text controls to compound
-        cls.bottom_text_scale = numeric_attr.create(
-            'bottom_text_scale', 'bottom_text_scale', om.MFnNumericData.kFloat, 1.0
-        )
-        numeric_attr.setMin(0.2)
-        numeric_attr.setMax(5.0)
-
-        # add bottom controls
-        cls.bottom_text_padding = numeric_attr.create(
-            'bottom_text_padding', 'bottom_text_padding', om.MFnNumericData.kInt, 20
-        )
-        numeric_attr.setMin(0)
-        numeric_attr.setMax(50)
-
-        cls.bottom_text_controls = compound_fn.create("Bottom Text Controls", "bottom_text_controls")
-        compound_fn.addChild(cls.bottom_text_font)
-        compound_fn.addChild(cls.bottom_text_font_weight)
-        compound_fn.addChild(cls.bottom_text_color)
-        compound_fn.addChild(cls.bottom_text_alpha)
-        compound_fn.addChild(cls.bottom_text_scale)
-        compound_fn.addChild(cls.bottom_text_padding)
-        cls.addAttribute(cls.bottom_text_controls)
-
-        # 1. add focal length parameter
-        cls.placeholder1 = numeric_attr.createColor('placeholder1', 'placeholder1')
-        numeric_attr.hidden = True
-
-        cls.show_focal_length = numeric_attr.create(
-            'show_focal_length', 'show_focal_length', om.MFnNumericData.kBoolean, True
-        )
-
-        cls.focal_length_position = numeric_attr.create(
-            'focal_length_position', 'focal_length_position', om.MFnNumericData.kInt, 0)
-        numeric_attr.setMin(0)
-        numeric_attr.setMax(6)
-
-        # add to the compound attribute
-        cls.camera_focal_length = compound_fn.create("Camera Focal Length", "camera_focal_length")
-        compound_fn.addChild(cls.show_focal_length)
-        compound_fn.addChild(cls.focal_length_position)
-        compound_fn.addChild(cls.placeholder1)
-        cls.addAttribute(cls.camera_focal_length)
-
-        # 2. show camera rotation option
+        # 6. distance to actor
         cls.show_object_speed1 = numeric_attr.create(
             'show_object_speed1', 'show_object_speed1', om.MFnNumericData.kBoolean, True
         )
 
-        # add camera rotation options
-        cls.camera_rotations_position = numeric_attr.create(
-            'camera_rotations_position', 'camera_rotations_position', om.MFnNumericData.kInt, 1)
-        numeric_attr.setMin(0)
-        numeric_attr.setMax(6)
+        cls.speed_text_colour1 = numeric_attr.createColor('speed_text_colour1', 'speed_text_colour1')
+        numeric_attr.default = (1.0, 1.0, 1.0)
 
-        # add to the compound attribute
-        cls.camera_rotations_grp = compound_fn.create("Camera Rotations", "camera_rotations")
+        cls.object_name1 = typed_attr.create("object_name1", "object_name1", om.MFnData.kString)
+
+        cls.speed_object_grp1 = compound_fn.create("Object Speed 1", "speed_object_grp1")
         compound_fn.addChild(cls.show_object_speed1)
-        compound_fn.addChild(cls.camera_rotations_position)
-        cls.addAttribute(cls.camera_rotations_grp)
-
-        # show camera height option
-        cls.show_camera_height = numeric_attr.create(
-            'show_camera_height', 'show_camera_height', om.MFnNumericData.kBoolean, True
-        )
-
-        # 3. add camera height options
-        cls.camera_height_position = numeric_attr.create(
-            'camera_height_position', 'camera_height_position', om.MFnNumericData.kInt, 2)
-        numeric_attr.setMin(0)
-        numeric_attr.setMax(6)
-
-        cls.camera_height_units = enum_attr.create('camera_height_units', 'camera_height_units', 0)
-        enum_attr.addField('Meters', 0)
-        enum_attr.addField('Feet', 1)
-
-        # add to the compound attribute
-        cls.camera_height_grp = compound_fn.create("Camera Height", "camera_height")
-        compound_fn.addChild(cls.show_camera_height)
-        compound_fn.addChild(cls.camera_height_position)
-        compound_fn.addChild(cls.camera_height_units)
-        cls.addAttribute(cls.camera_height_grp)
-
-        # 4. show frame number
-        cls.show_frame_number = numeric_attr.create(
-            'show_frame_number', 'show_frame_number', om.MFnNumericData.kBoolean, True
-        )
-        # add frame counter group
-        cls.frame_number_position = numeric_attr.create(
-            'frame_number_position', 'frame_number_position', om.MFnNumericData.kInt, 3
-        )
-        numeric_attr.setMin(0)
-        numeric_attr.setMax(6)
-
-        cls.frame_padding = numeric_attr.create(
-            'frame_padding', 'frame_padding', om.MFnNumericData.kInt, 4
-        )
-        numeric_attr.setMin(2)
-        numeric_attr.setMax(6)
-
-        # need placeholder for it to add the compound group
-        cls.placeholder2 = numeric_attr.createColor('placeholder2', 'placeholder2')
-        numeric_attr.hidden = True
-
-        # add all to the frame number group
-        cls.frame_number_grp = compound_fn.create("Frame Number", "frame_number_grp")
-        compound_fn.addChild(cls.show_frame_number)
-        compound_fn.addChild(cls.frame_number_position)
-        compound_fn.addChild(cls.frame_padding)
-        compound_fn.addChild(cls.placeholder2)
-        cls.addAttribute(cls.frame_number_grp)
-
-        # 5. add camera speed attribute
-        cls.show_camera_and_object_speed = numeric_attr.create(
-            'show_camera_and_object_speed', 'show_camera_and_object_speed', om.MFnNumericData.kBoolean, True
-        )
-        cls.camera_speed_position = numeric_attr.create(
-            'camera_speed_position', 'camera_speed_position', om.MFnNumericData.kInt, 4)
-        numeric_attr.setMin(0)
-        numeric_attr.setMax(6)
-
-        cls.object_name_speed = typed_attr.create("object_name_speed", "object_name_speed", om.MFnData.kString)
-
-        # add to compound group
-        cls.camera_speed_grp = compound_fn.create("Camera and Object Speed", "speed_options")
-        compound_fn.addChild(cls.show_camera_and_object_speed)
-        compound_fn.addChild(cls.camera_speed_position)
-        compound_fn.addChild(cls.object_name_speed)
-        cls.addAttribute(cls.camera_speed_grp)
-
-        # 6. distance to actor
-        cls.show_distance_to_object = numeric_attr.create(
-            'show_distance_to_object', 'show_distance_to_object', om.MFnNumericData.kBoolean, True
-        )
-        cls.distance_to_actor_position = numeric_attr.create(
-            'distance_to_actor_position', 'distance_to_actor_position', om.MFnNumericData.kInt, 5)
-        numeric_attr.setMin(0)
-        numeric_attr.setMax(6)
-
-        cls.object_name = typed_attr.create("object_name", "object_name", om.MFnData.kString)
-
-        cls.distance_to_actor_grp = compound_fn.create("Distance To Actor", "distance_to_actor")
-        compound_fn.addChild(cls.show_distance_to_object)
-        compound_fn.addChild(cls.distance_to_actor_position)
-        compound_fn.addChild(cls.object_name)
-        cls.addAttribute(cls.distance_to_actor_grp)
+        compound_fn.addChild(cls.speed_text_colour1)
+        compound_fn.addChild(cls.object_name1)
+        cls.addAttribute(cls.speed_object_grp1)
 
     @classmethod
     def creator(cls):
@@ -326,7 +176,37 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
     def boundingBox(self, obj_path, camera_path):
         return om.MBoundingBox()
 
-    def get_transform_dag_speed(self, transform_dag):
+    def get_world_position_at_time(self, dep_fn, frame):
+        # type: (om.MFnDependencyNode) -> om.MVector
+        """
+        Get an objects position at a particular frame
+
+        Args:
+            dep_fn: The dependency node to find
+            frame: Frame to get the position
+
+        Returns:
+            Current vector position
+        """
+        # Build an MTime for the desired frame
+        time = om.MTime(frame, om.MTime.uiUnit())
+
+        # Use MDGContext to evaluate at a specific time
+        ctx = om.MDGContext(time)
+
+        # Pull the worldMatrix attribute value at that time
+        world_matrix_plug = dep_fn.findPlug("worldMatrix", False)
+        world_matrix_plug = world_matrix_plug.elementByLogicalIndex(0)  # instance 0
+
+        mobj = world_matrix_plug.asMObject(ctx)
+        matrix_data = om.MFnMatrixData(mobj)
+        matrix = matrix_data.matrix()
+        tx = matrix[12]
+        ty = matrix[13]
+        tz = matrix[14]
+        return om.MVector(tx, ty, tz)
+
+    def get_object_speed(self, object_name_speed):
         # type: (om.MDagNode) -> str
         """
         From an objects transform get its speed at the current frame
@@ -337,7 +217,15 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         Returns:
             speed_mph_str: The speed text to display
         """
-        dep_fn = om.MFnDependencyNode(transform_dag.node())
+
+        sel = om.MSelectionList()
+        try:
+            sel.add(object_name_speed)
+        except RuntimeError:
+            return f"{object_name_speed} not found"
+
+        dag_path = sel.getDagPath(0)
+        dep_fn = om.MFnDependencyNode(dag_path.node())
 
         frame = omanim.MAnimControl.currentTime().value
 
@@ -363,66 +251,12 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         speed_mph_str = f"{speed_mph:8.3f} mph"
         return speed_mph_str
 
-    def get_transform_dag_from_frame_context(self, frame_context):
-        # type: (omr.MFrameContext) -> om.MDagPath
-        """
-        From the frame context get the camera transform dag
-
-        Args:
-            frame_context: The frame context
-
-        Returns:
-            transform_dag: The camera as a dag object
-        """
-        camera_path = frame_context.getCurrentCameraPath()
-        camera = om.MFnCamera(camera_path)
-
-        # Get the transform DAG path by popping the shape
-        transform_dag = camera.dagPath()
-        transform_dag.pop()
-        return transform_dag
-
-    def get_distance_to_actor(self, frame_context, show_distance_to_object, object_name):
-        # type: (omr.MFrameContext, bool, str) -> str
-        """
-        Get the distance from the camera to the given object name
-
-        Args:
-            frame_context: The frame context
-            show_distance_to_object: Whether to show the distance to the object
-            object_name: The object to measure the distance to
-
-        Returns:
-            distance_to_camera_text: The text to display on the hud
-        """
-        if not show_distance_to_object:
-            return str()
-        if not object_name:
-            return "No object name given"
-
-        sel = om.MSelectionList()
-        try:
-            sel.add(object_name)
-        except RuntimeError:
-            return f"{object_name} not found"
-
-        # get the actors translation
-        dag = sel.getDagPath(0)
-        transform_fn = om.MFnTransform(dag)
-        actor_tr = transform_fn.translation(om.MSpace.kWorld)
-
-        # get the camera translations get the difference
-        cam_tr = self.get_camera_translation(frame_context)
-        dist = (actor_tr - cam_tr).length()
-        distance_to_camera_text = "Distance to %s -- %.2f" % (object_name, dist)
-        return distance_to_camera_text
-
     def get_screen_pos(self, object_name, frame_context):
         sel = om.MSelectionList()
         try:
             sel.add(object_name)
         except RuntimeError:
-            return f"{object_name} not found"
+            return
 
         # get the actors translation
         obj_path = sel.getDagPath(0)
@@ -471,12 +305,13 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         data.text_fields = [0, 1, 2]
 
         speed_hud_node = om.MFnDagNode(obj_path)
-        object_name = speed_hud_node.findPlug('object_name', False).asString()
-        show_distance_to_object = speed_hud_node.findPlug('show_distance_to_object', False).asBool()
-        
-        screen_pos = self.get_screen_pos(object_name, frame_context)
+
+        #show_distance_to_object = speed_hud_node.findPlug('show_distance_to_object', False).asBool()
+        object_name1 = speed_hud_node.findPlug('object_name1', False).asString()
+        screen_pos = self.get_screen_pos(object_name1, frame_context)
+        object_speed = self.get_object_speed(object_name1)
         #distance_to_actor = self.get_distance_to_actor(frame_context, show_distance_to_object, object_name)
-        data.text_fields[0] = screen_pos
+        data.text_fields[0] = [screen_pos, object_speed]
         
         '''
         speed_hud_node = om.MFnDagNode(obj_path)
@@ -519,21 +354,6 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
             top_text_font_weight_attr.fieldName(top_text_font_weight_plug.asShort())
         )
 
-        # create the lower text colour
-        bottom_text_color_r = speed_hud_node.findPlug('bottom_text_colorR', False).asFloat()
-        bottom_text_color_g = speed_hud_node.findPlug('bottom_text_colorG', False).asFloat()
-        bottom_text_color_b = speed_hud_node.findPlug('bottom_text_colorB', False).asFloat()
-        bottom_text_color_a = speed_hud_node.findPlug('bottom_text_alpha', False).asFloat()
-        data.bottom_text_color = om.MColor(
-            (bottom_text_color_r, bottom_text_color_g, bottom_text_color_b, bottom_text_color_a)
-        )
-
-        # bottom text font weight
-        bottom_text_font_weight_plug = speed_hud_node.findPlug('bottom_text_font_weight', False)
-        bottom_text_font_weight_attr = om.MFnEnumAttribute(bottom_text_font_weight_plug.attribute())
-        data.bottom_text_font_weight = FONT_WEIGHT_MAP.get(
-            bottom_text_font_weight_attr.fieldName(bottom_text_font_weight_plug.asShort())
-        )
 
         # set the frame number text position
         frame_number_position = speed_hud_node.findPlug('frame_number_position', False).asInt()
@@ -549,39 +369,6 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
             focal_length_string = self.get_focal_length_string(frame_context, show_focal_length)
             data.text_fields[focal_length_position] = focal_length_string
 
-        # get the camera height and display it
-        camera_height_position = speed_hud_node.findPlug('camera_height_position', False).asInt()
-        show_camera_height = speed_hud_node.findPlug('show_camera_height', False).asBool()
-        if 0 <= camera_height_position < objectSpeedHUDNode.TEXT_POSITION_NUMBER:
-            # Get camera height
-            camera_height_units_int = speed_hud_node.findPlug('camera_height_units', False).asInt()
-            camera_height_string = self.get_camera_height_string(
-                frame_context, show_camera_height, camera_height_units_int)
-            data.text_fields[camera_height_position] = camera_height_string
-
-        # get the camera rotations
-        camera_rotations_position = speed_hud_node.findPlug('camera_rotations_position', False).asInt()
-        show_object_speed1 = speed_hud_node.findPlug('show_object_speed1', False).asBool()
-        if 0 <= camera_rotations_position < objectSpeedHUDNode.TEXT_POSITION_NUMBER:
-            camera_rotations = self.get_camera_rotations(frame_context, show_object_speed1)
-            data.text_fields[camera_rotations_position] = camera_rotations
-
-        # work out the camera speed
-        camera_speed_position = speed_hud_node.findPlug('camera_speed_position', False).asInt()
-        show_camera_and_object_speed = speed_hud_node.findPlug('show_camera_and_object_speed', False).asBool()
-        object_name_speed = speed_hud_node.findPlug('object_name_speed', False).asString()
-
-        if 0 <= camera_speed_position < objectSpeedHUDNode.TEXT_POSITION_NUMBER:
-            camera_speed = self.get_camera_speed_mph(frame_context, object_name_speed, show_camera_and_object_speed)
-            data.text_fields[camera_speed_position] = camera_speed
-
-        # get the distance to an actor
-        distance_to_actor_position = speed_hud_node.findPlug('distance_to_actor_position', False).asInt()
-        object_name = speed_hud_node.findPlug('object_name', False).asString()
-        show_distance_to_object = speed_hud_node.findPlug('show_distance_to_object', False).asBool()
-        if 0 <= distance_to_actor_position < objectSpeedHUDNode.TEXT_POSITION_NUMBER:
-            distance_to_actor = self.get_distance_to_actor(frame_context, show_distance_to_object, object_name)
-            data.text_fields[distance_to_actor_position] = distance_to_actor
         '''
         return data
 
@@ -591,57 +378,14 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
     def addUIDrawables(self, obj_path, draw_manager, frame_context, data):
         if not isinstance(data, objectSpeedHUDData):
             return
-        #xpoint = data.text_fields[0][0]
-        #ypoint = data.text_fields[0][0]
-        mpoint = data.text_fields[0]
+        mpoint, object_speed = data.text_fields[0]
         draw_manager.beginDrawable()
         self.draw_text(
             draw_manager, mpoint,
-            "rrrrr", omr.MUIDrawManager.kLeft
+            object_speed, omr.MUIDrawManager.kLeft
         )
         draw_manager.endDrawable()
         '''
-        camera_path = frame_context.getCurrentCameraPath()
-        camera = om.MFnCamera(camera_path)
-        camera_aspect_ratio = camera.aspectRatio()
-        device_aspect_ratio = pm.general.getAttr('defaultResolution.deviceAspectRatio')
-
-        viewport_x, viewport_y, viewport_width, viewport_height = frame_context.getViewportDimensions()
-        viewport_aspect_ratio = viewport_width / float(viewport_height)
-
-        scale = 1.0
-        if camera.filmFit == om.MFnCamera.kHorizontalFilmFit:
-            mask_width = viewport_width / camera.overscan
-            mask_height = mask_width / device_aspect_ratio
-
-        elif camera.filmFit == om.MFnCamera.kVerticalFilmFit:
-            mask_height = viewport_height / camera.overscan
-            mask_width = mask_height * device_aspect_ratio
-
-        elif camera.filmFit in (om.MFnCamera.kFillFilmFit, om.MFnCamera.kOverscanFilmFit):
-            if camera_aspect_ratio > device_aspect_ratio:
-                scale = device_aspect_ratio / camera_aspect_ratio
-
-            elif viewport_aspect_ratio < camera_aspect_ratio:
-                scale = min(camera_aspect_ratio, device_aspect_ratio) / viewport_aspect_ratio
-            else:
-                pass
-
-            if camera.filmFit == om.MFnCamera.kFillFilmFit:
-                mask_width = viewport_width / camera.overscan * scale
-                mask_height = mask_width / device_aspect_ratio
-            else:
-                mask_height = viewport_height / camera.overscan / scale
-                mask_width = mask_height * device_aspect_ratio
-        else:
-            om.MGlobal.displayError('[objectSpeedHUD] Unknown Film Fit Value')
-            return
-#
-
-        mask_x = 0.5 * (viewport_width - mask_width)
-        mask_y_top = 0.5 * (viewport_height + mask_height + data.text_y_offset)
-        mask_y_bottom = 0.5 * (viewport_height - mask_height + (data.text_y_offset * -1))
-
         #if not data.crop_enabled:
         border_height = int(0.1 * mask_height * data.overall_text_scale)
 
@@ -665,39 +409,14 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
             draw_manager, om.MPoint(mask_x+data.top_text_padding, mask_y_top-border_height),
             data.text_fields[0], omr.MUIDrawManager.kLeft, background_size
         )
-        self.draw_text(
-            draw_manager, om.MPoint(viewport_width*0.5, mask_y_top-border_height),
-            data.text_fields[1], omr.MUIDrawManager.kCenter, background_size
-        )
-        self.draw_text(
-            draw_manager, om.MPoint(mask_x+mask_width-data.top_text_padding, mask_y_top-border_height),
-            data.text_fields[2], omr.MUIDrawManager.kRight, background_size
-        )
-
-        draw_manager.setFontName(data.bottom_text_font)
-        draw_manager.setFontWeight(data.bottom_text_font_weight)
-        draw_manager.setColor(data.bottom_text_color)
-        draw_manager.setFontSize(int(border_height * 0.25 * data.bottom_text_scale))
-
-        self.draw_text(
-            draw_manager, om.MPoint(mask_x+data.bottom_text_padding, mask_y_bottom),
-            data.text_fields[3], omr.MUIDrawManager.kLeft, background_size
-        )
-        self.draw_text(
-            draw_manager, om.MPoint(viewport_width*0.5, mask_y_bottom),
-            data.text_fields[4], omr.MUIDrawManager.kCenter, background_size
-        )
-        self.draw_text(
-            draw_manager, om.MPoint(mask_x+mask_width-data.bottom_text_padding, mask_y_bottom),
-            data.text_fields[5], omr.MUIDrawManager.kRight, background_size
-        )
-
         draw_manager.endDrawable()
         '''
         pass
 
     @staticmethod
     def draw_text(draw_manager, position, text, alignment):
+        if not position:
+            return
         if not len(text):
             return
         draw_manager.text2d(
