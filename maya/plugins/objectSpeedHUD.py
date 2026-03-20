@@ -296,22 +296,28 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         screen_pos = om.MPoint(px, py)
         return screen_pos
 
+    def get_colour_attribute(self, speed_hud_node, colour_name):
+        top_text_color_r = speed_hud_node.findPlug(f'{colour_name}R', False).asFloat()
+        top_text_color_g = speed_hud_node.findPlug(f'{colour_name}G', False).asFloat()
+        top_text_color_b = speed_hud_node.findPlug(f'{colour_name}B', False).asFloat()
+        top_text_color = om.MColor(
+            (top_text_color_r, top_text_color_g, top_text_color_b, 1.0)
+        )
+        return top_text_color
 
     def prepareForDraw(self, obj_path, camera_path, frame_context, old_data):
         data = old_data
         if not isinstance(data, objectSpeedHUDData):
             data = objectSpeedHUDData()
         
-        data.text_fields = [0, 1, 2]
-
+        data.text_fields = [0, 1, 2, 3, 4, 5]
         speed_hud_node = om.MFnDagNode(obj_path)
 
-        #show_distance_to_object = speed_hud_node.findPlug('show_distance_to_object', False).asBool()
         object_name1 = speed_hud_node.findPlug('object_name1', False).asString()
         screen_pos = self.get_screen_pos(object_name1, frame_context)
-        object_speed = self.get_object_speed(object_name1)
-        #distance_to_actor = self.get_distance_to_actor(frame_context, show_distance_to_object, object_name)
-        data.text_fields[0] = [screen_pos, object_speed]
+        object_speed1 = self.get_object_speed(object_name1)
+        speed_text_colour1 = self.get_colour_attribute(speed_hud_node, "speed_text_colour1")
+        data.text_fields[0] = [screen_pos, object_speed1, speed_text_colour1]
         
         '''
         speed_hud_node = om.MFnDagNode(obj_path)
@@ -378,8 +384,12 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
     def addUIDrawables(self, obj_path, draw_manager, frame_context, data):
         if not isinstance(data, objectSpeedHUDData):
             return
-        mpoint, object_speed = data.text_fields[0]
+
         draw_manager.beginDrawable()
+        mpoint, object_speed, speed_text_colour1 = data.text_fields[0]
+        draw_manager.setColor(speed_text_colour1)
+
+
         self.draw_text(
             draw_manager, mpoint,
             object_speed, omr.MUIDrawManager.kLeft
