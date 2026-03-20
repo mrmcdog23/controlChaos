@@ -91,12 +91,6 @@ class objectSpeedHUDNode(omui.MPxLocatorNode):
         numeric_attr.setMax(2.0)
         cls.addAttribute(cls.overall_text_scale)
 
-        # offset both text in y
-        cls.text_y_offset = numeric_attr.create('text_y_offset', 'text_y_offset', om.MFnNumericData.kInt, 0)
-        numeric_attr.setMin(-50)
-        numeric_attr.setMax(50)
-        cls.addAttribute(cls.text_y_offset)
-
         # top text controls
         cls.top_text_font_weight = enum_attr.create('top_text_font_weight', 'top_text_font_weight', 2)
         font_weights = list(FONT_WEIGHT_MAP.keys())
@@ -107,33 +101,14 @@ class objectSpeedHUDNode(omui.MPxLocatorNode):
         cls.top_text_color = numeric_attr.createColor('top_text_color', 'top_text_color')
         numeric_attr.default = (1.0, 1.0, 1.0)
 
-        # top text alpha
-        cls.top_text_alpha = numeric_attr.create(
-            'top_text_alpha', 'top_text_alpha', om.MFnNumericData.kFloat, 1.0
-        )
-        numeric_attr.setMin(0.0)
-        numeric_attr.setMax(1.0)
-
-        # add scale controller
-        cls.top_text_scale = numeric_attr.create(
-            'top_text_scale', 'top_text_scale', om.MFnNumericData.kFloat, 1.0
-        )
-        numeric_attr.setMin(0.2)
-        numeric_attr.setMax(5.0)
-
-        cls.top_text_padding = numeric_attr.create('top_text_padding', 'top_text_padding', om.MFnNumericData.kInt, 20)
-        numeric_attr.setMin(0)
-        numeric_attr.setMax(50)
 
         # add all top text controls to compound
         cls.top_text_controls = compound_fn.create("Top Text Controls", "top_text_controls")
-        compound_fn.addChild(cls.top_text_font)
-        compound_fn.addChild(cls.top_text_font_weight)
+        cls.addAttribute(cls.top_text_font)
+        cls.addAttribute(cls.top_text_font_weight)
         compound_fn.addChild(cls.top_text_color)
-        compound_fn.addChild(cls.top_text_alpha)
-        compound_fn.addChild(cls.top_text_scale)
-        compound_fn.addChild(cls.top_text_padding)
         cls.addAttribute(cls.top_text_controls)
+
 
         # 6. distance to actor
         cls.show_object_speed1 = numeric_attr.create(
@@ -143,11 +118,23 @@ class objectSpeedHUDNode(omui.MPxLocatorNode):
         cls.speed_text_colour1 = numeric_attr.createColor('speed_text_colour1', 'speed_text_colour1')
         numeric_attr.default = (1.0, 1.0, 1.0)
 
+        # offset both text in y
+        cls.text_x_offset1 = numeric_attr.create('text_x_offset1', 'text_x_offset1', om.MFnNumericData.kInt, 0)
+        numeric_attr.setMin(-50)
+        numeric_attr.setMax(50)
+
+        # offset both text in y
+        cls.text_y_offset1 = numeric_attr.create('text_y_offset1', 'text_y_offset1', om.MFnNumericData.kInt, 0)
+        numeric_attr.setMin(-50)
+        numeric_attr.setMax(50)
+
         cls.object_name1 = typed_attr.create("object_name1", "object_name1", om.MFnData.kString)
 
         cls.speed_object_grp1 = compound_fn.create("Object Speed 1", "speed_object_grp1")
         compound_fn.addChild(cls.show_object_speed1)
         compound_fn.addChild(cls.speed_text_colour1)
+        compound_fn.addChild(cls.text_x_offset1)
+        compound_fn.addChild(cls.text_y_offset1)
         compound_fn.addChild(cls.object_name1)
         cls.addAttribute(cls.speed_object_grp1)
 
@@ -251,7 +238,7 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         speed_mph_str = f"{speed_mph:8.3f} mph"
         return speed_mph_str
 
-    def get_screen_pos(self, object_name, frame_context):
+    def get_screen_pos(self, object_name, text_x_offset, text_y_offset, frame_context):
         sel = om.MSelectionList()
         try:
             sel.add(object_name)
@@ -288,10 +275,12 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         # --- NDC → viewport pixels ------------------------------------------
         vp_x, vp_y, vp_w, vp_h = frame_context.getViewportDimensions()
         # NDC  (-1,1) → (0,1) → pixel
-        px = vp_x + (ndc_x * 0.5 + 0.5) * vp_w
+        px_original = vp_x + (ndc_x * 0.5 + 0.5) * vp_w
+        px = text_x_offset + px_original
+
         # Maya's DrawManager y=0 is BOTTOM; NDC y=+1 is TOP → flip
         py_offset = vp_y + (1.0 - (ndc_y * 0.5 + 0.5)) * vp_h
-        py = vp_h - py_offset
+        py = vp_h - py_offset + text_y_offset
         # store as an MPoint (z ignored by text2d)
         screen_pos = om.MPoint(px, py)
         return screen_pos
@@ -314,11 +303,15 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         speed_hud_node = om.MFnDagNode(obj_path)
 
         object_name1 = speed_hud_node.findPlug('object_name1', False).asString()
-        screen_pos = self.get_screen_pos(object_name1, frame_context)
+        text_x_offset1 = speed_hud_node.findPlug('text_x_offset1', False).asFloat()
+        text_y_offset1 = speed_hud_node.findPlug('text_y_offset1', False).asFloat()
+
+        screen_pos1 = self.get_screen_pos(object_name1, text_x_offset1, text_y_offset1, frame_context)
         object_speed1 = self.get_object_speed(object_name1)
         speed_text_colour1 = self.get_colour_attribute(speed_hud_node, "speed_text_colour1")
-        data.text_fields[0] = [screen_pos, object_speed1, speed_text_colour1]
-        
+        data.text_fields[0] = [screen_pos1, object_speed1, speed_text_colour1]
+
+
         '''
         speed_hud_node = om.MFnDagNode(obj_path)
         data.text_fields = []
