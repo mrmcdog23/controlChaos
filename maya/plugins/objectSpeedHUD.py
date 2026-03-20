@@ -456,10 +456,10 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         # NDC  (-1,1) → (0,1) → pixel
         px = vp_x + (ndc_x * 0.5 + 0.5) * vp_w
         # Maya's DrawManager y=0 is BOTTOM; NDC y=+1 is TOP → flip
-        py = vp_y + (1.0 - (ndc_y * 0.5 + 0.5)) * vp_h
-
+        py_offset = vp_y + (1.0 - (ndc_y * 0.5 + 0.5)) * vp_h
+        py = vp_h - py_offset
         # store as an MPoint (z ignored by text2d)
-        screen_pos = om.MPoint(px, py, 0.0)
+        screen_pos = om.MPoint(px, py)
         return screen_pos
 
 
@@ -475,7 +475,6 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         show_distance_to_object = speed_hud_node.findPlug('show_distance_to_object', False).asBool()
         
         screen_pos = self.get_screen_pos(object_name, frame_context)
-        print (screen_pos)
         #distance_to_actor = self.get_distance_to_actor(frame_context, show_distance_to_object, object_name)
         data.text_fields[0] = screen_pos
         
@@ -592,6 +591,15 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
     def addUIDrawables(self, obj_path, draw_manager, frame_context, data):
         if not isinstance(data, objectSpeedHUDData):
             return
+        #xpoint = data.text_fields[0][0]
+        #ypoint = data.text_fields[0][0]
+        mpoint = data.text_fields[0]
+        draw_manager.beginDrawable()
+        self.draw_text(
+            draw_manager, mpoint,
+            "rrrrr", omr.MUIDrawManager.kLeft
+        )
+        draw_manager.endDrawable()
         '''
         camera_path = frame_context.getCurrentCameraPath()
         camera = om.MFnCamera(camera_path)
@@ -689,12 +697,11 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         pass
 
     @staticmethod
-    def draw_text(draw_manager, position, text, alignment, background_size):
+    def draw_text(draw_manager, position, text, alignment):
         if not len(text):
             return
         draw_manager.text2d(
             position, text, alignment=alignment,
-            backgroundSize=background_size,
             backgroundColor=om.MColor((1.0, 0.0, 0.0, 0.0)),
             dynamic=False
         )

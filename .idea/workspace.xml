@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/maya/plugins/objectSpeedHUD.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/plugins/objectSpeedHUD.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/plugins/objectSpeedHUD.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -340,7 +339,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774031152333</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="got screen position">
+      <option name="closed" value="true" />
+      <created>1774033885280</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1774033885280</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -392,6 +399,7 @@
     <MESSAGE value="offset in y option" />
     <MESSAGE value="&#10;# Conflicts:&#10;#&#9;.idea/misc.xml&#10;" />
     <MESSAGE value="updated to all hud option" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated to all hud option" />
+    <MESSAGE value="got screen position" />
+    <option name="LAST_COMMIT_MESSAGE" value="got screen position" />
   </component>
 </project>
