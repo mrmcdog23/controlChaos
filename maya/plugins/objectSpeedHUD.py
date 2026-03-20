@@ -83,7 +83,6 @@ class objectSpeedHUDNode(omui.MPxLocatorNode):
         for index, font_weight in enumerate(font_weights):
             enum_attr.addField(font_weight, index)
 
-
         cls.addAttribute(cls.text_font)
         cls.addAttribute(cls.font_weight)
 
@@ -296,13 +295,14 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
 
 
         object_name1 = speed_hud_node.findPlug('object_name1', False).asString()
+        show_object_speed1 = speed_hud_node.findPlug('show_object_speed1', False).asBool()
         text_x_offset1 = speed_hud_node.findPlug('text_x_offset1', False).asFloat()
         text_y_offset1 = speed_hud_node.findPlug('text_y_offset1', False).asFloat()
 
         screen_pos1 = self.get_screen_pos(object_name1, text_x_offset1, text_y_offset1, frame_context)
         object_speed1 = self.get_object_speed(object_name1)
         speed_text_colour1 = self.get_colour_attribute(speed_hud_node, "speed_text_colour1")
-        data.text_fields[0] = [screen_pos1, object_speed1, speed_text_colour1]
+        data.text_fields[0] = [screen_pos1, object_speed1, speed_text_colour1, show_object_speed1]
 
         '''
         speed_hud_node = om.MFnDagNode(obj_path)
@@ -367,12 +367,14 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         draw_manager.setFontName(data.text_font)
         draw_manager.setFontWeight(data.font_weight)
         draw_manager.setFontSize(data.font_size)
-        mpoint, object_speed, speed_text_colour1 = data.text_fields[0]
+
+        # show information
+        mpoint, object_speed, speed_text_colour1, show_object_speed1 = data.text_fields[0]
         draw_manager.setColor(speed_text_colour1)
 
         self.draw_text(
             draw_manager, mpoint,
-            object_speed, omr.MUIDrawManager.kLeft
+            object_speed, omr.MUIDrawManager.kLeft, show_object_speed1
         )
         draw_manager.endDrawable()
         '''
@@ -404,7 +406,9 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         pass
 
     @staticmethod
-    def draw_text(draw_manager, position, text, alignment):
+    def draw_text(draw_manager, position, text, alignment, show_text):
+        if not show_text:
+            return
         if not position:
             return
         if not len(text):
