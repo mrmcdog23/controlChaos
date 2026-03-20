@@ -293,7 +293,6 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
             font_weight_attr.fieldName(font_weight_plug.asShort())
         )
 
-
         object_name1 = speed_hud_node.findPlug('object_name1', False).asString()
         show_object_speed1 = speed_hud_node.findPlug('show_object_speed1', False).asBool()
         text_x_offset1 = speed_hud_node.findPlug('text_x_offset1', False).asFloat()
@@ -304,56 +303,6 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         speed_text_colour1 = self.get_colour_attribute(speed_hud_node, "speed_text_colour1")
         data.text_fields[0] = [screen_pos1, object_speed1, speed_text_colour1, show_object_speed1]
 
-        '''
-        speed_hud_node = om.MFnDagNode(obj_path)
-        data.text_fields = []
-        for attribute in objectSpeedHUDNode.TEXT_ATTRIBUTES:
-            data.text_fields.append(speed_hud_node.findPlug(attribute, False).asString())
-
-        data.top_text_padding = speed_hud_node.findPlug('top_text_padding', False).asInt()
-        data.bottom_text_padding = speed_hud_node.findPlug('bottom_text_padding', False).asInt()
-        data.top_text_scale = speed_hud_node.findPlug('top_text_scale', False).asFloat()
-        data.bottom_text_scale = speed_hud_node.findPlug('bottom_text_scale', False).asFloat()
-
-        # Get top text font
-        text_font_plug = speed_hud_node.findPlug('text_font', False)
-        enum_fn = om.MFnEnumAttribute(text_font_plug.attribute())
-        data.text_font = enum_fn.fieldName(text_font_plug.asInt())
-
-        # Get bottom text font
-        bottom_text_font_plug = speed_hud_node.findPlug('bottom_text_font', False)
-        enum_fn = om.MFnEnumAttribute(bottom_text_font_plug.attribute())
-        data.bottom_text_font = enum_fn.fieldName(bottom_text_font_plug.asInt())
-
-        # general scale
-        data.font_size = speed_hud_node.findPlug('font_size', False).asFloat()
-        data.text_y_offset = speed_hud_node.findPlug('text_y_offset', False).asFloat()
-
-        # get the text colours
-        top_text_color_r = speed_hud_node.findPlug('top_text_colorR', False).asFloat()
-        top_text_color_g = speed_hud_node.findPlug('top_text_colorG', False).asFloat()
-        top_text_color_b = speed_hud_node.findPlug('top_text_colorB', False).asFloat()
-        top_text_color_a = speed_hud_node.findPlug('top_text_alpha', False).asFloat()
-        data.top_text_color = om.MColor(
-            (top_text_color_r, top_text_color_g, top_text_color_b, top_text_color_a)
-        )
-
-
-        # set the frame number text position
-        frame_number_position = speed_hud_node.findPlug('frame_number_position', False).asInt()
-        show_frame_number = speed_hud_node.findPlug('show_frame_number', False).asBool()
-        if 0 <= frame_number_position < objectSpeedHUDNode.TEXT_POSITION_NUMBER:
-            frame_string = self.get_frame_string(speed_hud_node, show_frame_number)
-            data.text_fields[frame_number_position] = frame_string
-
-        # get the camera focal length to display
-        focal_length_position = speed_hud_node.findPlug('focal_length_position', False).asInt()
-        show_focal_length = speed_hud_node.findPlug('show_focal_length', False).asBool()
-        if 0 <= focal_length_position < objectSpeedHUDNode.TEXT_POSITION_NUMBER:
-            focal_length_string = self.get_focal_length_string(frame_context, show_focal_length)
-            data.text_fields[focal_length_position] = focal_length_string
-
-        '''
         return data
 
     def hasUIDrawables(self):
@@ -377,33 +326,6 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
             object_speed, omr.MUIDrawManager.kLeft, show_object_speed1
         )
         draw_manager.endDrawable()
-        '''
-        #if not data.crop_enabled:
-        border_height = int(0.1 * mask_height * data.font_size)
-
-        if border_height <= 0:
-            om.MGlobal.displayWarning(
-                "objectSpeedHUD's height pixel <= 0 ({0}), current crop preset not "
-                "suit for current scene render size.".format(border_height)
-            )
-            return
-        background_size = (int(mask_width), border_height)
-
-        # draw mask
-        draw_manager.beginDrawable()
-
-        draw_manager.setFontName(data.text_font)
-        draw_manager.setFontWeight(data.font_weight)
-        draw_manager.setColor(data.top_text_color)
-        draw_manager.setFontSize(int(border_height * 0.25 * data.top_text_scale))
-
-        self.draw_text(
-            draw_manager, om.MPoint(mask_x+data.top_text_padding, mask_y_top-border_height),
-            data.text_fields[0], omr.MUIDrawManager.kLeft, background_size
-        )
-        draw_manager.endDrawable()
-        '''
-        pass
 
     @staticmethod
     def draw_text(draw_manager, position, text, alignment, show_text):
