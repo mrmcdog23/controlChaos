@@ -22,6 +22,14 @@ FONT_WEIGHT_MAP = {
     'Bold': omr.MUIDrawManager.kWeightBold,
 }
 
+SPEED_UNITS = [
+    "Miles",
+    "Yards",
+    "Knots"
+]
+
+NUMBER_OF_OBJECTS = 5
+
 
 def maya_useNewAPI():
     pass
@@ -75,7 +83,6 @@ class objectSpeedHUDNode(omui.MPxLocatorNode):
         cls.font_size = numeric_attr.create('font_size', 'font_size', om.MFnNumericData.kInt, 12)
         numeric_attr.setMin(1)
         numeric_attr.setMax(40)
-        cls.addAttribute(cls.font_size)
 
         # top text controls
         cls.font_weight = enum_attr.create('font_weight', 'font_weight', 2)
@@ -83,36 +90,45 @@ class objectSpeedHUDNode(omui.MPxLocatorNode):
         for index, font_weight in enumerate(font_weights):
             enum_attr.addField(font_weight, index)
 
+        # unit type to measure the speed
+        cls.speed_unit = enum_attr.create('speed_unit', 'speed_unit', 0)
+        for index, speed_unit_name in enumerate(SPEED_UNITS):
+            enum_attr.addField(speed_unit_name, index)
+
+        cls.addAttribute(cls.font_size)
         cls.addAttribute(cls.text_font)
         cls.addAttribute(cls.font_weight)
+        cls.addAttribute(cls.speed_unit)
 
         # 6. distance to actor
-        cls.show_object_speed1 = numeric_attr.create(
-            'show_object_speed1', 'show_object_speed1', om.MFnNumericData.kBoolean, True
-        )
+        for index in range(NUMBER_OF_OBJECTS):
+            num = str(index + 1)
+            cls.show_object_speed1 = numeric_attr.create(
+                f'show_object_speed{num}', f'show_object_speed{num}', om.MFnNumericData.kBoolean, True
+            )
 
-        cls.speed_text_colour1 = numeric_attr.createColor('speed_text_colour1', 'speed_text_colour1')
-        numeric_attr.default = (1.0, 1.0, 1.0)
+            cls.speed_text_colour1 = numeric_attr.createColor(f'speed_text_colour{num}', f'speed_text_colour{num}')
+            numeric_attr.default = (1.0, 1.0, 1.0)
 
-        # offset both text in y
-        cls.text_x_offset1 = numeric_attr.create('text_x_offset1', 'text_x_offset1', om.MFnNumericData.kInt, 0)
-        numeric_attr.setMin(-50)
-        numeric_attr.setMax(50)
+            # offset both text in y
+            cls.text_x_offset1 = numeric_attr.create(f'text_x_offset{num}', f'text_x_offset{num}', om.MFnNumericData.kInt, 0)
+            numeric_attr.setMin(-50)
+            numeric_attr.setMax(50)
 
-        # offset both text in y
-        cls.text_y_offset1 = numeric_attr.create('text_y_offset1', 'text_y_offset1', om.MFnNumericData.kInt, 0)
-        numeric_attr.setMin(-50)
-        numeric_attr.setMax(50)
+            # offset both text in y
+            cls.text_y_offset1 = numeric_attr.create(f'text_y_offset{num}', f'text_y_offset{num}', om.MFnNumericData.kInt, 0)
+            numeric_attr.setMin(-50)
+            numeric_attr.setMax(50)
 
-        cls.object_name1 = typed_attr.create("object_name1", "object_name1", om.MFnData.kString)
+            cls.object_name1 = typed_attr.create(f"object_name{num}", f"object_name{num}", om.MFnData.kString)
 
-        cls.speed_object_grp1 = compound_fn.create("Object Speed 1", "speed_object_grp1")
-        compound_fn.addChild(cls.show_object_speed1)
-        compound_fn.addChild(cls.speed_text_colour1)
-        compound_fn.addChild(cls.text_x_offset1)
-        compound_fn.addChild(cls.text_y_offset1)
-        compound_fn.addChild(cls.object_name1)
-        cls.addAttribute(cls.speed_object_grp1)
+            cls.speed_object_grp1 = compound_fn.create(f"Object Speed {num}", f"speed_object_grp{num}")
+            compound_fn.addChild(cls.show_object_speed1)
+            compound_fn.addChild(cls.speed_text_colour1)
+            compound_fn.addChild(cls.text_x_offset1)
+            compound_fn.addChild(cls.text_y_offset1)
+            compound_fn.addChild(cls.object_name1)
+            cls.addAttribute(cls.speed_object_grp1)
 
     @classmethod
     def creator(cls):
@@ -169,7 +185,7 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         tz = matrix[14]
         return om.MVector(tx, ty, tz)
 
-    def get_object_speed(self, object_name_speed):
+    def get_object_speed(self, object_name_speed, speed_unit):
         # type: (om.MDagNode) -> str
         """
         From an objects transform get its speed at the current frame
@@ -210,9 +226,17 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
 
         # Central difference: delta spans 2 frames
         speed_mps = (distance_m / 2) * fps       # metres per second
-        speed_mph = speed_mps * 2.23694          # 1 m/s = 2.23694 mph
-        speed_mph_str = f"{speed_mph:8.3f} mph"
-        return speed_mph_str
+        if speed_unit == "Miles":
+            # convert to correct unit
+            speed_mph = speed_mps * 2.23694          # 1 m/s = 2.23694 mph
+            speed_str = f"{speed_mph:8.3f} mph"
+        elif speed_unit == "Yards":
+            speed_yph = speed_mps * 3937.01
+            speed_str = f"{speed_yph:8.3f} yph"
+        else:
+            speed_knots = speed_mps * 1.94384
+            speed_str = f"{speed_knots:8.3f} kph"
+        return speed_str
 
     def get_screen_pos(self, object_name, text_x_offset, text_y_offset, frame_context):
         sel = om.MSelectionList()
@@ -275,7 +299,7 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         if not isinstance(data, objectSpeedHUDData):
             data = objectSpeedHUDData()
         
-        data.text_fields = [0, 1, 2, 3, 4, 5]
+        data.text_fields = [i for i in range(NUMBER_OF_OBJECTS)]
         speed_hud_node = om.MFnDagNode(obj_path)
         
         # text scale
@@ -293,17 +317,22 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
             font_weight_attr.fieldName(font_weight_plug.asShort())
         )
 
+        # get speed unit
+        speed_unit_plug = speed_hud_node.findPlug('speed_unit', False)
+        enum_fn = om.MFnEnumAttribute(speed_unit_plug.attribute())
+        speed_unit = enum_fn.fieldName(speed_unit_plug.asInt())
 
-        object_name1 = speed_hud_node.findPlug('object_name1', False).asString()
-        show_object_speed1 = speed_hud_node.findPlug('show_object_speed1', False).asBool()
-        text_x_offset1 = speed_hud_node.findPlug('text_x_offset1', False).asFloat()
-        text_y_offset1 = speed_hud_node.findPlug('text_y_offset1', False).asFloat()
+        for index in range(NUMBER_OF_OBJECTS):
+            num = str(index + 1)
+            object_name1 = speed_hud_node.findPlug(f'object_name{num}', False).asString()
+            show_object_speed1 = speed_hud_node.findPlug(f'show_object_speed{num}', False).asBool()
+            text_x_offset1 = speed_hud_node.findPlug(f'text_x_offset{num}', False).asFloat()
+            text_y_offset1 = speed_hud_node.findPlug(f'text_y_offset{num}', False).asFloat()
 
-        screen_pos1 = self.get_screen_pos(object_name1, text_x_offset1, text_y_offset1, frame_context)
-        object_speed1 = self.get_object_speed(object_name1)
-        speed_text_colour1 = self.get_colour_attribute(speed_hud_node, "speed_text_colour1")
-        data.text_fields[0] = [screen_pos1, object_speed1, speed_text_colour1, show_object_speed1]
-
+            screen_pos1 = self.get_screen_pos(object_name1, text_x_offset1, text_y_offset1, frame_context)
+            object_speed1 = self.get_object_speed(object_name1, speed_unit)
+            speed_text_colour1 = self.get_colour_attribute(speed_hud_node, f"speed_text_colour{num}")
+            data.text_fields[index] = [screen_pos1, object_speed1, speed_text_colour1, show_object_speed1]
         return data
 
     def hasUIDrawables(self):
@@ -319,13 +348,14 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         draw_manager.setFontSize(data.font_size)
 
         # show information
-        mpoint, object_speed, speed_text_colour1, show_object_speed1 = data.text_fields[0]
-        draw_manager.setColor(speed_text_colour1)
+        for index in range(NUMBER_OF_OBJECTS):
+            mpoint, object_speed, speed_text_colour1, show_object_speed1 = data.text_fields[index]
+            draw_manager.setColor(speed_text_colour1)
 
-        self.draw_text(
-            draw_manager, mpoint,
-            object_speed, omr.MUIDrawManager.kLeft, show_object_speed1
-        )
+            self.draw_text(
+                draw_manager, mpoint,
+                object_speed, omr.MUIDrawManager.kLeft, show_object_speed1
+            )
         draw_manager.endDrawable()
 
     @staticmethod
