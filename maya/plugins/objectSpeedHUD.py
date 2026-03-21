@@ -293,6 +293,7 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
             font_weight_attr.fieldName(font_weight_plug.asShort())
         )
 
+
         object_name1 = speed_hud_node.findPlug('object_name1', False).asString()
         show_object_speed1 = speed_hud_node.findPlug('show_object_speed1', False).asBool()
         text_x_offset1 = speed_hud_node.findPlug('text_x_offset1', False).asFloat()
