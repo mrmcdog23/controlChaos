@@ -411,7 +411,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774076063721</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="got screen position">
+      <option name="closed" value="true" />
+      <created>1774077997642</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1774077997642</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
