@@ -267,21 +267,18 @@ class controlChaosHUDNode(omui.MPxLocatorNode):
         cls.addAttribute(cls.frame_number_grp)
 
         # 5. add camera speed attribute
-        cls.show_camera_and_object_speed = numeric_attr.create(
-            'show_camera_and_object_speed', 'show_camera_and_object_speed', om.MFnNumericData.kBoolean, True
+        cls.show_camera_speed = numeric_attr.create(
+            'show_camera_speed', 'show_camera_speed', om.MFnNumericData.kBoolean, True
         )
         cls.camera_speed_position = numeric_attr.create(
             'camera_speed_position', 'camera_speed_position', om.MFnNumericData.kInt, 4)
         numeric_attr.setMin(0)
         numeric_attr.setMax(6)
 
-        cls.object_name_speed = typed_attr.create("object_name_speed", "object_name_speed", om.MFnData.kString)
-
         # add to compound group
-        cls.camera_speed_grp = compound_fn.create("Camera and Object Speed", "speed_options")
-        compound_fn.addChild(cls.show_camera_and_object_speed)
+        cls.camera_speed_grp = compound_fn.create("Camera Speed", "speed_options")
+        compound_fn.addChild(cls.show_camera_speed)
         compound_fn.addChild(cls.camera_speed_position)
-        compound_fn.addChild(cls.object_name_speed)
         cls.addAttribute(cls.camera_speed_grp)
 
         # 6. distance to actor
@@ -396,15 +393,14 @@ class controlChaosHUDDrawOverride(omr.MPxDrawOverride):
         tz = matrix[14]
         return om.MVector(tx, ty, tz)
 
-    def get_camera_speed_mph(self, frame_context, object_name_speed, show_camera_and_object_speed):
-        # type: (omr.MFrameContext, str, bool) -> str
+    def get_camera_speed_mph(self, frame_context, show_camera_and_object_speed):
+        # type: (omr.MFrameContext, bool) -> str
         """
         Returns the speed of a node at a given frame in mph.
         Uses central differencing for accuracy.
 
         Args:
             frame_context: The frame context
-            object_name_speed: Name of the object to find
             show_camera_and_object_speed: Whether to display the text
 
         Returns:
@@ -420,21 +416,7 @@ class controlChaosHUDDrawOverride(omr.MPxDrawOverride):
         cam_path.pop()  # walk up to transform
         camera_name = om.MFnDagNode(cam_path).name()  # e.g. "persp"
         camera_speed_text = f"{camera_name}:{camera_speed}"
-
-        if not object_name_speed:
-            return camera_speed_text
-
-        sel = om.MSelectionList()
-        try:
-            sel.add(object_name_speed)
-        except RuntimeError:
-            return f"{object_name_speed} not found"
-
-        dag_path = sel.getDagPath(0)
-        object_speed = self.get_transform_dag_speed(dag_path)
-        object_speed_text = f"{object_name_speed}:{object_speed}"
-        full_speed_text = f"{camera_speed_text}/{object_speed_text}"
-        return full_speed_text
+        return camera_speed_text
 
     def get_transform_dag_speed(self, transform_dag):
         # type: (om.MDagNode) -> str
@@ -701,11 +683,10 @@ class controlChaosHUDDrawOverride(omr.MPxDrawOverride):
 
         # work out the camera speed
         camera_speed_position = chaos_hud_node.findPlug('camera_speed_position', False).asInt()
-        show_camera_and_object_speed = chaos_hud_node.findPlug('show_camera_and_object_speed', False).asBool()
-        object_name_speed = chaos_hud_node.findPlug('object_name_speed', False).asString()
+        show_camera_speed = chaos_hud_node.findPlug('show_camera_speed', False).asBool()
 
         if 0 <= camera_speed_position < controlChaosHUDNode.TEXT_POSITION_NUMBER:
-            camera_speed = self.get_camera_speed_mph(frame_context, object_name_speed, show_camera_and_object_speed)
+            camera_speed = self.get_camera_speed_mph(frame_context, show_camera_speed)
             data.text_fields[camera_speed_position] = camera_speed
 
         # get the distance to an actor
