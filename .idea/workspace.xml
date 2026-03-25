@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="" />
+    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/plugins/objectSpeedHUD.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/plugins/objectSpeedHUD.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,6 +34,9 @@
   &quot;associatedIndex&quot;: 3
 }</component>
   <component name="ProjectId" id="3AtwOGoy9vKxlQ6mhAXb5tjVHyI" />
+  <component name="ProjectLevelVcsManager">
+    <OptionsSetting value="false" id="Update" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -424,7 +430,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774079143016</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="removed object speed from camera hud">
+      <option name="closed" value="true" />
+      <created>1774079554380</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1774079554380</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -477,6 +491,7 @@
     <MESSAGE value="&#10;# Conflicts:&#10;#&#9;.idea/misc.xml&#10;" />
     <MESSAGE value="updated to all hud option" />
     <MESSAGE value="got screen position" />
-    <option name="LAST_COMMIT_MESSAGE" value="got screen position" />
+    <MESSAGE value="removed object speed from camera hud" />
+    <option name="LAST_COMMIT_MESSAGE" value="removed object speed from camera hud" />
   </component>
 </project>

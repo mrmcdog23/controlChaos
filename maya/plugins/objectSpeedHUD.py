@@ -23,9 +23,11 @@ FONT_WEIGHT_MAP = {
 }
 
 SPEED_UNITS = [
-    "Miles",
-    "Yards",
-    "Knots"
+    "Meters Per Second",
+    "Kilometers Per Hour",
+    "Miles Per Hour",
+    "Yards Per Hour",
+    "Knots Per Hour"
 ]
 
 NUMBER_OF_OBJECTS = 5
@@ -227,16 +229,24 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
 
         # Central difference: delta spans 2 frames
         speed_mps = (distance_m / 2) * fps       # metres per second
-        if speed_unit == "Miles":
-            # convert to correct unit
+        if speed_unit == "Meters Per Second":     # 1 m/s = 2.23694 mph
+            speed_str = f"{speed_mps:8.3f} mtrph"
+
+        elif speed_unit == "Kilometers Per Hour":
+            speed_mph = speed_mps * 3.6         # 1 m/s = 2.23694 mph
+            speed_str = f"{speed_mph:8.3f} kph"
+
+        elif speed_unit == "Miles Per Hour":
             speed_mph = speed_mps * 2.23694          # 1 m/s = 2.23694 mph
             speed_str = f"{speed_mph:8.3f} mph"
-        elif speed_unit == "Yards":
+
+        elif speed_unit == "Yards Per Hour":
             speed_yph = speed_mps * 3937.01
-            speed_str = f"{speed_yph:8.3f} yph"
-        else:
+            speed_str = f"{speed_yph:8.3f} ydsph"
+
+        elif speed_unit == "Knots Per Hour":
             speed_knots = speed_mps * 1.94384
-            speed_str = f"{speed_knots:8.3f} kph"
+            speed_str = f"{speed_knots:8.3f} ktsph"
         return speed_str
 
     def get_screen_pos(self, object_name, text_x_offset, text_y_offset, frame_context):
