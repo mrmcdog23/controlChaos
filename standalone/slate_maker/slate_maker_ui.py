@@ -1,7 +1,6 @@
 """ Extract all text from a PDF file. """
 import os
 import sys
-import pdfplumber
 import extract_pdf_data
 from dataclasses import asdict
 from PySide6 import QtWidgets, QtCore, QtGui
@@ -248,6 +247,9 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.ui_settings.setValue("le_pdf_dir", self.le_pdf_dir.text())
         self.ui_settings.setValue("le_movie_dir", self.le_movie_dir.text())
         self.ui_settings.setValue("le_output_dir", output_dir)
+
+        # display created message
+        QtWidgets.QMessageBox.information(self, "Created", "Created slates", QtWidgets.QMessageBox.Ok)
 
 
 if __name__ == "__main__":
