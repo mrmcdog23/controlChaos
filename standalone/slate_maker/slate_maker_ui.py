@@ -19,6 +19,7 @@ class SlateMakerUI(QtWidgets.QMainWindow):
             "focal_length", "resolution", "version", "notes"
         ]
         self.pdf_data_inst = None
+        self.shot_to_data = dict()
         self.ui_settings = QtCore.QSettings('controlChaos', 'slate_maker')
 
         # set the ui size and title
@@ -105,6 +106,12 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         le_output_dir = self.ui_settings.value("le_output_dir", str())
         self.le_output_dir.setText(le_output_dir)
 
+    def save_settings(self):
+        # save the path in the q-settings
+        self.ui_settings.setValue("le_pdf_dir", self.le_pdf_dir.text())
+        self.ui_settings.setValue("le_movie_dir", self.le_movie_dir.text())
+        self.ui_settings.setValue("le_output_dir", self.le_output_dir.text())        
+
     def connect_signals(self):
         """
         Connect the signals to the widgets
@@ -172,7 +179,9 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         """
         Find the PDF files and extract the data from them
         """
+        self.save_settings()
         # Populate table with data
+        shot_name_index = self.headers.index("shot_name")
         pdf_dir = self.le_pdf_dir.text()
         movie_dir = self.le_movie_dir.text()
         self.pdf_data_inst = extract_pdf_data.ExtractData(movie_dir)
@@ -207,15 +216,15 @@ class SlateMakerUI(QtWidgets.QMainWindow):
                 self.tbw_shots.setItem(row_index, column, item)
 
             # add the data to the table widget item
-            first_item = self.tbw_shots.item(row_index, 1)
-            first_item.setData(QtCore.Qt.UserRole, pdf_data)
+            shot_name = self.tbw_shots.item(row_index, shot_name_index).text()
+            self.shot_to_data[shot_name] = pdf_data
 
     def get_all_data(self):
-        data = []
+        shot_name_index = self.headers.index("shot_name")
         for row_index in range(self.tbw_shots.rowCount()):
             # get the first item data
-            first_item = self.tbw_shots.item(row_index, 1)
-            pdf_data = first_item.data(QtCore.Qt.UserRole)
+            shot_name = self.tbw_shots.item(row_index, shot_name_index).text()
+            pdf_data = self.shot_to_data[shot_name]
 
             # update the PDF data with the table information
             res_index = self.headers.index("resolution")
@@ -228,25 +237,20 @@ class SlateMakerUI(QtWidgets.QMainWindow):
             # get the notes and add to the table
             notes_index = self.headers.index("notes")
             pdf_data.notes = self.tbw_shots.item(row_index, notes_index).text()
-            data.append(pdf_data)
-        return data
+            self.shot_to_data[shot_name] = pdf_data
 
     def create_slates(self):
         """
         Get the slate data and create the slates
         """
+        self.save_settings()
         output_dir = self.le_output_dir.text()
-        data = self.get_all_data()
+        self.get_all_data()
 
         # loop through the PDF data and create the slates
-        for pdf_data in data:
+        for shot_name, pdf_data in self.shot_to_data.items():
             self.pdf_data_inst.create_slate(pdf_data, output_dir)
             self.ui_settings.setValue(pdf_data.shot_name, pdf_data.version)
-
-        # save the path in the q-settings
-        self.ui_settings.setValue("le_pdf_dir", self.le_pdf_dir.text())
-        self.ui_settings.setValue("le_movie_dir", self.le_movie_dir.text())
-        self.ui_settings.setValue("le_output_dir", output_dir)
 
         # display created message
         QtWidgets.QMessageBox.information(self, "Created", "Created slates", QtWidgets.QMessageBox.Ok)

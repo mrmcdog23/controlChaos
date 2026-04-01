@@ -8,14 +8,19 @@ import logging
 from dataclasses import dataclass
 
 
+FFMPEG_EXE = "C:/Users/joele/Downloads/ffmpeg/bin/ffmpeg.exe"
+
+
 # constants
 logging.basicConfig(level=logging.INFO)
 THUMBNAIL_SIZE = "750x450"
 FONT_SIZE = "35"
-FFMPEG_EXE = "C:/Users/joele/Downloads/ffmpeg_build/bin/ffmpeg.exe"
-NO_THUMBNAIL = "C:/Users/joele/Documents/pipelines/controlChaos/images/nothumbnail.png"
-BLANK_SLATE = "C:/Users/joele/Documents/pipelines/controlChaos/images/blank_slate.png"
-TEXT_FORMAT = ("drawtext=fontfile=C\\\:/Users/joele/Downloads/Roboto-Regular.ttf:text='{text}'"
+current_dir = os.path.dirname(__file__).replace("\\", "/")
+DRIVE_LETTER = current_dir[0]
+NO_DRIVE_PATH = current_dir[3:]
+NO_THUMBNAIL = f"{current_dir}/nothumbnail.png"
+BLANK_SLATE = f"{current_dir}/blank_slate.png"
+TEXT_FORMAT = ("drawtext=fontfile={DRIVE_LETTER}\\\:/{NO_DRIVE_PATH}/Roboto-Regular.ttf:text='{text}'"
                ":fontcolor=white:fontsize={font_size}:x=245:y={ypos}")
 
 
@@ -61,6 +66,7 @@ class ExtractData(object):
         Returns:
             pdf_data: The PDF data class
         """
+        self.pdf_data = PDFData()
         self.extract_with_pdfplumber(pdf_path)
         self.build_data_dict()
         self.generate_thumbnail()
@@ -90,6 +96,7 @@ class ExtractData(object):
         Args:
             pdf_path: Path of the PDF to extract data for
         """
+        self.pages_text = list()
         self.logger.info(f"Reading: {pdf_path}")
         with pdfplumber.open(pdf_path) as pdf:
             for i, page in enumerate(pdf.pages, 1):
@@ -144,6 +151,13 @@ class ExtractData(object):
         command = (f"{FFMPEG_EXE} -y -i {movie_file_path} -frames:v 1 "
                    f"-s {THUMBNAIL_SIZE} {self.pdf_data.thumbnail_path}")
         self.run_ffmpeg_command(command)
+        self.created_message(self.pdf_data.thumbnail_path)
+
+    def created_message(self, path):
+        if os.path.exists(path):
+            self.logger.info(f"Created thumbnail: {path}")
+        else:
+            self.logger.error(f"Failed to create: {path}")
 
     def get_temp_file_path(self, file_name):
         # type: (str) -> str
@@ -167,11 +181,15 @@ class ExtractData(object):
             pdf_data: The data of the slate to make
             output_dir: The output directory of the slates
         """
+        self.logger.info("")
+        self.logger.info(f"Shot name: {pdf_data.shot_name}")
+
         # create the overlay image
         temp_image_overlay_path = self.get_temp_file_path(f"{pdf_data.shot_name}_slate.png")
-        command = (f'{FFMPEG_EXE} -y -i {BLANK_SLATE} -i {self.pdf_data.thumbnail_path} '
+        command = (f'{FFMPEG_EXE} -y -i {BLANK_SLATE} -i {pdf_data.thumbnail_path} '
                    f'-filter_complex "overlay=1100:170" {temp_image_overlay_path}')
         self.run_ffmpeg_command(command)
+        self.created_message(temp_image_overlay_path)
 
         # text in format in year, day, month format
         date_string = datetime.datetime.now().strftime("%Y/%d/%m")
@@ -194,17 +212,18 @@ class ExtractData(object):
         # build a list of the arguments of the overlay text
         text_args = list()
         for text, ypos in text_dict.items():
-            text_argument = TEXT_FORMAT.format(text=text, ypos=ypos, font_size=FONT_SIZE)
+            text_argument = TEXT_FORMAT.format(DRIVE_LETTER=DRIVE_LETTER, NO_DRIVE_PATH=NO_DRIVE_PATH, text=text, ypos=ypos, font_size=FONT_SIZE)
             text_args.append(text_argument)
 
         # build the ffmpeg command to create the finished slate
         full_text_cmd = ",".join(text_args)
         command = f'{FFMPEG_EXE} -y -i {temp_image_overlay_path} -vf "{full_text_cmd}" {finished_slate_path}'
         self.run_ffmpeg_command(command)
+        self.created_message(finished_slate_path)
 
         # log the final output
         self.logger.info(f"Created slate: {finished_slate_path}")
 
         # remove the temp thumbnail and the temp overlay image
-        os.remove(self.pdf_data.thumbnail_path)
-        os.remove(temp_image_overlay_path)
+        #os.remove(self.pdf_data.thumbnail_path)
+        #os.remove(temp_image_overlay_path)
