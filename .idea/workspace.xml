@@ -4,13 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="fixed the focal length so its set">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/standalone/python/slate_maker/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/standalone/python/slate_maker/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/standalone/python/slate_maker/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/standalone/python/slate_maker/.idea/slate_maker.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/standalone/python/slate_maker/slate_maker_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/slate_maker_ui.py" afterDir="false" />
+    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="added pycharm icons to the pipe">
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/blender.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/equalizer.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/flame.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/frameio.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/ftrack.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/general.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/houdini.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/maya.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/natron.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/nuke.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/requirements.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/standalone.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/unreal.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/python/slate_maker/extract_pdf_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/extract_pdf_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,14 +108,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773425141034</updated>
-    </task>
-    <task id="LOCAL-00020" summary="spped">
-      <option name="closed" value="true" />
-      <created>1773612908741</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1773612908741</updated>
     </task>
     <task id="LOCAL-00021" summary="hide text objects">
       <option name="closed" value="true" />
@@ -493,7 +493,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775071944903</updated>
     </task>
-    <option name="localTasksCounter" value="69" />
+    <task id="LOCAL-00069" summary="added pycharm icons to the pipe">
+      <option name="closed" value="true" />
+      <created>1775072675756</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1775072675756</updated>
+    </task>
+    <option name="localTasksCounter" value="70" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -524,6 +532,7 @@
     <MESSAGE value="thumnbail" />
     <MESSAGE value="restructuring of cc project" />
     <MESSAGE value="fixed the focal length so its set" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed the focal length so its set" />
+    <MESSAGE value="added pycharm icons to the pipe" />
+    <option name="LAST_COMMIT_MESSAGE" value="added pycharm icons to the pipe" />
   </component>
 </project>
