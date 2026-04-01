@@ -227,6 +227,10 @@ class SlateMakerUI(QtWidgets.QMainWindow):
             pdf_data = self.shot_to_data[shot_name]
 
             # update the PDF data with the table information
+            duration_index = self.headers.index("duration")
+            pdf_data.duration = self.tbw_shots.item(row_index, duration_index).text()
+
+            # update the PDF data with the table information
             focal_length_index = self.headers.index("focal_length")
             pdf_data.focal_length = self.tbw_shots.item(row_index, focal_length_index).text()
 
