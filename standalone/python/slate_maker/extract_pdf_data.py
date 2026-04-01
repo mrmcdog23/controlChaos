@@ -8,7 +8,7 @@ import logging
 from dataclasses import dataclass
 
 
-FFMPEG_EXE = "C:/Users/joele/Downloads/ffmpeg/bin/ffmpeg.exe"
+FFMPEG_EXE = "C:/ffmpeg/bin/ffmpeg.exe"
 
 
 # constants
@@ -220,7 +220,7 @@ class ExtractData(object):
         command = f'{FFMPEG_EXE} -y -i {temp_image_overlay_path} -vf "{full_text_cmd}" {finished_slate_path}'
         self.run_ffmpeg_command(command)
         self.created_message(finished_slate_path)
-
+        print (command)
         # log the final output
         self.logger.info(f"Created slate: {finished_slate_path}")
 

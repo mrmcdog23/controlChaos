@@ -4,10 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="thumnbail">
-      <change beforePath="$PROJECT_DIR$/requirements/requirements314.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/extract_pdf_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/slate_maker/extract_pdf_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/slate_maker_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/slate_maker/slate_maker_ui.py" afterDir="false" />
+    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="restructuring of cc project">
+      <change afterPath="$PROJECT_DIR$/standalone/python/slate_maker/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/controlChaos.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/controlChaos.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/python/cchmaya/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/python/cchmaya/multiplayblast.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/multiplayblast.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/.idea/slate_maker.iml" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/.idea/slate_maker.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/Roboto-Regular.ttf" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/Roboto-Regular.ttf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/blank_slate.png" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/blank_slate.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/extract_pdf_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/extract_pdf_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/nothumbnail.png" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/nothumbnail.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/slate_launcher.bat" beforeDir="false" afterPath="$PROJECT_DIR$/bat/slate_launcher.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/slate_maker/slate_maker_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/slate_maker_ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,12 +58,12 @@
     &quot;assignee&quot;: &quot;mrmcdog23&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/mrmcdog23/controlChaos&quot;,
-    &quot;accountId&quot;: &quot;b6be3f20-6ec2-4f4e-8102-f37d17882d5f&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/mrmcdog23/controlChaos",
+    "accountId": "a08df705-7f09-4894-9e5f-6295c50fa96a"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -66,7 +80,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "last_opened_file_path": "C:/Users/joele/Documents/pipelines/controlChaos",
-    "settings.editor.selected.configurable": "advanced.settings"
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -74,6 +88,8 @@
       <recent name="$PROJECT_DIR$/maya/plugins" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\joele\Documents\pipelines\controlChaos\standalone\python" />
+      <recent name="C:\Users\joele\Documents\pipelines\controlChaos\bat" />
       <recent name="C:\Users\joele\Documents\pipelines\controlChaos\standalone\slate_maker" />
     </key>
   </component>
@@ -92,14 +108,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773425141034</updated>
-    </task>
-    <task id="LOCAL-00018" summary="spped">
-      <option name="closed" value="true" />
-      <created>1773612189288</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1773612189288</updated>
     </task>
     <task id="LOCAL-00019" summary="spped">
       <option name="closed" value="true" />
@@ -485,7 +493,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774640492387</updated>
     </task>
-    <option name="localTasksCounter" value="67" />
+    <task id="LOCAL-00067" summary="restructuring of cc project">
+      <option name="closed" value="true" />
+      <created>1775069368295</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1775069368296</updated>
+    </task>
+    <option name="localTasksCounter" value="68" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -514,6 +530,7 @@
     <MESSAGE value="trgthtr" />
     <MESSAGE value="standalone" />
     <MESSAGE value="thumnbail" />
-    <option name="LAST_COMMIT_MESSAGE" value="thumnbail" />
+    <MESSAGE value="restructuring of cc project" />
+    <option name="LAST_COMMIT_MESSAGE" value="restructuring of cc project" />
   </component>
 </project>
