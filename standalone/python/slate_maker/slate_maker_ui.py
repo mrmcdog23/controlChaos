@@ -7,6 +7,8 @@ from PySide6 import QtWidgets, QtCore, QtGui
 
 
 # constants
+CHECKED_INDEX = 0
+CHECKED_WIDTH = 0
 THUMBNAIL_WIDTH = 250
 THUMBNAIL_HEIGHT = 160
 
@@ -15,7 +17,7 @@ class SlateMakerUI(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.headers = [
-            "thumbnail", "show_name", "shot_name", "duration",
+            " ", "thumbnail", "show_name", "shot_name", "duration",
             "focal_length", "resolution", "version", "notes"
         ]
         self.pdf_data_inst = None
@@ -75,10 +77,28 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.le_movie_dir, self.btn_movie_dir = self.create_line_edit("Movie Directory", "Browse Movie Directory")
 
         self.btn_extract_data = QtWidgets.QPushButton("Extract Data")
-        self.main_layout.addWidget(self.btn_extract_data)
+
+        # add check all button
+        lyt_options = QtWidgets.QHBoxLayout()
+        self.chk_all = QtWidgets.QCheckBox()
+        self.chk_all.setChecked(True)
+        self.chk_all.setMaximumWidth(20)
+
+        # add resolution field
+        self.le_new_res = QtWidgets.QLineEdit("1920 x 1080")
+        self.le_new_res.setMaximumWidth(70)
+        self.btn_new_res = QtWidgets.QPushButton("Set Resolution")
+        self.btn_new_res.setMaximumWidth(90)
+
+        lyt_options.addWidget(self.chk_all)
+        lyt_options.addWidget(self.le_new_res)
+        lyt_options.addWidget(self.btn_new_res)
+        lyt_options.addWidget(self.btn_extract_data)
+        self.main_layout.addLayout(lyt_options)
 
         self.tbw_shots = QtWidgets.QTableWidget(0, len(self.headers))
-        self.tbw_shots.setColumnWidth(0, THUMBNAIL_WIDTH)
+        self.tbw_shots.setColumnWidth(self.headers.index("thumbnail"), THUMBNAIL_WIDTH)
+        self.tbw_shots.setColumnWidth(self.headers.index(" "), CHECKED_WIDTH)
         self.tbw_shots.setHorizontalHeaderLabels(self.headers)
         self.tbw_shots.horizontalHeader().setStretchLastSection(True)
         self.main_layout.addWidget(self.tbw_shots)
@@ -102,15 +122,22 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         le_movie_dir = self.ui_settings.value("le_movie_dir", str())
         self.le_movie_dir.setText(le_movie_dir)
 
-        # save the path in the q-settings
+        # save the output directory
         le_output_dir = self.ui_settings.value("le_output_dir", str())
         self.le_output_dir.setText(le_output_dir)
 
+        # save the new resolution directory
+        le_new_res = self.ui_settings.value("le_new_res", str())
+        self.le_new_res.setText(le_new_res)
+
     def save_settings(self):
-        # save the path in the q-settings
+        """
+        Save the path in the q-settings
+        """
         self.ui_settings.setValue("le_pdf_dir", self.le_pdf_dir.text())
         self.ui_settings.setValue("le_movie_dir", self.le_movie_dir.text())
-        self.ui_settings.setValue("le_output_dir", self.le_output_dir.text())        
+        self.ui_settings.setValue("le_output_dir", self.le_output_dir.text())
+        self.ui_settings.setValue("le_new_res", self.le_new_res.text())
 
     def connect_signals(self):
         """
@@ -121,6 +148,21 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.btn_output_dir.clicked.connect(self.select_output_dir)
         self.btn_extract_data.clicked.connect(self.extract_data)
         self.btn_create_slates.clicked.connect(self.create_slates)
+        self.btn_new_res.clicked.connect(self.set_new_resolution)
+        self.chk_all.toggled.connect(self.check_all)
+
+    def set_new_resolution(self):
+        res_index = self.headers.index("resolution")
+        new_res = self.le_new_res.text()
+        for row_index in range(self.tbw_shots.rowCount()):
+            item = self.tbw_shots.item(row_index, res_index)
+            item.setText(new_res)
+
+    def check_all(self, checked):
+        state = QtCore.Qt.CheckState.Checked if checked else QtCore.Qt.CheckState.Unchecked
+        for row_index in range(self.tbw_shots.rowCount()):
+            item = self.tbw_shots.item(row_index, CHECKED_INDEX)
+            item.setCheckState(state)
 
     def make_image_label(self, path):
         # type: (str) -> QtWidgets.QLabel
@@ -175,6 +217,13 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         )
         line_edit.setText(sel_path)
 
+    def create_checkbox_item(self):
+        checkbox_item = QtWidgets.QTableWidgetItem()
+        checkbox_item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+        checkbox_item.setCheckState(QtCore.Qt.Checked)
+        checkbox_item.setTextAlignment(QtCore.Qt.AlignCenter)
+        return checkbox_item
+
     def extract_data(self):
         """
         Find the PDF files and extract the data from them
@@ -182,25 +231,41 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.save_settings()
         # Populate table with data
         shot_name_index = self.headers.index("shot_name")
+
         pdf_dir = self.le_pdf_dir.text()
         movie_dir = self.le_movie_dir.text()
+        resolution = self.le_new_res.text()
+
         self.pdf_data_inst = extract_pdf_data.ExtractData(movie_dir)
 
         for row_index, pdf_file_name in enumerate(os.listdir(pdf_dir)):
+
+            # only deal with files
+            if not "." in pdf_file_name:
+                continue
+
+            # add a new row
             self.tbw_shots.setRowCount(row_index + 1)
 
             # get the PDF data
             pdf_path = os.path.join(pdf_dir, pdf_file_name)
             pdf_data = self.pdf_data_inst.get_data_from_pdf(pdf_path)
-
-            # create a QLabel widget and set it in the cell
-            lb_thumbnail = self.make_image_label(pdf_data.thumbnail_path)
-            self.tbw_shots.setCellWidget(row_index, 0, lb_thumbnail)
-            self.tbw_shots.setRowHeight(row_index, THUMBNAIL_HEIGHT)
+            pdf_data.resolution = resolution
 
             # loop through the headers and populate the data
             for column, header in enumerate(self.headers):
+
+                # for the checkbox create a table item
+                if header == " ":
+                    self.tbw_shots.setItem(row_index, column, self.create_checkbox_item())
+                    continue
+
+                # create a QLabel widget and set it in the cell
                 if header == "thumbnail":
+                    lb_thumbnail = self.make_image_label(pdf_data.thumbnail_path)
+                    thumbnail_index = self.headers.index("thumbnail")
+                    self.tbw_shots.setCellWidget(row_index, thumbnail_index, lb_thumbnail)
+                    self.tbw_shots.setRowHeight(row_index, THUMBNAIL_HEIGHT)
                     continue
 
                 # using the header get the value
@@ -219,31 +284,35 @@ class SlateMakerUI(QtWidgets.QMainWindow):
             shot_name = self.tbw_shots.item(row_index, shot_name_index).text()
             self.shot_to_data[shot_name] = pdf_data
 
-    def get_all_data(self):
+    def update_pdf_data(self):
+        """
+        Update the data from the table information
+        """
         shot_name_index = self.headers.index("shot_name")
+        duration_index = self.headers.index("duration")
+        focal_length_index = self.headers.index("focal_length")
+        res_index = self.headers.index("resolution")
+        version_index = self.headers.index("version")
+        notes_index = self.headers.index("notes")
+
         for row_index in range(self.tbw_shots.rowCount()):
             # get the first item data
             shot_name = self.tbw_shots.item(row_index, shot_name_index).text()
             pdf_data = self.shot_to_data[shot_name]
 
             # update the PDF data with the table information
-            duration_index = self.headers.index("duration")
             pdf_data.duration = self.tbw_shots.item(row_index, duration_index).text()
 
             # update the PDF data with the table information
-            focal_length_index = self.headers.index("focal_length")
             pdf_data.focal_length = self.tbw_shots.item(row_index, focal_length_index).text()
 
             # update the PDF data with the table information
-            res_index = self.headers.index("resolution")
             pdf_data.resolution = self.tbw_shots.item(row_index, res_index).text()
 
             # update the table version
-            version_index = self.headers.index("version")
             pdf_data.version = self.tbw_shots.item(row_index, version_index).text()
 
             # get the notes and add to the table
-            notes_index = self.headers.index("notes")
             pdf_data.notes = self.tbw_shots.item(row_index, notes_index).text()
             self.shot_to_data[shot_name] = pdf_data
 
@@ -252,11 +321,20 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         Get the slate data and create the slates
         """
         self.save_settings()
-        output_dir = self.le_output_dir.text()
-        self.get_all_data()
+        self.update_pdf_data()
 
-        # loop through the PDF data and create the slates
-        for shot_name, pdf_data in self.shot_to_data.items():
+        output_dir = self.le_output_dir.text()
+        shot_name_index = self.headers.index("shot_name")
+        for row_index in range(self.tbw_shots.rowCount()):
+            # skip if the row is unchecked
+            item = self.tbw_shots.item(row_index, CHECKED_INDEX)
+            if item.checkState() != QtCore.Qt.Checked:
+                continue
+                
+            shot_name = self.tbw_shots.item(row_index, shot_name_index).text()
+            pdf_data = self.shot_to_data[shot_name]
+
+            # loop through the PDF data and create the slates
             self.pdf_data_inst.create_slate(pdf_data, output_dir)
             self.ui_settings.setValue(pdf_data.shot_name, pdf_data.version)
 

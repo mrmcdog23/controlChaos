@@ -4,21 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="added pycharm icons to the pipe">
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/blender.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/equalizer.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/flame.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/frameio.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/ftrack.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/general.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/houdini.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/maya.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/natron.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/nuke.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/requirements.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/standalone.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/images/pycharm_icons/unreal.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/standalone/python/slate_maker/extract_pdf_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/extract_pdf_data.py" afterDir="false" />
+    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="padded the version number to give the name">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/standalone/python/slate_maker/slate_maker_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/slate_maker_ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,7 +21,7 @@
     </option>
   </component>
   <component name="Git.Merge.Settings">
-    <option name="BRANCH" value="origin/dev_branch" />
+    <option name="BRANCH" value="origin/checkbox" />
     <option name="OPTIONS">
       <set>
         <option value="SQUASH" />
@@ -44,7 +32,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="playblast" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -72,17 +60,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "last_opened_file_path": "C:/Users/joele/Documents/pipelines/controlChaos",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "AtomSelectConfig"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/joele/Documents/pipelines/controlChaos&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;AtomSelectConfig&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/maya/plugins" />
@@ -108,38 +96,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773425141034</updated>
-    </task>
-    <task id="LOCAL-00021" summary="hide text objects">
-      <option name="closed" value="true" />
-      <created>1773646540204</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1773646540204</updated>
-    </task>
-    <task id="LOCAL-00022" summary="hide text objects">
-      <option name="closed" value="true" />
-      <created>1773648892139</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1773648892139</updated>
-    </task>
-    <task id="LOCAL-00023" summary="hide text objects">
-      <option name="closed" value="true" />
-      <created>1773652667189</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1773652667189</updated>
-    </task>
-    <task id="LOCAL-00024" summary="renamed plugin">
-      <option name="closed" value="true" />
-      <created>1773652932127</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1773652932127</updated>
     </task>
     <task id="LOCAL-00025" summary="renamed plugin">
       <option name="closed" value="true" />
@@ -501,7 +457,39 @@
       <option name="project" value="LOCAL" />
       <updated>1775072675756</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <task id="LOCAL-00070" summary="padded the version number to give the name">
+      <option name="closed" value="true" />
+      <created>1775074141144</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1775074141144</updated>
+    </task>
+    <task id="LOCAL-00071" summary="padded the version number to give the name">
+      <option name="closed" value="true" />
+      <created>1775074952888</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1775074952888</updated>
+    </task>
+    <task id="LOCAL-00072" summary="padded the version number to give the name">
+      <option name="closed" value="true" />
+      <created>1775121730478</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1775121730479</updated>
+    </task>
+    <task id="LOCAL-00073" summary="padded the version number to give the name">
+      <option name="closed" value="true" />
+      <created>1775142322226</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1775142322227</updated>
+    </task>
+    <option name="localTasksCounter" value="74" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -533,6 +521,7 @@
     <MESSAGE value="restructuring of cc project" />
     <MESSAGE value="fixed the focal length so its set" />
     <MESSAGE value="added pycharm icons to the pipe" />
-    <option name="LAST_COMMIT_MESSAGE" value="added pycharm icons to the pipe" />
+    <MESSAGE value="padded the version number to give the name" />
+    <option name="LAST_COMMIT_MESSAGE" value="padded the version number to give the name" />
   </component>
 </project>
