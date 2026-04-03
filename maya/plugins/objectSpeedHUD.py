@@ -26,7 +26,7 @@ SPEED_UNITS = [
     "Meters Per Second",
     "Kilometers Per Hour",
     "Miles Per Hour",
-    "Yards Per Hour",
+    "Feet Per Second",
     "Knots Per Hour"
 ]
 
@@ -192,7 +192,7 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         # type: (om.MDagNode, str) -> str
         """
         From an objects name get its speed at the current frame
-        
+
         Args:
             object_name_speed: The transform dag node
             speed_unit: The unit to measure the speed in
@@ -240,9 +240,9 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
             speed_mph = speed_mps * 2.23694          # 1 m/s = 2.23694 mph
             speed_str = f"{speed_mph:8.3f} mph"
 
-        elif speed_unit == "Yards Per Hour":
-            speed_yph = speed_mps * 3937.01
-            speed_str = f"{speed_yph:8.3f} ydsph"
+        elif speed_unit == "Feet Per Second":
+            speed_yph = speed_mps * 3.28084
+            speed_str = f"{speed_yph:8.3f} feetps"
 
         elif speed_unit == "Knots Per Hour":
             speed_knots = speed_mps * 1.94384

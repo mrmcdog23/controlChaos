@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="padded the version number to give the name">
+    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="made slate maker have override the resolution">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/standalone/python/slate_maker/slate_maker_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/slate_maker_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/multiplayblast.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/multi_playblast.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,22 +96,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773425141034</updated>
-    </task>
-    <task id="LOCAL-00025" summary="renamed plugin">
-      <option name="closed" value="true" />
-      <created>1773653774513</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1773653774513</updated>
-    </task>
-    <task id="LOCAL-00026" summary="renamed plugin">
-      <option name="closed" value="true" />
-      <created>1773654635220</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1773654635220</updated>
     </task>
     <task id="LOCAL-00027" summary="renamed plugin">
       <option name="closed" value="true" />
@@ -489,7 +473,23 @@
       <option name="project" value="LOCAL" />
       <updated>1775142322227</updated>
     </task>
-    <option name="localTasksCounter" value="74" />
+    <task id="LOCAL-00074" summary="made slate maker have override the resolution">
+      <option name="closed" value="true" />
+      <created>1775144055436</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1775144055436</updated>
+    </task>
+    <task id="LOCAL-00075" summary="made slate maker have override the resolution">
+      <option name="closed" value="true" />
+      <created>1775156611725</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1775156611725</updated>
+    </task>
+    <option name="localTasksCounter" value="76" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -522,6 +522,7 @@
     <MESSAGE value="fixed the focal length so its set" />
     <MESSAGE value="added pycharm icons to the pipe" />
     <MESSAGE value="padded the version number to give the name" />
-    <option name="LAST_COMMIT_MESSAGE" value="padded the version number to give the name" />
+    <MESSAGE value="made slate maker have override the resolution" />
+    <option name="LAST_COMMIT_MESSAGE" value="made slate maker have override the resolution" />
   </component>
 </project>
