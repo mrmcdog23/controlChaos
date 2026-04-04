@@ -5,35 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="add">
-      <change afterPath="$PROJECT_DIR$/core/python/cccore/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/maya/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/maya/python/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/maya/python/ccmaya/shot/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/maya/python/ccmaya/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/maya/python/ccmaya/utils/create_dockable_widget.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/maya/python/ccmaya/utils/maya_utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/maya/shelves/icons/control_chaos_hud.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/maya/shelves/icons/multi_playblast.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/maya/shelves/shelf_controlChaos.mel" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/controlChaos.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/controlChaos.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/maya/python/ccmaya/panels/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/blank_slate.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/nothumbnail.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/blender.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/equalizer.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/flame.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/frameio.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/ftrack.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/general.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/houdini.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/maya.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/natron.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/nuke.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/requirements.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/standalone.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/unreal.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/multi_playblast.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/shot/multi_playblast.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/utils/create_dockable_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/utils/create_dockable_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/shelves/shelf_controlChaos.mel" beforeDir="false" afterPath="$PROJECT_DIR$/maya/shelves/shelf_ControlChaos.mel" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,11 +78,11 @@
       <recent name="$PROJECT_DIR$/maya/plugins" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/maya/python/ccmaya/panels" />
       <recent name="$PROJECT_DIR$/core/python/cccore" />
       <recent name="$PROJECT_DIR$/core/python/cccore/utils" />
       <recent name="$PROJECT_DIR$/maya/python/ccmaya/shot" />
       <recent name="C:\Users\joele\Documents\pipelines\controlChaos\standalone\python" />
-      <recent name="C:\Users\joele\Documents\pipelines\controlChaos\bat" />
     </key>
   </component>
   <component name="SharedIndexes">

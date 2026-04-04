@@ -1,4 +1,4 @@
-global proc shelf_controlChaos () {
+global proc shelf_ControlChaos () {
     global string $gBuffStr;
     global string $gBuffStr0;
     global string $gBuffStr1;
@@ -19,7 +19,7 @@ global proc shelf_controlChaos () {
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "Publisher" 
+        -label "Playblast" 
         -labelOffset 0
         -rotation 0
         -flipX 0
@@ -34,7 +34,7 @@ global proc shelf_controlChaos () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "import no8maya.wizard.wizard_launcher as wl;wl.launch()" 
+        -command "from ccmaya.shot.multi_playblast import MultiPlayblast;inst = MultiPlayblast(None);inst.show()" 
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -61,7 +61,7 @@ global proc shelf_controlChaos () {
         -flipY 0
         -useAlpha 1
         -font "plainLabelFont" 
-        -imageOverlayLabel "load" 
+        -imageOverlayLabel "HUD" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.2 
         -image "control_chaos_hud.png" 
@@ -69,7 +69,7 @@ global proc shelf_controlChaos () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "import no8maya.asset.asset_loader as al;al.main()" 
+        -command "import no8maya.asset.asset_loader as al;al.main()"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
