@@ -237,7 +237,7 @@ class Ui(object):
         Returns:
             icon_path: Path to the icon
         """
-        icon_path = os.path.join(self.icon_directory, icon_name)
+        icon_path = os.path.join(self.icon_directory, icon_name + ".png")
         return icon_path
 
     def get_qicon_from_name(self, icon_name):
@@ -288,11 +288,25 @@ class Ui(object):
             else:
                 widget = self.findChild(QtWidgets.QWidget, widget_name)
 
+            icon_dir_image_path = self.get_path(icon_name)
+
+            # the given python file path
+            python_file_path = inspect.getfile(self.__class__)
+            current_image_path = os.path.join(os.path.dirname(python_file_path), icon_name + ".png")
+
             # find the icon path
+            icon_path = None
             if "/" in icon_name and os.path.exists(icon_name):
                 icon_path = icon_name
-            else:
-                icon_path = self.get_path(icon_name)
+
+            elif os.path.exists(icon_dir_image_path):
+                icon_path = icon_dir_image_path
+
+            elif os.path.exists(current_image_path):
+                icon_path = current_image_path
+
+            if not icon_path:
+                return
 
             if hasattr(widget, "setIcon"):
                 qicon = QtGui.QIcon(icon_path)

@@ -4,11 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="add">
-      <change afterPath="$PROJECT_DIR$/maya/python/ccmaya/panels/__init__.py" afterDir="false" />
+    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/utils/create_dockable_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/utils/create_dockable_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya/shelves/shelf_controlChaos.mel" beforeDir="false" afterPath="$PROJECT_DIR$/maya/shelves/shelf_ControlChaos.mel" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/python/cccore/base_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/python/cccore/base_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel.ui" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel.ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/shelves/shelf_ControlChaos.mel" beforeDir="false" afterPath="$PROJECT_DIR$/maya/shelves/shelf_ControlChaos.mel" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,38 +101,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773425141034</updated>
-    </task>
-    <task id="LOCAL-00027" summary="renamed plugin">
-      <option name="closed" value="true" />
-      <created>1773655024185</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1773655024185</updated>
-    </task>
-    <task id="LOCAL-00028" summary="renamed plugin">
-      <option name="closed" value="true" />
-      <created>1773655686451</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1773655686451</updated>
-    </task>
-    <task id="LOCAL-00029" summary="renamed plugin">
-      <option name="closed" value="true" />
-      <created>1773655969882</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1773655969882</updated>
-    </task>
-    <task id="LOCAL-00030" summary="renamed plugin">
-      <option name="closed" value="true" />
-      <created>1773656368957</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1773656368957</updated>
     </task>
     <task id="LOCAL-00031" summary="renamed plugin">
       <option name="closed" value="true" />
@@ -493,7 +462,39 @@
       <option name="project" value="LOCAL" />
       <updated>1775156611725</updated>
     </task>
-    <option name="localTasksCounter" value="76" />
+    <task id="LOCAL-00076" summary="panel for maya infrastructure">
+      <option name="closed" value="true" />
+      <created>1775304494439</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1775304494439</updated>
+    </task>
+    <task id="LOCAL-00077" summary="hud panel files added to the ui">
+      <option name="closed" value="true" />
+      <created>1775304512067</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1775304512067</updated>
+    </task>
+    <task id="LOCAL-00078" summary="hud panel files added to the ui">
+      <option name="closed" value="true" />
+      <created>1775304963318</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1775304963318</updated>
+    </task>
+    <task id="LOCAL-00079" summary="hud panel files added to the ui">
+      <option name="closed" value="true" />
+      <created>1775323802158</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1775323802158</updated>
+    </task>
+    <option name="localTasksCounter" value="80" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -527,6 +528,9 @@
     <MESSAGE value="added pycharm icons to the pipe" />
     <MESSAGE value="padded the version number to give the name" />
     <MESSAGE value="made slate maker have override the resolution" />
-    <option name="LAST_COMMIT_MESSAGE" value="made slate maker have override the resolution" />
+    <MESSAGE value="add" />
+    <MESSAGE value="panel for maya infrastructure" />
+    <MESSAGE value="hud panel files added to the ui" />
+    <option name="LAST_COMMIT_MESSAGE" value="hud panel files added to the ui" />
   </component>
 </project>
