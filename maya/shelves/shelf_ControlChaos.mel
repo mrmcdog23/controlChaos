@@ -34,7 +34,7 @@ global proc shelf_ControlChaos () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "from ccmaya.shot.multi_playblast import MultiPlayblast;inst = MultiPlayblast(None);inst.show()" 
+        -command "import ccmaya.shot.multi_playblast as mpb;mpb.main()"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -69,7 +69,7 @@ global proc shelf_ControlChaos () {
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "import ccmaya.panels.cc_hud_panel as cchp;cchp.create_cc_panel()" 
+        -command "import ccmaya.panels.cc_hud_panel as cchp;cchp.main()"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
