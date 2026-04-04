@@ -2,118 +2,28 @@
 import os
 import glob
 import shutil
+import subprocess
 import maya.cmds as cmds
 from PySide6 import QtWidgets, QtCore
 import ccmaya.utils.maya_utils as maya_utils
 import cccore.base_ui as base_ui
+import cccore.utils.cc_logging as cc_logging
 
 
-class MultiPlayblast(base_ui.WidgetBase):
+FFMPEG_EXE = "C:/ffmpeg/bin/ffmpeg.exe"
+
+
+class MultiPlayblast(base_ui.WindowBase):
     title = "CC Multi Playblast"
     def __init__(self, parent):
         super().__init__(parent=parent)
         self.ui_settings = QtCore.QSettings('controlChaos', 'multiplay')
+        self.logger = cc_logging.cc_logger()
 
         # run setup functions
-        self.create_layout()
         self.populate_data()
         self.load_settings()
         self.connect_signals()
-
-    def horizontal_spacer(self):
-        # type: () -> QtWidgets.QSpacerItem
-        """ Create a horizontal spacer """
-        return QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-
-    def vertical_spacer(self):
-        # type: () -> QtWidgets.QSpacerItem
-        """ Create a vertical spacer """
-        return QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-
-    def create_layout(self):
-        """
-        Create the layout of the window
-        """
-        main_layout = QtWidgets.QVBoxLayout(self)
-
-        # create the top options
-        lyt_controls = QtWidgets.QHBoxLayout()
-        self.chk_all = QtWidgets.QCheckBox("Check All")
-        self.chk_all.setChecked(True)
-
-        # select either the playblast or render buttons
-        self.rbn_playblast = QtWidgets.QRadioButton("Playblast")
-        self.rbn_playblast.setChecked(True)
-        self.rbn_render = QtWidgets.QRadioButton("Render")
-        lyt_controls.addWidget(self.chk_all)
-        lyt_controls.addSpacerItem(self.horizontal_spacer())
-        lyt_controls.addWidget(self.rbn_playblast)
-        lyt_controls.addWidget(self.rbn_render)
-        lyt_controls.addSpacerItem(self.horizontal_spacer())
-
-        # create the cameras list widget
-        lyt_cameras = QtWidgets.QHBoxLayout()
-        self.lw_cameras = QtWidgets.QListWidget()
-        lyt_cameras.addWidget(self.lw_cameras)
-
-        # create the playblast options
-        lyt_options = QtWidgets.QVBoxLayout()
-        lyt_options.addSpacerItem(self.vertical_spacer())
-
-        # formats
-        self.cmb_formats = QtWidgets.QComboBox()
-        self.cmb_formats.addItems(["qt", "image"])
-        lyt_options.addWidget(self.cmb_formats)
-
-        # codecs
-        self.cmb_codecs = QtWidgets.QComboBox()
-        lyt_options.addWidget(self.cmb_codecs)
-
-        # images types for image playblast
-        self.cmb_image_type = QtWidgets.QComboBox()
-        self.cmb_image_type.addItems(["jpg", "tga", "tif", "png"])
-        self.cmb_image_type.setHidden(True)
-        lyt_options.addWidget(self.cmb_image_type)
-
-        # ignore objects
-        self.chk_ignore_objects = QtWidgets.QCheckBox("Ignore Object")
-        lyt_options.addWidget(self.chk_ignore_objects)
-
-        # the resolution options
-        lyt_res = QtWidgets.QHBoxLayout()
-        self.sp_width = QtWidgets.QSpinBox()
-        self.sp_width.setMaximum(99999)
-        self.sp_width.setValue(720)
-        self.sp_height = QtWidgets.QSpinBox()
-        self.sp_height.setMaximum(99999)
-        self.sp_height.setValue(576)
-        lyt_res.addWidget(self.sp_width)
-        lyt_res.addWidget(self.sp_height)
-
-        # add spacer and add to main widget
-        lyt_options.addSpacerItem(self.vertical_spacer())
-        lyt_options.addLayout(lyt_res)
-        lyt_cameras.addLayout(lyt_options)
-
-        # add the select the output directory buttons
-        lbl_dir = QtWidgets.QLabel("Output Directory")
-        self.le_dir = QtWidgets.QLineEdit()
-        self.btn_dir = QtWidgets.QPushButton("Select Directory")
-
-        # add to the layout
-        lyt_dir = QtWidgets.QHBoxLayout()
-        lyt_dir.addWidget(lbl_dir)
-        lyt_dir.addWidget(self.le_dir)
-        lyt_dir.addWidget(self.btn_dir)
-
-        # main playblast button
-        self.btn_playblast = QtWidgets.QPushButton("Playblast")
-
-        # add all to the main layout
-        main_layout.addLayout(lyt_controls)
-        main_layout.addLayout(lyt_cameras)
-        main_layout.addLayout(lyt_dir)
-        main_layout.addWidget(self.btn_playblast)
 
     def load_settings(self):
         """
@@ -138,7 +48,6 @@ class MultiPlayblast(base_ui.WidgetBase):
         self.btn_playblast.clicked.connect(self.playblast_or_render)
         self.btn_dir.clicked.connect(self.browse)
         self.lw_cameras.itemSelectionChanged.connect(self.switch_view)
-        self.cmb_formats.currentIndexChanged.connect(self.hide_option)
         self.chk_all.toggled.connect(self.check_all)
         self.rbn_playblast.toggled.connect(self.enable_pb_options)
 
@@ -147,12 +56,7 @@ class MultiPlayblast(base_ui.WidgetBase):
         Enable the playblast options
         """
         enable = self.rbn_playblast.isChecked()
-        widgets = [
-            self.cmb_codecs, self.cmb_image_type, self.cmb_formats,
-            self.chk_ignore_objects, self.sp_width, self.sp_height
-        ]
-        for wdg in widgets:
-            wdg.setEnabled(enable)
+        self.grp_playblast.setEnabled(enable)
 
         # update the button text
         btn_text = "Playblast" if enable else "Render"
@@ -170,15 +74,6 @@ class MultiPlayblast(base_ui.WidgetBase):
         for index in range(self.lw_cameras.count()):
             item = self.lw_cameras.item(index)
             item.setCheckState(state)
-
-    def hide_option(self):
-        """
-        Hide the image or codec options
-        """
-        qt_format = self.cmb_formats.currentText()
-        is_qt = qt_format == "qt"
-        self.cmb_codecs.setHidden(not is_qt)
-        self.cmb_image_type.setHidden(is_qt)
 
     def switch_view(self):
         """
@@ -228,15 +123,7 @@ class MultiPlayblast(base_ui.WidgetBase):
             item = QtWidgets.QListWidgetItem(cam)
             item.setCheckState(QtCore.Qt.Checked)
             self.lw_cameras.addItem(item)
-
-        # populate the list codec list
-        codecs = cmds.playblast(q=True, compression=True)
-        codecs.sort()
-        self.cmb_codecs.addItems(codecs)
-
-        # set to png by default
-        index = self.cmb_codecs.findText("png")
-        self.cmb_codecs.setCurrentIndex(index)
+        self.cmb_image_type.addItems(["jpg", "tga", "tif", "png"])
 
     @property
     def checked_cameras(self):
@@ -297,13 +184,28 @@ class MultiPlayblast(base_ui.WidgetBase):
             dest_path = os.path.join(render_directory, image_name)
             shutil.move(image_path, dest_path)
 
+    def run_ffmpeg_command(self, command):
+        # type: (str) -> None
+        """
+        Run the ffmpeg subprocess
+
+        Args:
+            command: The command to run
+        """
+        process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True
+        )
+        process.communicate()
+
     def playblast(self):
         """
         Playblast the current maya scene
         """
         directory = self.le_dir.text()
         ignore_objects = self.chk_ignore_objects.isChecked()
-        format = self.cmb_formats.currentText()
         width = self.sp_width.value()
         height = self.sp_height.value()
 
@@ -313,14 +215,12 @@ class MultiPlayblast(base_ui.WidgetBase):
         self.ui_settings.setValue("height", height)
 
         # get the compression of the output
-        if format == "qt":
-            compression = self.cmb_codecs.currentText()
-        else:
-            compression = self.cmb_image_type.currentText()
+        image_type = self.cmb_image_type.currentText()
+        create_movie = self.chk_create_movie.isChecked()
 
         # build the playblast dictionary
         playblast_args = {
-            "format": format,
+            "format": "image",
             "percent": 100,
             "quality": 100,
             "sequenceTime": 0,
@@ -328,7 +228,7 @@ class MultiPlayblast(base_ui.WidgetBase):
             "viewer": False,
             "showOrnaments": not ignore_objects,
             "fp": 4,
-            "compression": compression,
+            "compression": image_type,
             "exposure": 0,
             "gamma": 1,
             "forceOverwrite": True,
@@ -341,16 +241,24 @@ class MultiPlayblast(base_ui.WidgetBase):
             self.edit_model_panel(camera_name)
 
             # work out the output file name
-            ext = ".mov" if format == "qt" else ""
-            movie_name_clean = camera_name.replace("|", "_")
-            movie_name = f"{movie_name_clean}{ext}"
-            movie_path = os.path.join(directory, movie_name)
+            sequence_name_clean = camera_name.replace("|", "_")
+            sequence_path = os.path.join(directory, sequence_name_clean)
+
+            sequence_padded_name = f"{sequence_name_clean}.%04d.{image_type}"
+            sequence_padded_path = os.path.join(directory, sequence_padded_name)
 
             # run the playblast of the camera
-            print(f"Playblasting...{movie_path}")
-            playblast_args["filename"] = movie_path
+            self.logger.info(f"Playblasting...{sequence_path}")
+            playblast_args["filename"] = sequence_path
             cmds.playblast(**playblast_args)
 
+            if create_movie:
+                movie_path = os.path.join(directory, f"{sequence_name_clean}.mov")
+                start = int(cmds.playbackOptions(q=True, ast=True))
+                command = (f"ffmpeg -y  -start_number {start} -i {sequence_padded_path} "
+                           f"-c:v libx264 -pix_fmt yuv420p {movie_path}")
+                self.logger.info(command)
+                self.run_ffmpeg_command(command)
 
 def main():
     """
