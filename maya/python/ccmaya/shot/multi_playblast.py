@@ -4,12 +4,14 @@ import glob
 import shutil
 import maya.cmds as cmds
 from PySide6 import QtWidgets, QtCore
+import ccmaya.utils.maya_utils as maya_utils
+import cccore.base_ui as base_ui
 
 
-class MultiPlayblast(QtWidgets.QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("CC Multi Playblast")
+class MultiPlayblast(base_ui.WidgetBase):
+    title = "CC Multi Playblast"
+    def __init__(self, parent):
+        super().__init__(parent=parent)
         self.ui_settings = QtCore.QSettings('controlChaos', 'multiplay')
 
         # run setup functions
@@ -351,6 +353,7 @@ class MultiPlayblast(QtWidgets.QWidget):
 
 
 def main():
-    # find and launch the ui under the maya window
-    loading = MultiPlayblast()
-    loading.show()
+    """
+    Launch the maya multi playblast
+    """
+    maya_utils.launch_maya_win(MultiPlayblast)

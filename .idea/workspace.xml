@@ -4,9 +4,36 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="made slate maker have override the resolution">
+    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="add">
+      <change afterPath="$PROJECT_DIR$/core/python/cccore/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/maya/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/maya/python/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/maya/python/ccmaya/shot/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/maya/python/ccmaya/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/maya/python/ccmaya/utils/create_dockable_widget.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/maya/python/ccmaya/utils/maya_utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/maya/shelves/icons/control_chaos_hud.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/maya/shelves/icons/multi_playblast.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/maya/shelves/shelf_controlChaos.mel" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/controlChaos.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/controlChaos.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/multiplayblast.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/multi_playblast.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/blank_slate.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/nothumbnail.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/blender.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/equalizer.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/flame.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/frameio.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/ftrack.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/general.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/houdini.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/maya.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/natron.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/nuke.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/requirements.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/standalone.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/pycharm_icons/unreal.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/multi_playblast.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/shot/multi_playblast.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +93,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/joele/Documents/pipelines/controlChaos&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/no8/pipeline/dev/joeleveson/controlChaos&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;AtomSelectConfig&quot;
   }
@@ -76,15 +103,17 @@
       <recent name="$PROJECT_DIR$/maya/plugins" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/core/python/cccore" />
+      <recent name="$PROJECT_DIR$/core/python/cccore/utils" />
+      <recent name="$PROJECT_DIR$/maya/python/ccmaya/shot" />
       <recent name="C:\Users\joele\Documents\pipelines\controlChaos\standalone\python" />
       <recent name="C:\Users\joele\Documents\pipelines\controlChaos\bat" />
-      <recent name="C:\Users\joele\Documents\pipelines\controlChaos\standalone\slate_maker" />
     </key>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-b63d5a1f7c97-b61e75351b1f-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.22158.340" />
+        <option value="bundled-python-sdk-4f4e415b4190-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.26053.29" />
       </set>
     </attachedChunks>
   </component>
