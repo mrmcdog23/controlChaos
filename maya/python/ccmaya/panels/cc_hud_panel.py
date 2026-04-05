@@ -30,6 +30,7 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         self.update_speed_controls()
         self.connect_signals()
         self.lbl_header.setHidden(True)
+        self.resize(500, 600)
 
     def populate_data(self):
         top_text_font_index = cmds.getAttr(f"{self.cam_node}.top_text_font")
@@ -87,6 +88,9 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         self.sb_frame_number.valueChanged.connect(self.set_frame_number_pos)
         self.sb_speed.valueChanged.connect(self.set_speed_pos)
         self.sb_object_distance.valueChanged.connect(self.set_object_distance_pos)
+
+        # options signals
+        self.btn_add_ground_geo.clicked.connect(self.add_ground_geo)
 
         # connect the speed controls
         self.sp_font_size.valueChanged.connect(self.set_font_size)
@@ -214,6 +218,10 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
                 return speed_object_list
             speed_object_list.append(object_name)
         return speed_object_list
+
+    def add_ground_geo(self):
+        selected_object = cmds.ls(sl=True)[0]
+        self.le_ground_geo.setText(selected_object)
 
     def add_selected_object(self):
         selected_object = cmds.ls(sl=True)[0]

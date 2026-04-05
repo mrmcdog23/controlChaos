@@ -230,11 +230,14 @@ class controlChaosHUDNode(omui.MPxLocatorNode):
         enum_attr.addField('Meters', 0)
         enum_attr.addField('Feet', 1)
 
+        cls.ground_geo = typed_attr.create("ground_geo", "ground_geo", om.MFnData.kString)
+
         # add to the compound attribute
         cls.camera_height_grp = compound_fn.create("Camera Height", "camera_height")
         compound_fn.addChild(cls.show_camera_height)
         compound_fn.addChild(cls.camera_height_position)
         compound_fn.addChild(cls.camera_height_units)
+        compound_fn.addChild(cls.ground_geo)
         cls.addAttribute(cls.camera_height_grp)
 
         # 4. show frame number
@@ -471,8 +474,51 @@ class controlChaosHUDDrawOverride(omr.MPxDrawOverride):
         translation = transform_fn.translation(om.MSpace.kWorld)
         return translation
 
-    def get_camera_height_string(self, frame_context, show_camera_height, camera_height_units_int):
-        # type: (omr.MFrameContext, bool, int) -> str
+    def get_camera_height_to_geo(self, frame_context, ground_geo):
+        """
+        Fires a ray straight down (-Y) from the camera and returns
+        the distance to the first piece of geometry hit.
+
+        Args:
+            camera_name (str): Name of the camera transform node.
+
+        Returns:
+            float or None: Distance in world units, or None if nothing was hit.
+        """
+        hit_distance = None
+        if not ground_geo:
+            return hit_distance
+        cam_pos = self.get_camera_translation(frame_context)
+
+        ray_origin    = om.MFloatPoint(cam_pos.x, cam_pos.y, cam_pos.z)
+        ray_direction = om.MFloatVector(0, -1, 0)   # straight down
+
+        # Accelerator speeds up repeated intersection tests
+        accel = om.MMeshIsectAccelParams()
+
+        # Get a mesh by name
+        sel = om.MSelectionList()
+        sel.add(ground_geo)
+        dag = sel.getDagPath(0)
+        fn_mesh = om.MFnMesh(dag)
+
+        hit = fn_mesh.closestIntersection(
+            ray_origin,
+            ray_direction,
+            om.MSpace.kWorld,
+            9999999,        # max distance
+            False,          # test both directions?
+        )
+
+        if hit is not None:
+            hit_point, hit_ray_param, hit_face, hit_tri, hit_bary1, hit_bary2 = hit
+            if hit_ray_param > 0:   # must be below the camera
+                if hit_distance is None or hit_ray_param < hit_distance:
+                    hit_distance = hit_ray_param
+        return hit_distance
+
+    def get_camera_height_string(self, frame_context, show_camera_height, camera_height_units_int, ground_geo):
+        # type: (omr.MFrameContext, bool, int, str) -> str
         """
         Get the cameras current height in meters or feet
 
@@ -480,6 +526,7 @@ class controlChaosHUDDrawOverride(omr.MPxDrawOverride):
             frame_context: The frame context
             show_camera_height: Whether to display the height
             camera_height_units_int: Show it in meters or feet
+            ground_geo: The name of the ground geo
 
         Returns:
             camera_height_str: Camera height text to display
@@ -487,16 +534,18 @@ class controlChaosHUDDrawOverride(omr.MPxDrawOverride):
         # work out the frame number as text
         if not show_camera_height:
             return str()
-        translation = self.get_camera_translation(frame_context)
+        translationy = self.get_camera_height_to_geo(frame_context, ground_geo)
+        if not translationy:
+            return "No distance found"
         linear_unit = om.MDistance.uiUnit()
 
         # Compare against enum and convert to meters
         if linear_unit == om.MDistance.kCentimeters:
-            ty = translation.y * 100
+            ty = translationy * 100
         elif linear_unit == om.MDistance.kMeters:
-            ty = translation.y
+            ty = translationy
         elif linear_unit == om.MDistance.kMillimeters:
-            ty = translation.y * 1000
+            ty = translationy * 1000
         else:
             return "unit not found"
 
@@ -670,8 +719,9 @@ class controlChaosHUDDrawOverride(omr.MPxDrawOverride):
         if 0 <= camera_height_position < controlChaosHUDNode.TEXT_POSITION_NUMBER:
             # Get camera height
             camera_height_units_int = chaos_hud_node.findPlug('camera_height_units', False).asInt()
+            ground_geo = chaos_hud_node.findPlug('ground_geo', False).asString()
             camera_height_string = self.get_camera_height_string(
-                frame_context, show_camera_height, camera_height_units_int)
+                frame_context, show_camera_height, camera_height_units_int, ground_geo)
             data.text_fields[camera_height_position] = camera_height_string
 
         # get the camera rotations
@@ -692,6 +742,7 @@ class controlChaosHUDDrawOverride(omr.MPxDrawOverride):
         # get the distance to an actor
         distance_to_actor_position = chaos_hud_node.findPlug('distance_to_actor_position', False).asInt()
         object_name = chaos_hud_node.findPlug('object_name', False).asString()
+
         show_distance_to_object = chaos_hud_node.findPlug('show_distance_to_object', False).asBool()
         if 0 <= distance_to_actor_position < controlChaosHUDNode.TEXT_POSITION_NUMBER:
             distance_to_actor = self.get_distance_to_actor(frame_context, show_distance_to_object, object_name)
