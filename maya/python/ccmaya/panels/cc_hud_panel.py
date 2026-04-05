@@ -65,11 +65,28 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
     def connect_signals(self):
         # connect the camera controls
         self.sld_cam_text_scale.valueChanged.connect(self.set_cam_text_scale)
+        self.sld_cam_x_offset.valueChanged.connect(self.set_cam_x_offset)
         self.sld_cam_y_offset.valueChanged.connect(self.set_cam_y_offset)
         self.cmb_cam_font_type.currentIndexChanged.connect(self.set_cam_font_type)
         self.cmb_cam_font_weight.currentIndexChanged.connect(self.set_cam_font_weight)
         self.btn_cam_text_colour.clicked.connect(self.set_cam_colour)
         self.sld_cam_font_alpha.valueChanged.connect(self.set_cam_font_alpha)
+
+        # display objects
+        self.chk_focal_length.toggled.connect(self.show_focal_length)
+        self.chk_rotations.toggled.connect(self.show_rotations)
+        self.chk_height.toggled.connect(self.show_height)
+        self.chk_frame_number.toggled.connect(self.show_frame_number)
+        self.chk_speed.toggled.connect(self.show_speed)
+        self.chk_object_distance.toggled.connect(self.show_object_distance)
+
+        # set the text positions
+        self.sb_focal_length.valueChanged.connect(self.set_focal_length_pos)
+        self.sb_rotations.valueChanged.connect(self.set_rotations_pos)
+        self.sb_height.valueChanged.connect(self.set_height_pos)
+        self.sb_frame_number.valueChanged.connect(self.set_frame_number_pos)
+        self.sb_speed.valueChanged.connect(self.set_speed_pos)
+        self.sb_object_distance.valueChanged.connect(self.set_object_distance_pos)
 
         # connect the speed controls
         self.sp_font_size.valueChanged.connect(self.set_font_size)
@@ -101,10 +118,52 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
             cmds.loadPlugin("objectSpeedHUD.py")
         return cmds.createNode("objectSpeedHUD")
 
+    def show_focal_length(self, show):
+        cmds.setAttr(f"{self.cam_node}.show_focal_length", show)
+
+    def show_rotations(self, show):
+        cmds.setAttr(f"{self.cam_node}.show_camera_rotations", show)
+
+    def show_height(self, show):
+        cmds.setAttr(f"{self.cam_node}.show_camera_height", show)
+
+    def show_frame_number(self, show):
+        cmds.setAttr(f"{self.cam_node}.show_frame_number", show)
+
+    def show_speed(self, show):
+        cmds.setAttr(f"{self.cam_node}.show_camera_speed", show)
+
+    def show_object_distance(self, show):
+        cmds.setAttr(f"{self.cam_node}.show_distance_to_object", show)
+
+    def set_focal_length_pos(self, value):
+        cmds.setAttr(f"{self.cam_node}.focal_length_position", value)
+
+    def set_rotations_pos(self, value):
+        cmds.setAttr(f"{self.cam_node}.camera_rotations_position", value)
+
+    def set_height_pos(self, value):
+        cmds.setAttr(f"{self.cam_node}.camera_height_position", value)
+
+    def set_frame_number_pos(self, value):
+        cmds.setAttr(f"{self.cam_node}.frame_number_position", value)
+
+    def set_speed_pos(self, value):
+        cmds.setAttr(f"{self.cam_node}.camera_speed_position", value)
+
+    def set_object_distance_pos(self, value):
+        cmds.setAttr(f"{self.cam_node}.distance_to_actor_position", value)
+
     def set_cam_text_scale(self):
         cam_text_scale = self.sld_cam_text_scale.value() / 100
         self.sb_cam_text_scale.setValue(cam_text_scale)
         cmds.setAttr(f"{self.cam_node}.overall_text_scale", cam_text_scale)
+
+    def set_cam_x_offset(self):
+        cam_x_offset = self.sld_cam_x_offset.value()
+        self.sb_cam_x_offset.setValue(cam_x_offset)
+        cmds.setAttr(f"{self.cam_node}.top_text_padding", cam_x_offset)
+        cmds.setAttr(f"{self.cam_node}.bottom_text_padding", cam_x_offset)
 
     def set_cam_y_offset(self):
         cam_y_offset = self.sld_cam_y_offset.value()
@@ -241,6 +300,10 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         self.sld_cam_text_scale.setValue(cam_text_scale * 100)
         self.sb_cam_text_scale.setValue(cam_text_scale)
 
+        cam_x_offset = cmds.getAttr(f"{self.cam_node}.top_text_padding")
+        self.sld_cam_x_offset.setValue(cam_x_offset)
+        self.sb_cam_x_offset.setValue(cam_x_offset)
+
         cam_y_offset = cmds.getAttr(f"{self.cam_node}.text_y_offset")
         self.sld_cam_y_offset.setValue(cam_y_offset)
         self.sb_cam_y_offset.setValue(cam_y_offset)
@@ -248,6 +311,37 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         cam_font_alpha = cmds.getAttr(f"{self.cam_node}.top_text_alpha")
         self.sld_cam_font_alpha.setValue(cam_font_alpha * 100)
         self.sb_cam_font_alpha.setValue(cam_font_alpha)
+
+        # camera positions
+        show_focal_length = cmds.getAttr(f"{self.cam_node}.show_focal_length")
+        self.chk_focal_length.setChecked(show_focal_length)
+        focal_length_position = cmds.getAttr(f"{self.cam_node}.focal_length_position")
+        self.sb_focal_length.setValue(focal_length_position)
+
+        show_rotations = cmds.getAttr(f"{self.cam_node}.show_camera_rotations")
+        self.chk_rotations.setChecked(show_rotations)
+        camera_rotations_position = cmds.getAttr(f"{self.cam_node}.camera_rotations_position")
+        self.sb_rotations.setValue(camera_rotations_position)
+
+        show_height = cmds.getAttr(f"{self.cam_node}.show_camera_height")
+        self.chk_height.setChecked(show_height)
+        camera_height_position = cmds.getAttr(f"{self.cam_node}.camera_height_position")
+        self.sb_height.setValue(camera_height_position)
+
+        show_frame_number = cmds.getAttr(f"{self.cam_node}.show_frame_number")
+        self.chk_frame_number.setChecked(show_frame_number)
+        frame_number_position = cmds.getAttr(f"{self.cam_node}.frame_number_position")
+        self.sb_frame_number.setValue(frame_number_position)
+
+        show_camera_speed = cmds.getAttr(f"{self.cam_node}.show_camera_speed")
+        self.chk_speed.setChecked(show_camera_speed)
+        camera_speed_position = cmds.getAttr(f"{self.cam_node}.camera_speed_position")
+        self.sb_speed.setValue(camera_speed_position)
+
+        show_distance_to_object = cmds.getAttr(f"{self.cam_node}.show_distance_to_object")
+        self.chk_object_distance.setChecked(show_distance_to_object)
+        distance_to_actor_position = cmds.getAttr(f"{self.cam_node}.distance_to_actor_position")
+        self.sb_object_distance.setValue(distance_to_actor_position)
 
     def update_speed_controls(self):
         index = self.get_object_index()
