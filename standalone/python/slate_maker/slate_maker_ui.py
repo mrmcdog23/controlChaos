@@ -1,5 +1,6 @@
 """ Extract all text from a PDF file. """
 import os
+import re
 import sys
 import extract_pdf_data
 from dataclasses import asdict
@@ -76,8 +77,6 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         # browse the movie directory
         self.le_movie_dir, self.btn_movie_dir = self.create_line_edit("Movie Directory", "Browse Movie Directory")
 
-        self.btn_extract_data = QtWidgets.QPushButton("Extract Data")
-
         # add check all button
         lyt_options = QtWidgets.QHBoxLayout()
         self.chk_all = QtWidgets.QCheckBox()
@@ -90,17 +89,19 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.btn_new_res = QtWidgets.QPushButton("Set Resolution")
         self.btn_new_res.setMaximumWidth(90)
 
+        self.btn_extract_data = QtWidgets.QPushButton("Extract Data")
+        self.chk_latest_rev = QtWidgets.QCheckBox("Latest Revisions Only")
+        self.chk_latest_rev.setMaximumWidth(150)
+        self.chk_latest_rev.setChecked(True)
+
         lyt_options.addWidget(self.chk_all)
         lyt_options.addWidget(self.le_new_res)
         lyt_options.addWidget(self.btn_new_res)
         lyt_options.addWidget(self.btn_extract_data)
+        lyt_options.addWidget(self.chk_latest_rev)
         self.main_layout.addLayout(lyt_options)
 
         self.tbw_shots = QtWidgets.QTableWidget(0, len(self.headers))
-        self.tbw_shots.setColumnWidth(self.headers.index("thumbnail"), THUMBNAIL_WIDTH)
-        self.tbw_shots.setColumnWidth(self.headers.index(" "), CHECKED_WIDTH)
-        self.tbw_shots.setHorizontalHeaderLabels(self.headers)
-        self.tbw_shots.horizontalHeader().setStretchLastSection(True)
         self.main_layout.addWidget(self.tbw_shots)
 
         # browse the movie directory
@@ -109,6 +110,14 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         # Button
         self.btn_create_slates = QtWidgets.QPushButton("Create Slates")
         self.main_layout.addWidget(self.btn_create_slates)
+
+        self.set_table_attributes()
+
+    def set_table_attributes(self):
+        self.tbw_shots.setColumnWidth(self.headers.index("thumbnail"), THUMBNAIL_WIDTH)
+        self.tbw_shots.setColumnWidth(self.headers.index(" "), CHECKED_WIDTH)
+        self.tbw_shots.setHorizontalHeaderLabels(self.headers)
+        self.tbw_shots.horizontalHeader().setStretchLastSection(True)
 
     def load_settings(self):
         """
@@ -130,6 +139,10 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         le_new_res = self.ui_settings.value("le_new_res", str())
         self.le_new_res.setText(le_new_res)
 
+        # save the latest revision check box
+        chk_latest_rev = self.ui_settings.value("chk_latest_rev", str())
+        self.chk_latest_rev.setChecked(int(chk_latest_rev))
+
     def save_settings(self):
         """
         Save the path in the q-settings
@@ -138,6 +151,7 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.ui_settings.setValue("le_movie_dir", self.le_movie_dir.text())
         self.ui_settings.setValue("le_output_dir", self.le_output_dir.text())
         self.ui_settings.setValue("le_new_res", self.le_new_res.text())
+        self.ui_settings.setValue("chk_latest_rev", self.chk_latest_rev.isChecked())
 
     def connect_signals(self):
         """
@@ -224,10 +238,49 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         checkbox_item.setTextAlignment(QtCore.Qt.AlignCenter)
         return checkbox_item
 
+    def get_dict_of_shot_to_versions(self, pdf_dir):
+        shot_to_versions = dict()
+        for row_index, pdf_file_name in enumerate(os.listdir(pdf_dir)):
+            # only deal with files
+            if not "." in pdf_file_name:
+                continue
+
+            # extract the shot name and version number
+            re_groups = re.search("(.*)_rev(\d+)_(.*)", pdf_file_name)
+            if re_groups:
+                shot_name, version_str, _ = re_groups.groups()
+                shot_versions = shot_to_versions.get(shot_name, list())
+                shot_versions.append(int(version_str))
+                shot_to_versions[shot_name] = shot_versions
+        return shot_to_versions
+
+    def get_pdf_files_list(self, pdf_dir, latest_rev):
+        shot_to_versions = self.get_dict_of_shot_to_versions(pdf_dir)
+        pdf_files_list = list()
+        for row_index, pdf_file_name in enumerate(os.listdir(pdf_dir)):
+            # only deal with files
+            if not "." in pdf_file_name:
+                continue
+
+            if latest_rev:
+                re_groups = re.search("(.*)_rev(\d+)_(.*)", pdf_file_name)
+                if re_groups:
+                    shot_name, version_str, _ = re_groups.groups()
+                    shot_versions = shot_to_versions[shot_name]
+                    if max(shot_versions) != int(version_str):
+                        continue
+
+            pdf_path = os.path.join(pdf_dir, pdf_file_name)
+            pdf_files_list.append(pdf_path)
+        return pdf_files_list
+
     def extract_data(self):
         """
         Find the PDF files and extract the data from them
         """
+        self.tbw_shots.clear()
+        self.set_table_attributes()
+
         self.save_settings()
         # Populate table with data
         shot_name_index = self.headers.index("shot_name")
@@ -235,20 +288,15 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         pdf_dir = self.le_pdf_dir.text()
         movie_dir = self.le_movie_dir.text()
         resolution = self.le_new_res.text()
+        latest_rev = self.chk_latest_rev.isChecked()
 
         self.pdf_data_inst = extract_pdf_data.ExtractData(movie_dir)
-
-        for row_index, pdf_file_name in enumerate(os.listdir(pdf_dir)):
-
-            # only deal with files
-            if not "." in pdf_file_name:
-                continue
-
+        pdf_files_list = self.get_pdf_files_list(pdf_dir, latest_rev)
+        for row_index, pdf_path in enumerate(pdf_files_list):
             # add a new row
             self.tbw_shots.setRowCount(row_index + 1)
 
             # get the PDF data
-            pdf_path = os.path.join(pdf_dir, pdf_file_name)
             pdf_data = self.pdf_data_inst.get_data_from_pdf(pdf_path)
             pdf_data.resolution = resolution
 
