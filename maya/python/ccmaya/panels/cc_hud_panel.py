@@ -32,8 +32,18 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         self.lbl_header.setHidden(True)
 
     def populate_data(self):
+        top_text_font_index = cmds.getAttr(f"{self.cam_node}.top_text_font")
+        self.cmb_cam_font_type.addItems(FONT_LIST)
+        self.cmb_cam_font_type.setCurrentIndex(top_text_font_index)
+
+        font_weight_index = cmds.getAttr(f"{self.cam_node}.top_text_font_weight")
+        self.cmb_cam_font_weight.addItems(FONT_WEIGHT)
+        self.cmb_cam_font_weight.setCurrentIndex(font_weight_index)
+
+        # populate speed data
         font_size = cmds.getAttr(f"{self.speed_node}.font_size")
         self.sp_font_size.setValue(font_size)
+
         # set fonts
         font_type_index = cmds.getAttr(f"{self.speed_node}.text_font")
         self.cmb_font_type.addItems(FONT_LIST)
@@ -56,6 +66,10 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         # connect the camera controls
         self.sld_cam_text_scale.valueChanged.connect(self.set_cam_text_scale)
         self.sld_cam_y_offset.valueChanged.connect(self.set_cam_y_offset)
+        self.cmb_cam_font_type.currentIndexChanged.connect(self.set_cam_font_type)
+        self.cmb_cam_font_weight.currentIndexChanged.connect(self.set_cam_font_weight)
+        self.btn_cam_text_colour.clicked.connect(self.set_cam_colour)
+        self.sld_cam_font_alpha.valueChanged.connect(self.set_cam_font_alpha)
 
         # connect the speed controls
         self.sp_font_size.valueChanged.connect(self.set_font_size)
@@ -67,7 +81,7 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         self.sld_x_offset.valueChanged.connect(self.set_x_sb)
         self.sld_y_offset.valueChanged.connect(self.set_y_sb)
         self.chk_visible.toggled.connect(self.set_visible)
-        self.btn_text_colour.clicked.connect(self.set_colour)
+        self.btn_text_colour.clicked.connect(self.set_speed_colour)
 
     @property
     def cam_node(self):
@@ -96,6 +110,16 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         cam_y_offset = self.sld_cam_y_offset.value()
         self.sb_cam_y_offset.setValue(cam_y_offset)
         cmds.setAttr(f"{self.cam_node}.text_y_offset", cam_y_offset)
+
+    def set_cam_font_type(self):
+        cam_font_type_index = self.cmb_cam_font_type.currentIndex()
+        cmds.setAttr(f"{self.cam_node}.top_text_font", cam_font_type_index)
+        cmds.setAttr(f"{self.cam_node}.bottom_text_font", cam_font_type_index)
+
+    def set_cam_font_weight(self):
+        cam_font_weight_index = self.cmb_cam_font_weight.currentIndex()
+        cmds.setAttr(f"{self.cam_node}.top_text_font_weight", cam_font_weight_index)
+        cmds.setAttr(f"{self.cam_node}.bottom_text_font_weight", cam_font_weight_index)
 
     def set_visible(self):
         visible = self.chk_visible.isChecked()
@@ -182,7 +206,7 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         b = max(0.0, min(1.0, colour[2])) * 255
         return f"background-color: rgb({r}, {g}, {b});"
 
-    def set_colour(self):
+    def set_speed_colour(self):
         colour = QtWidgets.QColorDialog.getColor()
         r, g, b, _ = colour.getRgb()
         stylesheet = f"background-color: rgb({r}, {g}, {b});"
@@ -192,7 +216,27 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         attribute_name = f"{self.speed_node}.speed_text_colour{index}"
         cmds.setAttr(attribute_name, (r/255), (g/255), (b/255), type="double3")
 
+    def set_cam_colour(self):
+        colour = QtWidgets.QColorDialog.getColor()
+        r, g, b, _ = colour.getRgb()
+        stylesheet = f"background-color: rgb({r}, {g}, {b});"
+        self.btn_cam_text_colour.setStyleSheet(stylesheet)
+        for attr in ["top_text_color", "bottom_text_color"]:
+            attribute_name = f"{self.cam_node}.{attr}"
+            cmds.setAttr(attribute_name, (r/255), (g/255), (b/255), type="double3")
+
+    def set_cam_font_alpha(self):
+        cam_font_alpha = self.sld_cam_font_alpha.value() / 100
+        self.sb_cam_font_alpha.setValue(cam_font_alpha)
+        cmds.setAttr(f"{self.cam_node}.top_text_alpha", cam_font_alpha)
+        cmds.setAttr(f"{self.cam_node}.bottom_text_alpha", cam_font_alpha)
+
     def update_cam_controls(self):
+        # set the colour
+        attribute_name = f"{self.cam_node}.top_text_color"
+        stylesheet = self.get_stylesheet_from_attribute(attribute_name)
+        self.btn_cam_text_colour.setStyleSheet(stylesheet)
+
         cam_text_scale = cmds.getAttr(f"{self.cam_node}.overall_text_scale")
         self.sld_cam_text_scale.setValue(cam_text_scale * 100)
         self.sb_cam_text_scale.setValue(cam_text_scale)
@@ -200,6 +244,10 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         cam_y_offset = cmds.getAttr(f"{self.cam_node}.text_y_offset")
         self.sld_cam_y_offset.setValue(cam_y_offset)
         self.sb_cam_y_offset.setValue(cam_y_offset)
+
+        cam_font_alpha = cmds.getAttr(f"{self.cam_node}.top_text_alpha")
+        self.sld_cam_font_alpha.setValue(cam_font_alpha * 100)
+        self.sb_cam_font_alpha.setValue(cam_font_alpha)
 
     def update_speed_controls(self):
         index = self.get_object_index()

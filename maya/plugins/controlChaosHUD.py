@@ -98,7 +98,7 @@ class controlChaosHUDNode(omui.MPxLocatorNode):
         cls.addAttribute(cls.text_y_offset)
 
         # top text controls
-        cls.top_text_font_weight = enum_attr.create('top_text_font_weight', 'top_text_font_weight', 2)
+        cls.top_text_font_weight = enum_attr.create('top_text_font_weight', 'top_text_font_weight', 0)
         font_weights = list(FONT_WEIGHT_MAP.keys())
         for index, font_weight in enumerate(font_weights):
             enum_attr.addField(font_weight, index)
