@@ -498,7 +498,10 @@ class controlChaosHUDDrawOverride(omr.MPxDrawOverride):
 
         # Get a mesh by name
         sel = om.MSelectionList()
-        sel.add(ground_geo)
+        try:
+            sel.add(ground_geo)
+        except RuntimeError:
+            return hit_distance
         dag = sel.getDagPath(0)
         fn_mesh = om.MFnMesh(dag)
 

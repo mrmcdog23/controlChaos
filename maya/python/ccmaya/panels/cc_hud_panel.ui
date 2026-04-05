@@ -572,7 +572,7 @@
        <item>
         <layout class="QGridLayout" name="gridLayout_8">
          <item row="0" column="0">
-          <widget class="QLabel" name="lbl_speed_unit_2">
+          <widget class="QLabel" name="lbl_camera_height_units">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -591,7 +591,7 @@
           </widget>
          </item>
          <item row="0" column="1" colspan="2">
-          <widget class="QComboBox" name="cmb_speed_unit_2"/>
+          <widget class="QComboBox" name="cmb_camera_height_units"/>
          </item>
          <item row="1" column="0">
           <widget class="QPushButton" name="btn_add_ground_geo">
@@ -604,14 +604,14 @@
           <widget class="QLineEdit" name="le_ground_geo"/>
          </item>
          <item row="2" column="0">
-          <widget class="QPushButton" name="btn_add_selected_3">
+          <widget class="QPushButton" name="btn_distance_object">
            <property name="text">
             <string>Distance To Selected Object</string>
            </property>
           </widget>
          </item>
          <item row="2" column="1" colspan="2">
-          <widget class="QLineEdit" name="lineEdit_2"/>
+          <widget class="QLineEdit" name="le_distance_object"/>
          </item>
         </layout>
        </item>

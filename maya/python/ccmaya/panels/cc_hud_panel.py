@@ -21,7 +21,7 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
     icon_to_widget = {
         "hud_header": "lbl_header"
     }
-    title = "Hud"
+    title = "Control Chaos HUD"
     def __init__(self, parent):
         super().__init__(parent)
         self.populate_data()
@@ -40,6 +40,10 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         font_weight_index = cmds.getAttr(f"{self.cam_node}.top_text_font_weight")
         self.cmb_cam_font_weight.addItems(FONT_WEIGHT)
         self.cmb_cam_font_weight.setCurrentIndex(font_weight_index)
+
+        cam_unit_index = cmds.getAttr(f"{self.cam_node}.camera_height_units")
+        self.cmb_camera_height_units.addItems(["Meters", "Feet"])
+        self.cmb_camera_height_units.setCurrentIndex(cam_unit_index)
 
         # populate speed data
         font_size = cmds.getAttr(f"{self.speed_node}.font_size")
@@ -91,6 +95,8 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
 
         # options signals
         self.btn_add_ground_geo.clicked.connect(self.add_ground_geo)
+        self.cmb_camera_height_units.currentIndexChanged.connect(self.set_camera_height_units)
+        self.btn_distance_object.clicked.connect(self.set_distance_object)
 
         # connect the speed controls
         self.sp_font_size.valueChanged.connect(self.set_font_size)
@@ -222,6 +228,16 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
     def add_ground_geo(self):
         selected_object = cmds.ls(sl=True)[0]
         self.le_ground_geo.setText(selected_object)
+        cmds.setAttr(f"{self.cam_node}.ground_geo", selected_object, type="string")
+
+    def set_distance_object(self):
+        selected_object = cmds.ls(sl=True)[0]
+        self.le_distance_object.setText(selected_object)
+        cmds.setAttr(f"{self.cam_node}.object_name", selected_object, type="string")
+
+    def set_camera_height_units(self):
+        camera_height_units_index = self.cmb_camera_height_units.currentIndex()
+        cmds.setAttr(f"{self.cam_node}.camera_height_units", camera_height_units_index)
 
     def add_selected_object(self):
         selected_object = cmds.ls(sl=True)[0]
@@ -350,6 +366,12 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         self.chk_object_distance.setChecked(show_distance_to_object)
         distance_to_actor_position = cmds.getAttr(f"{self.cam_node}.distance_to_actor_position")
         self.sb_object_distance.setValue(distance_to_actor_position)
+
+        ground_geo = cmds.getAttr(f"{self.cam_node}.ground_geo")
+        self.le_ground_geo.setText(ground_geo)
+
+        object_name = cmds.getAttr(f"{self.cam_node}.object_name")
+        self.le_distance_object.setText(object_name)
 
     def update_speed_controls(self):
         index = self.get_object_index()
