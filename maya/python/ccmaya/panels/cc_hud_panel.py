@@ -62,11 +62,6 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         self.chk_visible.toggled.connect(self.set_visible)
         self.btn_text_colour.clicked.connect(self.set_colour)
 
-    def set_colour(self):
-
-        color = QtWidgets.QColorDialog.getColor()
-        print (color)
-
     def set_visible(self):
         visible = self.chk_visible.isChecked()
         index = self.get_object_index()
@@ -154,6 +149,28 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         speed_unit_index = self.cmb_speed_unit.currentIndex()
         cmds.setAttr(f"{self.speed_node}.speed_unit", speed_unit_index)
 
+    def get_stylesheet_from_attribute(self, attribute_name):
+        colour = cmds.getAttr(attribute_name)[0]
+        r = max(0.0, min(1.0, colour[0])) * 255
+        g = max(0.0, min(1.0, colour[1])) * 255
+        b = max(0.0, min(1.0, colour[2])) * 255
+        return f"background-color: rgb({r}, {g}, {b});"
+
+    def set_colour(self):
+        colour = QtWidgets.QColorDialog.getColor()
+        r, g, b, _ = colour.getRgb()
+        print (colour.getRgb())
+        stylesheet = f"background-color: rgb({r}, {g}, {b});"
+        self.btn_text_colour.setStyleSheet(stylesheet)
+
+        index = self.get_object_index()
+        attribute_name = f"{self.speed_node}.speed_text_colour{index}"
+        print ((r/255), (g/255), (b/255))
+        cmds.setAttr(attribute_name, (r/255), (g/255), (b/255), type="double3")
+
+
+
+
     def update_controls(self):
         index = self.get_object_index()
         if index == 0:
@@ -168,17 +185,9 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         self.chk_visible.setChecked(visible)
 
         # set the colour
-        colour = cmds.getAttr(f"{self.speed_node}.speed_text_colour{index}")[0]
-        print (colour)
-        red, green, blue = colour
-        import colorsys
-        h, s, v = colorsys.rgb_to_hsv(red, green, blue)
-        a = f"{h*360:.1f}"
-        b = f"{s*100:.1f}"
-        c = f"{v*100:.1f}"
-        print(f"H: {h*360:.1f}°  S: {s*100:.1f}%  V: {v*100:.1f}%")
-        self.btn_text_colour.setStyleSheet(f"background-color: rgb({a},{b},{c});")
-
+        attribute_name = f"{self.speed_node}.speed_text_colour{index}"
+        stylesheet = self.get_stylesheet_from_attribute(attribute_name)
+        self.btn_text_colour.setStyleSheet(stylesheet)
 
 def create_cc_panel():
     """
