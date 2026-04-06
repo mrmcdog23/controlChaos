@@ -166,6 +166,9 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.chk_all.toggled.connect(self.check_all)
 
     def set_new_resolution(self):
+        """
+        Set the resolution on the rows of the slates
+        """
         res_index = self.headers.index("resolution")
         new_res = self.le_new_res.text()
         for row_index in range(self.tbw_shots.rowCount()):
@@ -173,6 +176,13 @@ class SlateMakerUI(QtWidgets.QMainWindow):
             item.setText(new_res)
 
     def check_all(self, checked):
+        # type: (bool) -> None
+        """
+        Set the rows check state based on the main checkbox
+
+        Args:
+            checked: State to check the rows to
+        """
         state = QtCore.Qt.CheckState.Checked if checked else QtCore.Qt.CheckState.Unchecked
         for row_index in range(self.tbw_shots.rowCount()):
             item = self.tbw_shots.item(row_index, CHECKED_INDEX)
@@ -232,6 +242,10 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         line_edit.setText(sel_path)
 
     def create_checkbox_item(self):
+        # type: () -> QtWidgets.QTableWidgetItem
+        """
+        Check a table widget item checkbox
+        """
         checkbox_item = QtWidgets.QTableWidgetItem()
         checkbox_item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
         checkbox_item.setCheckState(QtCore.Qt.Checked)
@@ -255,6 +269,18 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         return shot_to_versions
 
     def get_pdf_files_list(self, pdf_dir, latest_rev):
+        # type: (str, bool) -> list[str]
+        """
+        Get a list of pdf files in the directory name given.
+        If latest_rev is true then only show the latest revisions
+
+        Args:
+            pdf_dir: Directory containing pdf files
+            latest_rev: Whether to get all or latest pdfs
+
+        Returns:
+            pdf_files_list: List of pdf file paths
+        """
         shot_to_versions = self.get_dict_of_shot_to_versions(pdf_dir)
         pdf_files_list = list()
         for row_index, pdf_file_name in enumerate(os.listdir(pdf_dir)):

@@ -225,37 +225,45 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
         cmds.setAttr(f"{self.cam_node}.distance_to_actor_position", value)
 
     def set_cam_text_scale(self):
+        """ Set the scale of the camera text """
         cam_text_scale = self.sld_cam_text_scale.value() / 100
         self.sb_cam_text_scale.setValue(cam_text_scale)
         cmds.setAttr(f"{self.cam_node}.overall_text_scale", cam_text_scale)
 
     def set_cam_x_offset(self):
+        """ Offset the camera text in x """
         cam_x_offset = self.sld_cam_x_offset.value()
         self.sb_cam_x_offset.setValue(cam_x_offset)
         cmds.setAttr(f"{self.cam_node}.top_text_padding", cam_x_offset)
         cmds.setAttr(f"{self.cam_node}.bottom_text_padding", cam_x_offset)
 
     def set_cam_y_offset(self):
+        """ Offset the camera text in y """
         cam_y_offset = self.sld_cam_y_offset.value()
         self.sb_cam_y_offset.setValue(cam_y_offset)
         cmds.setAttr(f"{self.cam_node}.text_y_offset", cam_y_offset)
 
     def set_cam_font_type(self):
+        """ Set the camera font type on the node """
         cam_font_type_index = self.cmb_cam_font_type.currentIndex()
         cmds.setAttr(f"{self.cam_node}.top_text_font", cam_font_type_index)
         cmds.setAttr(f"{self.cam_node}.bottom_text_font", cam_font_type_index)
 
     def set_cam_font_weight(self):
+        """ Set the camera font weight on the node """
         cam_font_weight_index = self.cmb_cam_font_weight.currentIndex()
         cmds.setAttr(f"{self.cam_node}.top_text_font_weight", cam_font_weight_index)
         cmds.setAttr(f"{self.cam_node}.bottom_text_font_weight", cam_font_weight_index)
 
     def set_visible(self):
+        """ Set the visibility of the text of the speed object """
         visible = self.chk_visible.isChecked()
         index = self.get_object_index()
         cmds.setAttr(f"{self.speed_node}.show_object_speed{index}", visible)
 
     def get_object_index(self):
+        # type: () -> int
+        """ Get the selected objects index in the speed node """
         speed_object_list = self.get_speed_object_list()
         selected_object = self.cmb_speed_objects.currentText()
         if not selected_object:
@@ -264,12 +272,18 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
         return index
 
     def set_x_sb(self):
+        """
+        Set the spin box of the text in x
+        """
         x_offset = self.sld_x_offset.value()
         self.sb_x_offset.setValue(x_offset)
         index = self.get_object_index()
         cmds.setAttr(f"{self.speed_node}.text_x_offset{index}", x_offset)
 
     def set_y_sb(self):
+        """
+        Set the spin box of the text in y
+        """
         y_offset = self.sld_y_offset.value()
         self.sb_y_offset.setValue(y_offset)
         index = self.get_object_index()
@@ -294,24 +308,35 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
 
     def add_ground_geo(self):
         """
-        Add the slected object to the ground geometry
+        Add the selected object to the ground geometry
         """
         selected_object = cmds.ls(sl=True)[0]
         self.le_ground_geo.setText(selected_object)
         cmds.setAttr(f"{self.cam_node}.ground_geo", selected_object, type="string")
 
     def set_distance_object(self):
+        """
+        Set the camera nodes object name to get the distance
+        """
         selected_object = cmds.ls(sl=True)[0]
         self.le_distance_object.setText(selected_object)
         cmds.setAttr(f"{self.cam_node}.object_name", selected_object, type="string")
 
     def set_camera_height_units(self):
+        """
+        Set the camera height units
+        """
         camera_height_units_index = self.cmb_camera_height_units.currentIndex()
         cmds.setAttr(f"{self.cam_node}.camera_height_units", camera_height_units_index)
 
     def add_selected_object(self):
+        """
+        Get the selected object and add it to the speed node
+        """
         selected_object = cmds.ls(sl=True)[0]
         speed_object_list = self.get_speed_object_list()
+
+        # if the object is in the node already give a warning
         if selected_object in speed_object_list:
             QtWidgets.QMessageBox.critical(
                 self,
@@ -320,14 +345,20 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
                 QtWidgets.QMessageBox.Ok
             )
             return
-        index = len(speed_object_list)
 
+        # get the next blank space attribute name and set it
+        index = len(speed_object_list)
         attribute_name = f"{self.speed_node}.object_name{index + 1}"
         cmds.setAttr(attribute_name, selected_object, type="string")
+
+        # add the new object to the combo box and set it
         self.cmb_speed_objects.addItem(selected_object)
         self.cmb_speed_objects.setCurrentIndex(index)
 
     def populate_speed_objects(self):
+        """
+        Populate the speed objects combo from the node
+        """
         self.cmb_speed_objects.clear()
         for num in range(1, 6):
             attribute_name = f"{self.speed_node}.object_name{num}"
@@ -337,22 +368,38 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
             self.cmb_speed_objects.addItem(object_name)
 
     def set_font_size(self):
+        """ Set the font size on the speed node """
         font_size = self.sp_font_size.value()
         cmds.setAttr(f"{self.speed_node}.font_size", font_size)
 
     def set_font_type(self):
+        """ Set the font type on the speed node """
         font_type_index = self.cmb_font_type.currentIndex()
         cmds.setAttr(f"{self.speed_node}.text_font", font_type_index)
 
     def set_font_weight(self):
+        """ Set the font weight on the speed node """
         font_weight_index = self.cmb_font_weight.currentIndex()
         cmds.setAttr(f"{self.speed_node}.font_weight", font_weight_index)
 
     def set_speed_unit(self):
+        """ Set the speed unit on the speed node """
         speed_unit_index = self.cmb_speed_unit.currentIndex()
         cmds.setAttr(f"{self.speed_node}.speed_unit", speed_unit_index)
 
-    def get_stylesheet_from_attribute(self, attribute_name):
+    @staticmethod
+    def get_stylesheet_from_attribute(attribute_name):
+        # type: (str) -> str
+        """
+        From the colour attribute on the maya
+        node get the pyside stylesheet
+
+        Args:
+            attribute_name: Name of the attribute to query
+
+        Returns:
+            The style sheet in css form
+        """
         colour = cmds.getAttr(attribute_name)[0]
         r = max(0.0, min(1.0, colour[0])) * 255
         g = max(0.0, min(1.0, colour[1])) * 255
@@ -360,16 +407,24 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
         return f"background-color: rgb({r}, {g}, {b});"
 
     def set_speed_colour(self):
+        """
+        Set the speed colour form the dialog
+        on the button and node
+        """
         colour = QtWidgets.QColorDialog.getColor()
         r, g, b, _ = colour.getRgb()
         stylesheet = f"background-color: rgb({r}, {g}, {b});"
         self.btn_text_colour.setStyleSheet(stylesheet)
 
+        # set the speed objects text colour
         index = self.get_object_index()
         attribute_name = f"{self.speed_node}.speed_text_colour{index}"
         cmds.setAttr(attribute_name, (r/255), (g/255), (b/255), type="double3")
 
     def set_cam_colour(self):
+        """
+        Set the camera text colour on the node and on the button
+        """
         colour = QtWidgets.QColorDialog.getColor()
         r, g, b, _ = colour.getRgb()
         stylesheet = f"background-color: rgb({r}, {g}, {b});"
@@ -379,12 +434,19 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
             cmds.setAttr(attribute_name, (r/255), (g/255), (b/255), type="double3")
 
     def set_cam_font_alpha(self):
+        """
+        Set the alpha channel of the text for the opacity
+        """
         cam_font_alpha = self.sld_cam_font_alpha.value() / 100
         self.sb_cam_font_alpha.setValue(cam_font_alpha)
         cmds.setAttr(f"{self.cam_node}.top_text_alpha", cam_font_alpha)
         cmds.setAttr(f"{self.cam_node}.bottom_text_alpha", cam_font_alpha)
 
     def update_cam_controls(self):
+        """
+        When the ui is opened from the node set
+        the settings in the ui widgets
+        """
         # set the colour
         attribute_name = f"{self.cam_node}.top_text_color"
         stylesheet = self.get_stylesheet_from_attribute(attribute_name)
@@ -444,15 +506,20 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
         self.le_distance_object.setText(object_name)
 
     def update_speed_controls(self):
+        """
+        Set the speed control to represent the selected object speed
+        """
         index = self.get_object_index()
         if index == 0:
             return
+
         # update the sliders
         x_offset = cmds.getAttr(f"{self.speed_node}.text_x_offset{index}")
         self.sld_x_offset.setValue(x_offset)
         y_offset = cmds.getAttr(f"{self.speed_node}.text_y_offset{index}")
         self.sld_y_offset.setValue(y_offset)
 
+        # set the visibility of the speed control
         visible = cmds.getAttr(f"{self.speed_node}.show_object_speed{index}")
         self.chk_visible.setChecked(visible)
 

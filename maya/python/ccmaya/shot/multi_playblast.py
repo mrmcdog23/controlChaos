@@ -97,7 +97,8 @@ class MultiPlayblast(base_ui.WindowBase):
         )
         self.le_dir.setText(sel_path)
 
-    def edit_model_panel(self, cam):
+    @staticmethod
+    def edit_model_panel(cam):
         # type: (str) -> None
         """
         Set the model panel to the given camera name
@@ -184,7 +185,8 @@ class MultiPlayblast(base_ui.WindowBase):
             dest_path = os.path.join(render_directory, image_name)
             shutil.move(image_path, dest_path)
 
-    def run_ffmpeg_command(self, command):
+    @staticmethod
+    def run_ffmpeg_command(command):
         # type: (str) -> None
         """
         Run the ffmpeg subprocess
