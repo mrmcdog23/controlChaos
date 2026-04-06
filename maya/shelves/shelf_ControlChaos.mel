@@ -9,7 +9,7 @@ global proc shelf_ControlChaos () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 35
+        -width 39
         -height 34
         -manage 1
         -visible 1
@@ -84,26 +84,27 @@ global proc shelf_ControlChaos () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "def reload_no8_modules():\n    \"\"\"\n    Reload all no8 modules\n    \"\"\"\n    to_remove = list()\n    for k, v in sys.modules.items():\n        if k.startswith(\"cc\"):\n            to_remove.append(k)\n    for e in to_remove:\n        print(f\"Reloading...{e}\")\n        del sys.modules[e]\nreload_no8_modules()" 
+        -annotation "reload" 
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "def reload_no8_modules():\n    \"\"\"\n    Reload all no8 modules\n   ..." 
+        -label "reload" 
         -labelOffset 0
         -rotation 0
         -flipX 0
         -flipY 0
         -useAlpha 1
         -font "plainLabelFont" 
+        -imageOverlayLabel "reload" 
         -overlayLabelColor 0.8 0.8 0.8 
-        -overlayLabelBackColor 0 0 0 0.5 
-        -image "pythonFamily.png" 
-        -image1 "pythonFamily.png" 
+        -overlayLabelBackColor 0 0 0 0.2 
+        -image "reload_modules.png" 
+        -image1 "reload_modules.png" 
         -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "def reload_no8_modules():\n    \"\"\"\n    Reload all no8 modules\n    \"\"\"\n    to_remove = list()\n    for k, v in sys.modules.items():\n        if k.startswith(\"cc\"):\n            to_remove.append(k)\n    for e in to_remove:\n        print(f\"Reloading...{e}\")\n        del sys.modules[e]\nreload_no8_modules()" 
+        -command "import cccore.utils.file_utils as fu;fu.reload_cc_modules()" 
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
