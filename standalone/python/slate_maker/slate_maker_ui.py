@@ -151,7 +151,7 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.ui_settings.setValue("le_movie_dir", self.le_movie_dir.text())
         self.ui_settings.setValue("le_output_dir", self.le_output_dir.text())
         self.ui_settings.setValue("le_new_res", self.le_new_res.text())
-        self.ui_settings.setValue("chk_latest_rev", self.chk_latest_rev.isChecked())
+        self.ui_settings.setValue("chk_latest_rev", int(self.chk_latest_rev.isChecked()))
 
     def connect_signals(self):
         """
