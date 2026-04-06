@@ -1,11 +1,14 @@
 """ Add the context panel to maya """
+import os
 import maya.cmds as cmds
-import ccmaya.utils.create_dockable_widget as create_dockable_widget
 import cccore.base_ui as base_ui
+import ccmaya.utils.create_dockable_widget as create_dockable_widget
 import ccmaya.utils.maya_utils as maya_utils
-from PySide6 import QtWidgets
+from ccmaya.panels.cc_hud_panel_ui import Ui_context_panel
+from PySide6 import QtWidgets, QtGui
 
 
+# constants
 FONT_LIST = ['Ariel', 'Times New Roman', 'Courier', "Serif"]
 FONT_WEIGHT = ['Normal', 'DemiBold', 'Bold']
 SPEED_UNITS = [
@@ -17,23 +20,31 @@ SPEED_UNITS = [
 ]
 
 
-class ControlChaosHUDPanel(base_ui.WidgetBase):
-    icon_to_widget = {
-        "hud_header": "lbl_header"
-    }
+class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
     title = "Control Chaos HUD"
     def __init__(self, parent):
         super().__init__(parent)
         # run the setup functions
+        self.setupUi(self)
+        self.set_header_logo()
         self.populate_data()
         self.populate_speed_objects()
         self.update_cam_controls()
         self.update_speed_controls()
         self.connect_signals()
 
+    def set_header_logo(self):
+        """
+        Set the header size and logo
+        """
         # reposition the ui
-        self.lbl_header.setHidden(True)
-        self.resize(500, 600)
+        self.lbl_header.setMinimumHeight(110)
+        self.lbl_header.setMaximumHeight(110)
+
+        # set the logo to the header label
+        logo_path = os.path.join(os.path.dirname(__file__), "hud_header.png")
+        pixmap = QtGui.QPixmap(logo_path)
+        self.lbl_header.setPixmap(pixmap)
 
     def populate_data(self):
         """
@@ -441,7 +452,6 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         self.btn_text_colour.setStyleSheet(stylesheet)
 
 
-'''
 def create_cc_panel():
     """
     Create the dockable panel in Maya
@@ -449,7 +459,7 @@ def create_cc_panel():
     create_dockable_widget.CreateDockableWidget(
         ControlChaosHUDPanel, "Control Chaos Hud", "Control Chaos Hud", 500
     )
-'''
+
 
 
 def main():

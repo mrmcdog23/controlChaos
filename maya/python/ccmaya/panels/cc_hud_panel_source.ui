@@ -6,31 +6,31 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>849</height>
+    <width>446</width>
+    <height>947</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>400</width>
+    <width>16777215</width>
     <height>16777215</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
     <widget class="QLabel" name="lbl_header">
      <property name="minimumSize">
       <size>
-       <width>500</width>
+       <width>400</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>500</width>
+       <width>400</width>
        <height>0</height>
       </size>
      </property>
@@ -42,7 +42,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>0</number>
