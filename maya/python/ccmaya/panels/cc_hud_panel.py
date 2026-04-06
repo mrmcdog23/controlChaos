@@ -141,7 +141,12 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
             return cc_cam_node[0]
         if not cmds.pluginInfo("controlChaosHUD.py", query=True, loaded=True):
             cmds.loadPlugin("controlChaosHUD.py")
-        return cmds.createNode("controlChaosHUD")
+
+        # create node and hide in outliner
+        node_shape = cmds.createNode("controlChaosHUD")
+        node_transform = cmds.listRelatives(node_shape, p=True)[0]
+        cmds.setAttr(f"{node_transform}.hiddenInOutliner", True)
+        return node_shape
 
     @property
     def speed_node(self):
@@ -154,7 +159,12 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
             return cc_speed_node[0]
         if not cmds.pluginInfo("objectSpeedHUD.py", query=True, loaded=True):
             cmds.loadPlugin("objectSpeedHUD.py")
-        return cmds.createNode("objectSpeedHUD")
+
+        # create node and hide in outliner
+        node_shape = cmds.createNode("objectSpeedHUD")
+        node_transform = cmds.listRelatives(node_shape, p=True)[0]
+        cmds.setAttr(f"{node_transform}.hiddenInOutliner", True)
+        return node_shape
 
     def show_focal_length(self, show):
         # type: (bool) -> None

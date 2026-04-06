@@ -557,7 +557,7 @@ class controlChaosHUDDrawOverride(omr.MPxDrawOverride):
             height = ty * 3.28084
             camera_height_str = "Height: %.2f ft" % height
         else:
-            camera_height_str = "Height: %.2f mtr" % ty
+            camera_height_str = "Height: %.2f m" % ty
         return camera_height_str
 
     def get_transform_dag_from_frame_context(self, frame_context):

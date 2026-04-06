@@ -230,7 +230,7 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
         # Central difference: delta spans 2 frames
         speed_mps = (distance_m / 2) * fps       # metres per second
         if speed_unit == "Meters Per Second":     # 1 m/s = 2.23694 mph
-            speed_str = f"{speed_mps:8.3f} mtrph"
+            speed_str = f"{speed_mps:8.3f} m"
 
         elif speed_unit == "Kilometers Per Hour":
             speed_mph = speed_mps * 3.6         # 1 m/s = 2.23694 mph
@@ -242,7 +242,7 @@ class objectSpeedHUDDrawOverride(omr.MPxDrawOverride):
 
         elif speed_unit == "Feet Per Second":
             speed_yph = speed_mps * 3.28084
-            speed_str = f"{speed_yph:8.3f} feetps"
+            speed_str = f"{speed_yph:8.3f} ftps"
 
         elif speed_unit == "Knots Per Hour":
             speed_knots = speed_mps * 1.94384
