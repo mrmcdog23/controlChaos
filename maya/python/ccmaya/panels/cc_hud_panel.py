@@ -24,15 +24,21 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
     title = "Control Chaos HUD"
     def __init__(self, parent):
         super().__init__(parent)
+        # run the setup functions
         self.populate_data()
         self.populate_speed_objects()
         self.update_cam_controls()
         self.update_speed_controls()
         self.connect_signals()
+
+        # reposition the ui
         self.lbl_header.setHidden(True)
         self.resize(500, 600)
 
     def populate_data(self):
+        """
+        Populate the data of the ui such as fonts and units
+        """
         top_text_font_index = cmds.getAttr(f"{self.cam_node}.top_text_font")
         self.cmb_cam_font_type.addItems(FONT_LIST)
         self.cmb_cam_font_type.setCurrentIndex(top_text_font_index)
@@ -68,6 +74,9 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         self.cmb_speed_unit.setCurrentIndex(speed_unit_index)
 
     def connect_signals(self):
+        """
+        Connect the signals to the widgets
+        """
         # connect the camera controls
         self.sld_cam_text_scale.valueChanged.connect(self.set_cam_text_scale)
         self.sld_cam_x_offset.valueChanged.connect(self.set_cam_x_offset)
@@ -112,6 +121,10 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
 
     @property
     def cam_node(self):
+        # type: () -> controlChaosHUD
+        """
+        Find the camera node and if it doesn't exist create it
+        """
         cc_cam_node = cmds.ls(type="controlChaosHUD")
         if cc_cam_node:
             return cc_cam_node[0]
@@ -121,6 +134,10 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
 
     @property
     def speed_node(self):
+        # type: () -> objectSpeedHUD
+        """
+        Find the speed node and if it doesn't exist create it
+        """
         cc_speed_node = cmds.ls(type="objectSpeedHUD")
         if cc_speed_node:
             return cc_speed_node[0]
@@ -129,39 +146,61 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         return cmds.createNode("objectSpeedHUD")
 
     def show_focal_length(self, show):
+        # type: (bool) -> None
+        """ Show the camera focal length """
         cmds.setAttr(f"{self.cam_node}.show_focal_length", show)
 
     def show_rotations(self, show):
+        # type: (bool) -> None
+        """ Show the camera rotations """
         cmds.setAttr(f"{self.cam_node}.show_camera_rotations", show)
 
     def show_height(self, show):
+        # type: (bool) -> None
+        """ Show the camera height """
         cmds.setAttr(f"{self.cam_node}.show_camera_height", show)
 
     def show_frame_number(self, show):
+        # type: (bool) -> None
+        """ Show the frame number """
         cmds.setAttr(f"{self.cam_node}.show_frame_number", show)
 
     def show_speed(self, show):
+        # type: (bool) -> None
+        """ Show the camera speed """
         cmds.setAttr(f"{self.cam_node}.show_camera_speed", show)
 
     def show_object_distance(self, show):
+        # type: (bool) -> None
+        """ Show the camera distance to an object """
         cmds.setAttr(f"{self.cam_node}.show_distance_to_object", show)
 
     def set_focal_length_pos(self, value):
+        # type: (int) -> None
+        """ Set the focal length text position """
         cmds.setAttr(f"{self.cam_node}.focal_length_position", value)
 
     def set_rotations_pos(self, value):
+        # type: (int) -> None
+        """ set the rotations text position """
         cmds.setAttr(f"{self.cam_node}.camera_rotations_position", value)
 
     def set_height_pos(self, value):
+        # type: (int) -> None
+        """ set the height text position """
         cmds.setAttr(f"{self.cam_node}.camera_height_position", value)
 
     def set_frame_number_pos(self, value):
         cmds.setAttr(f"{self.cam_node}.frame_number_position", value)
 
     def set_speed_pos(self, value):
+        # type: (int) -> None
+        """ set the speed text position """
         cmds.setAttr(f"{self.cam_node}.camera_speed_position", value)
 
     def set_object_distance_pos(self, value):
+        # type: (int) -> None
+        """ set the distance to the actor text position """
         cmds.setAttr(f"{self.cam_node}.distance_to_actor_position", value)
 
     def set_cam_text_scale(self):
@@ -216,6 +255,13 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         cmds.setAttr(f"{self.speed_node}.text_y_offset{index}", y_offset)
 
     def get_speed_object_list(self):
+        # type: () -> list[str]
+        """
+        Get a list of speed objects that are in the speed node
+
+        Returns:
+            speed_object_list: List of speed objects
+        """
         speed_object_list = list()
         for num in range(1, 6):
             attribute_name = f"{self.speed_node}.object_name{num}"
@@ -226,6 +272,9 @@ class ControlChaosHUDPanel(base_ui.WidgetBase):
         return speed_object_list
 
     def add_ground_geo(self):
+        """
+        Add the slected object to the ground geometry
+        """
         selected_object = cmds.ls(sl=True)[0]
         self.le_ground_geo.setText(selected_object)
         cmds.setAttr(f"{self.cam_node}.ground_geo", selected_object, type="string")
