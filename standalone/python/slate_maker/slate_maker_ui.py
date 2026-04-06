@@ -140,7 +140,7 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.le_new_res.setText(le_new_res)
 
         # save the latest revision check box
-        chk_latest_rev = self.ui_settings.value("chk_latest_rev", str())
+        chk_latest_rev = self.ui_settings.value("chk_latest_rev", 1)
         self.chk_latest_rev.setChecked(int(chk_latest_rev))
 
     def save_settings(self):

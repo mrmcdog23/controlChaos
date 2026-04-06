@@ -6,9 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bat/slate_launcher.bat" beforeDir="false" afterPath="$PROJECT_DIR$/bat/slate_launcher.bat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/shot/multi_playblast.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/shot/multi_playblast.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/standalone/python/slate_maker/slate_maker_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/standalone/python/slate_maker/slate_maker_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements/install_env.bat" beforeDir="false" afterPath="$PROJECT_DIR$/bat/install_env.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements/requirements311.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements/requirements311.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +74,9 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "last_opened_file_path": "/no8/pipeline/dev/joeleveson/controlChaos",
+    "last_opened_file_path": "C:/Users/joele/Documents/pipelines/controlChaos/bat",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "run.code.analysis.last.selected.profile": "pProject Default",
@@ -82,14 +85,15 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\joele\Documents\pipelines\controlChaos\bat" />
       <recent name="$PROJECT_DIR$/maya/plugins" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\joele\Documents\pipelines\controlChaos\bat" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/maya/python/ccmaya/panels" />
       <recent name="$PROJECT_DIR$/core/python/cccore" />
       <recent name="$PROJECT_DIR$/core/python/cccore/utils" />
-      <recent name="$PROJECT_DIR$/maya/python/ccmaya/shot" />
     </key>
   </component>
   <component name="SharedIndexes">

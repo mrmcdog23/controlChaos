@@ -212,6 +212,8 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
         cmds.setAttr(f"{self.cam_node}.camera_height_position", value)
 
     def set_frame_number_pos(self, value):
+        # type: (int) -> None
+        """ set the frame number text position """
         cmds.setAttr(f"{self.cam_node}.frame_number_position", value)
 
     def set_speed_pos(self, value):
@@ -536,7 +538,6 @@ def create_cc_panel():
     create_dockable_widget.CreateDockableWidget(
         ControlChaosHUDPanel, "Control Chaos Hud", "Control Chaos Hud", 500
     )
-
 
 
 def main():

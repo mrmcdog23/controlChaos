@@ -1,2 +1,3 @@
 pdfplumber
-pyside6
+PySide6
+pymel
