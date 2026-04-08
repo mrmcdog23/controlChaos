@@ -4,7 +4,7 @@ import sys
 import inspect
 import requests
 from typing import Any, Optional
-from PySide6 import QtWidgets, QtGui, QtCore
+from PySide2 import QtWidgets, QtGui, QtCore
 from qtpy import uic
 from pathlib import Path
 

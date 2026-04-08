@@ -4,8 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="store the checkbox as an integer">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="adding shelves to the bat files">
+      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/shot/multi_playblast.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/shot/multi_playblast.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/utils/create_dockable_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/utils/create_dockable_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/utils/maya_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/utils/maya_utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,22 +111,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773425141034</updated>
-    </task>
-    <task id="LOCAL-00043" summary="got screen position">
-      <option name="closed" value="true" />
-      <created>1774076063721</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1774076063721</updated>
-    </task>
-    <task id="LOCAL-00044" summary="got screen position">
-      <option name="closed" value="true" />
-      <created>1774077997642</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1774077997642</updated>
     </task>
     <task id="LOCAL-00045" summary="got screen position">
       <option name="closed" value="true" />
@@ -500,7 +488,23 @@
       <option name="project" value="LOCAL" />
       <updated>1775501694338</updated>
     </task>
-    <option name="localTasksCounter" value="92" />
+    <task id="LOCAL-00092" summary="adding quotes to maya bat file">
+      <option name="closed" value="true" />
+      <created>1775640583648</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1775640583649</updated>
+    </task>
+    <task id="LOCAL-00093" summary="adding shelves to the bat files">
+      <option name="closed" value="true" />
+      <created>1775640830009</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1775640830009</updated>
+    </task>
+    <option name="localTasksCounter" value="94" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -518,8 +522,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="renamed plugin" />
-    <MESSAGE value="offset in y option" />
     <MESSAGE value="&#10;# Conflicts:&#10;#&#9;.idea/misc.xml&#10;" />
     <MESSAGE value="updated to all hud option" />
     <MESSAGE value="got screen position" />
@@ -543,6 +545,8 @@
     <MESSAGE value="latw" />
     <MESSAGE value="hide nodes on creation in the outliner" />
     <MESSAGE value="store the checkbox as an integer" />
-    <option name="LAST_COMMIT_MESSAGE" value="store the checkbox as an integer" />
+    <MESSAGE value="adding quotes to maya bat file" />
+    <MESSAGE value="adding shelves to the bat files" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding shelves to the bat files" />
   </component>
 </project>
