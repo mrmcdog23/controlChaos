@@ -6,6 +6,10 @@ set PYTHONPATH=%PYTHONPATH%;%ROOT_DIR%virtual_env\python311_nopyside\Lib\site-pa
 set PYTHONPATH=%PYTHONPATH%;%PIPELINE_ROOT%\core\python
 set PYTHONPATH=%PYTHONPATH%;%PIPELINE_ROOT%\maya\python
 
+set MAYA_PLUG_IN_PATH=%PIPELINE_ROOT%\maya\plugins
+set MAYA_SHELF_PATH=%PIPELINE_ROOT%\maya\shelves
+set XBMLANGPATH=%PIPELINE_ROOT%\maya\icons
+
 echo "Python path: %PYTHONPATH%"
 
 "C:\Program Files\Autodesk\Maya2024\bin\maya.exe"
