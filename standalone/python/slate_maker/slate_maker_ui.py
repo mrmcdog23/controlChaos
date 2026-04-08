@@ -14,6 +14,23 @@ THUMBNAIL_WIDTH = 250
 THUMBNAIL_HEIGHT = 160
 
 
+class PasteTableWidget(QtWidgets.QTableWidget):
+    def keyPressEvent(self, event):
+        if event.matches(QtGui.QKeySequence.StandardKey.Paste):
+            self.paste_to_selection()
+        else:
+            super().keyPressEvent(event)
+
+    def paste_to_selection(self):
+        clipboard = QtWidgets.QApplication.clipboard()
+        text = clipboard.text()
+        if not text:
+            return
+        items = self.selectedItems()
+        for item in items:
+            item.setText(text)
+
+
 class SlateMakerUI(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -59,6 +76,13 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.main_layout.addLayout(lyt_dir)
         return le_dir, btn_dir
 
+    def create_spacer(self):
+        return QtWidgets.QSpacerItem(
+            40, 20,
+            QtWidgets.QSizePolicy.Policy.Expanding,
+            QtWidgets.QSizePolicy.Policy.Minimum
+        )
+
     def create_layout(self):
         """
         Create the ui layout widget
@@ -89,19 +113,39 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.btn_new_res = QtWidgets.QPushButton("Set Resolution")
         self.btn_new_res.setMaximumWidth(90)
 
-        self.btn_extract_data = QtWidgets.QPushButton("Extract Data")
+        self.btn_version_up = QtWidgets.QPushButton("Version Up")
+
         self.chk_latest_rev = QtWidgets.QCheckBox("Latest Revisions Only")
         self.chk_latest_rev.setMaximumWidth(150)
         self.chk_latest_rev.setChecked(True)
 
+        self.rbn_icon_view = QtWidgets.QRadioButton("Icon View")
+        self.rbn_icon_view.setChecked(True)
+        self.rbn_list_view = QtWidgets.QRadioButton("List View")
+
+        self.btn_extract_data = QtWidgets.QPushButton("Extract Data")
+
+        lyt_options.addWidget(QtWidgets.QLabel("  "))
         lyt_options.addWidget(self.chk_all)
+        lyt_options.addItem(self.create_spacer())
+
         lyt_options.addWidget(self.le_new_res)
         lyt_options.addWidget(self.btn_new_res)
-        lyt_options.addWidget(self.btn_extract_data)
+        lyt_options.addItem(self.create_spacer())
+
+        lyt_options.addWidget(self.rbn_icon_view)
+        lyt_options.addWidget(self.rbn_list_view)
+        lyt_options.addItem(self.create_spacer())
+
+        lyt_options.addWidget(self.btn_version_up)
+        lyt_options.addItem(self.create_spacer())
+
         lyt_options.addWidget(self.chk_latest_rev)
         self.main_layout.addLayout(lyt_options)
 
-        self.tbw_shots = QtWidgets.QTableWidget(0, len(self.headers))
+        self.main_layout.addWidget(self.btn_extract_data)
+
+        self.tbw_shots = PasteTableWidget(0, len(self.headers))
         self.main_layout.addWidget(self.tbw_shots)
 
         # browse the movie directory
@@ -114,6 +158,9 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.set_table_attributes()
 
     def set_table_attributes(self):
+        """
+        Set the table heads and width
+        """
         self.tbw_shots.setColumnWidth(self.headers.index("thumbnail"), THUMBNAIL_WIDTH)
         self.tbw_shots.setColumnWidth(self.headers.index(" "), CHECKED_WIDTH)
         self.tbw_shots.setHorizontalHeaderLabels(self.headers)
@@ -164,6 +211,27 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.btn_create_slates.clicked.connect(self.create_slates)
         self.btn_new_res.clicked.connect(self.set_new_resolution)
         self.chk_all.toggled.connect(self.check_all)
+        self.rbn_icon_view.toggled.connect(self.toggle_view)
+        self.btn_version_up.clicked.connect(self.version_up)
+
+    def version_up(self):
+        """
+        Version up the slates by one
+        """
+        version_index = self.headers.index("version")
+        for row_index in range(self.tbw_shots.rowCount()):
+            item = self.tbw_shots.item(row_index, version_index)
+            next_version = int(item.text()) + 1
+            item.setText(str(next_version))
+
+    def toggle_view(self, icon_view):
+        # type: (bool) -> None
+        """
+        Toggle between the view types
+        """
+        height = THUMBNAIL_HEIGHT if icon_view else 30
+        for row in range(self.tbw_shots.rowCount()):
+            self.tbw_shots.setRowHeight(row, height)
 
     def set_new_resolution(self):
         """
