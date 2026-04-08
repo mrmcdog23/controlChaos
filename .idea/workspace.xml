@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="adding shelves to the bat files">
-      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/panels/cc_hud_panel_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/shot/multi_playblast.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/shot/multi_playblast.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/utils/create_dockable_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/utils/create_dockable_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya/python/ccmaya/utils/maya_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/maya/python/ccmaya/utils/maya_utils.py" afterDir="false" />
-    </list>
+    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="switched to pyside2" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -111,22 +105,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773425141034</updated>
-    </task>
-    <task id="LOCAL-00045" summary="got screen position">
-      <option name="closed" value="true" />
-      <created>1774079143016</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1774079143016</updated>
-    </task>
-    <task id="LOCAL-00046" summary="trgthtr">
-      <option name="closed" value="true" />
-      <created>1774293026513</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1774293026513</updated>
     </task>
     <task id="LOCAL-00047" summary="standalone">
       <option name="closed" value="true" />
@@ -504,7 +482,23 @@
       <option name="project" value="LOCAL" />
       <updated>1775640830009</updated>
     </task>
-    <option name="localTasksCounter" value="94" />
+    <task id="LOCAL-00094" summary="switched to pyside2">
+      <option name="closed" value="true" />
+      <created>1775641225310</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1775641225310</updated>
+    </task>
+    <task id="LOCAL-00095" summary="switched to pyside2">
+      <option name="closed" value="true" />
+      <created>1775641323374</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1775641323374</updated>
+    </task>
+    <option name="localTasksCounter" value="96" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -522,7 +516,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="&#10;# Conflicts:&#10;#&#9;.idea/misc.xml&#10;" />
     <MESSAGE value="updated to all hud option" />
     <MESSAGE value="got screen position" />
     <MESSAGE value="trgthtr" />
@@ -547,6 +540,7 @@
     <MESSAGE value="store the checkbox as an integer" />
     <MESSAGE value="adding quotes to maya bat file" />
     <MESSAGE value="adding shelves to the bat files" />
-    <option name="LAST_COMMIT_MESSAGE" value="adding shelves to the bat files" />
+    <MESSAGE value="switched to pyside2" />
+    <option name="LAST_COMMIT_MESSAGE" value="switched to pyside2" />
   </component>
 </project>
