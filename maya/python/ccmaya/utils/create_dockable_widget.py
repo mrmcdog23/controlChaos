@@ -3,7 +3,7 @@ import maya.cmds as cmds
 import maya.OpenMayaUI as OpenMayaUI
 from typing import Any
 import shiboken2
-from PySide2 import QtWidgets, QtCore
+from CCPySide import QtWidgets, QtCore
 
 
 class CreateDockableWidget(object):

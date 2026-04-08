@@ -2,8 +2,7 @@
 import maya.cmds as cmds
 import maya.OpenMayaUI as OpenMayaUI
 from typing import Optional, Any
-import shiboken2
-from PySide2 import QtWidgets
+from CCPySide import QtWidgets, shiboken
 import cccore.utils.cc_logging as cc_logging
 
 
@@ -20,7 +19,7 @@ def get_maya_main_window():
     """
     ptr = OpenMayaUI.MQtUtil.mainWindow()
     if ptr is not None:
-        return shiboken2.wrapInstance(int(ptr), QtWidgets.QWidget)
+        return shiboken.wrapInstance(int(ptr), QtWidgets.QWidget)
 
 
 def launch_maya_win(win_class):

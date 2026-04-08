@@ -4,7 +4,7 @@ import re
 import sys
 import extract_pdf_data
 from dataclasses import asdict
-from PySide6 import QtWidgets, QtCore, QtGui
+from CCPySide import QtWidgets, QtCore, QtGui
 
 
 # constants
