@@ -5,7 +5,7 @@ import cccore.base_ui as base_ui
 import ccmaya.utils.create_dockable_widget as create_dockable_widget
 import ccmaya.utils.maya_utils as maya_utils
 from ccmaya.panels.cc_hud_panel_ui import Ui_context_panel
-from PySide6 import QtWidgets, QtGui
+from PySide2 import QtWidgets, QtGui
 
 
 # constants

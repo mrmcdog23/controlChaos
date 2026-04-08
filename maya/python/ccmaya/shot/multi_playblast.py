@@ -4,7 +4,7 @@ import glob
 import shutil
 import subprocess
 import maya.cmds as cmds
-from PySide6 import QtWidgets, QtCore
+from PySide2 import QtWidgets, QtCore
 import ccmaya.utils.maya_utils as maya_utils
 import cccore.base_ui as base_ui
 import cccore.utils.cc_logging as cc_logging
