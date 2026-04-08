@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="hide nodes on creation in the outliner">
-      <change afterPath="$PROJECT_DIR$/core/python/cccore/utils/file_utils.py" afterDir="false" />
+    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="store the checkbox as an integer">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/maya/shelves/shelf_ControlChaos.mel" beforeDir="false" afterPath="$PROJECT_DIR$/maya/shelves/shelf_ControlChaos.mel" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,12 +42,12 @@
     &quot;assignee&quot;: &quot;mrmcdog23&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/mrmcdog23/controlChaos&quot;,
-    &quot;accountId&quot;: &quot;a08df705-7f09-4894-9e5f-6295c50fa96a&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/mrmcdog23/controlChaos",
+    "accountId": "b6be3f20-6ec2-4f4e-8102-f37d17882d5f"
   }
-}</component>
+}]]></component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -97,7 +95,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-4f4e415b4190-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.26053.29" />
+        <option value="bundled-python-sdk-b63d5a1f7c97-b61e75351b1f-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.22158.340" />
       </set>
     </attachedChunks>
   </component>
@@ -109,14 +107,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773425141034</updated>
-    </task>
-    <task id="LOCAL-00042" summary="got screen position">
-      <option name="closed" value="true" />
-      <created>1774041313500</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1774041313500</updated>
     </task>
     <task id="LOCAL-00043" summary="got screen position">
       <option name="closed" value="true" />
@@ -502,7 +492,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775474695553</updated>
     </task>
-    <option name="localTasksCounter" value="91" />
+    <task id="LOCAL-00091" summary="store the checkbox as an integer">
+      <option name="closed" value="true" />
+      <created>1775501694338</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1775501694338</updated>
+    </task>
+    <option name="localTasksCounter" value="92" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -520,7 +518,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="hide text objects" />
     <MESSAGE value="renamed plugin" />
     <MESSAGE value="offset in y option" />
     <MESSAGE value="&#10;# Conflicts:&#10;#&#9;.idea/misc.xml&#10;" />
@@ -545,6 +542,7 @@
     <MESSAGE value="load the ui from converted python script instead of ui file" />
     <MESSAGE value="latw" />
     <MESSAGE value="hide nodes on creation in the outliner" />
-    <option name="LAST_COMMIT_MESSAGE" value="hide nodes on creation in the outliner" />
+    <MESSAGE value="store the checkbox as an integer" />
+    <option name="LAST_COMMIT_MESSAGE" value="store the checkbox as an integer" />
   </component>
 </project>

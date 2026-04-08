@@ -8,5 +8,5 @@ set PYTHONPATH=%PYTHONPATH%;%PIPELINE_ROOT%\maya\python
 
 echo "Python path: %PYTHONPATH%"
 
-C:\Program Files\Autodesk\Maya2024\bin\maya.exe
+"C:\Program Files\Autodesk\Maya2024\bin\maya.exe"
 pause
