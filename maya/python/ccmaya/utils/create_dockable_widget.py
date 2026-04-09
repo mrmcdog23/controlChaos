@@ -2,8 +2,7 @@
 import maya.cmds as cmds
 import maya.OpenMayaUI as OpenMayaUI
 from typing import Any
-import shiboken2
-from CCPySide import QtWidgets, QtCore
+from CCPySide import QtWidgets, QtCore, shiboken
 
 
 class CreateDockableWidget(object):
@@ -48,7 +47,7 @@ class CreateDockableWidget(object):
             label=self.panel_label
         )
         dock_ptr = OpenMayaUI.MQtUtil.findControl(dock_panel)
-        dock_widget = shiboken2.wrapInstance(int(dock_ptr), QtWidgets.QWidget)
+        dock_widget = shiboken.wrapInstance(int(dock_ptr), QtWidgets.QWidget)
         dock_widget.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         child = self.widget_cls(dock_widget)

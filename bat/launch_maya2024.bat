@@ -22,7 +22,7 @@ set PYTHONPATH=%PYTHONPATH%;%PIPELINE_ROOT%\core\python\cccore\pyside
 :: --- Maya environment paths ---
 set MAYA_PLUG_IN_PATH=%PIPELINE_ROOT%\maya\plugins
 set MAYA_SHELF_PATH=%PIPELINE_ROOT%\maya\shelves
-set XBMLANGPATH=%PIPELINE_ROOT%\maya\icons\%B
+set XBMLANGPATH=%PIPELINE_ROOT%\maya\shelves\icons\%B
 
 :: --- Debug output ---
 echo "Python path: %PYTHONPATH%"
