@@ -9,7 +9,7 @@ global proc shelf_ControlChaos () {
         -flexibleWidthType 3
         -flexibleWidthValue 32
         -enable 1
-        -width 35
+        -width 39
         -height 34
         -manage 1
         -visible 1
@@ -42,9 +42,9 @@ global proc shelf_ControlChaos () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 31
+        -flexibleWidthValue 32
         -enable 1
-        -width 34
+        -width 39
         -height 34
         -manage 1
         -visible 1
@@ -77,9 +77,9 @@ global proc shelf_ControlChaos () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 33
+        -flexibleWidthValue 32
         -enable 1
-        -width 36
+        -width 39
         -height 34
         -manage 1
         -visible 1
