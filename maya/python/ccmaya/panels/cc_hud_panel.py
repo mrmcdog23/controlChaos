@@ -139,8 +139,6 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
         cc_cam_node = cmds.ls(type="controlChaosHUD")
         if cc_cam_node:
             return cc_cam_node[0]
-        if not cmds.pluginInfo("controlChaosHUD.py", query=True, loaded=True):
-            cmds.loadPlugin("controlChaosHUD.py")
 
         # create node and hide in outliner
         node_shape = cmds.createNode("controlChaosHUD")
@@ -157,8 +155,6 @@ class ControlChaosHUDPanel(base_ui.WidgetBase, Ui_context_panel):
         cc_speed_node = cmds.ls(type="objectSpeedHUD")
         if cc_speed_node:
             return cc_speed_node[0]
-        if not cmds.pluginInfo("objectSpeedHUD.py", query=True, loaded=True):
-            cmds.loadPlugin("objectSpeedHUD.py")
 
         # create node and hide in outliner
         node_shape = cmds.createNode("objectSpeedHUD")
@@ -535,6 +531,11 @@ def create_cc_panel():
     """
     Create the dockable panel in Maya
     """
+    if not cmds.pluginInfo("controlChaosHUD.py", query=True, loaded=True):
+        cmds.loadPlugin("controlChaosHUD.py")
+
+    if not cmds.pluginInfo("objectSpeedHUD.py", query=True, loaded=True):
+        cmds.loadPlugin("objectSpeedHUD.py")
     create_dockable_widget.CreateDockableWidget(
         ControlChaosHUDPanel, "Control Chaos Hud", "Control Chaos Hud", 500
     )

@@ -5,7 +5,7 @@ import maya.api.OpenMaya as om
 import maya.api.OpenMayaUI as omui
 import maya.api.OpenMayaRender as omr
 import maya.api.OpenMayaAnim as omanim
-import pymel.core as pm
+import maya.cmds as cmds
 
 
 # plugin information
@@ -761,7 +761,7 @@ class controlChaosHUDDrawOverride(omr.MPxDrawOverride):
         camera_path = frame_context.getCurrentCameraPath()
         camera = om.MFnCamera(camera_path)
         camera_aspect_ratio = camera.aspectRatio()
-        device_aspect_ratio = pm.general.getAttr('defaultResolution.deviceAspectRatio')
+        device_aspect_ratio = cmds.getAttr('defaultResolution.deviceAspectRatio')
 
         viewport_x, viewport_y, viewport_width, viewport_height = frame_context.getViewportDimensions()
         viewport_aspect_ratio = viewport_width / float(viewport_height)
