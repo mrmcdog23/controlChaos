@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="removed pymel command as its not released for maya 2026">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="46b9efff-3667-4fd9-8d43-a42b97c4f05c" name="Changes" comment="adding workspace to gitignore">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -108,14 +107,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773425141034</updated>
-    </task>
-    <task id="LOCAL-00053" summary="thumnbail">
-      <option name="closed" value="true" />
-      <created>1774383320908</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1774383320909</updated>
     </task>
     <task id="LOCAL-00054" summary="thumnbail">
       <option name="closed" value="true" />
@@ -501,7 +492,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775804286909</updated>
     </task>
-    <option name="localTasksCounter" value="102" />
+    <task id="LOCAL-00102" summary="adding workspace to gitignore">
+      <option name="closed" value="true" />
+      <created>1775822349391</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1775822349392</updated>
+    </task>
+    <option name="localTasksCounter" value="103" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -519,7 +518,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed the focal length so its set" />
     <MESSAGE value="added pycharm icons to the pipe" />
     <MESSAGE value="padded the version number to give the name" />
     <MESSAGE value="made slate maker have override the resolution" />
@@ -544,6 +542,7 @@
     <MESSAGE value="adding qtpy to the requirements" />
     <MESSAGE value="fix for icons on maya shelves" />
     <MESSAGE value="removed pymel command as its not released for maya 2026" />
-    <option name="LAST_COMMIT_MESSAGE" value="removed pymel command as its not released for maya 2026" />
+    <MESSAGE value="adding workspace to gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="adding workspace to gitignore" />
   </component>
 </project>
