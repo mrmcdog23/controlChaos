@@ -1,6 +1,7 @@
 """ Create uis and manager them through base class """
 import os
 import sys
+import logging
 import inspect
 import requests
 from typing import Any, Optional
@@ -9,13 +10,9 @@ from qtpy import uic
 from pathlib import Path
 
 
-cc_SS = "../../style/css/cc_stylesheet.css"
-BTN_SS = "../../style/css/cc_button.css"
-HOU_BTN_SS = "../../style/css/cc_houdini_button.css"
-HOUDINI_SS = "../../style/css/houdini.css"
-BLENDER_SS = "../../style/css/blender.css"
-FTRACK_SS = "../../style/css/equalizer.css"
-FLAME_SS = "../../style/css/flame.css"
+CONTROL_CHAOS_SS = "../../css/cc_stylesheet.css"
+BTN_SS = "../../css/btn_stylesheet.css"
+
 
 
 class Ui(object):
@@ -28,52 +25,41 @@ class Ui(object):
     additional_stylesheet = None
     use_cc_ss = False
     previous_ui_settings = None
+    cc_header = None
+    add_cc_title_name = False
 
     def __init__(self, parent=None, *args, **kwargs):
         super(Ui, self).__init__(parent)
-        self.cc_header = None
-        self.cc_ss = kwargs.get("cc_ss")
-        if self.cc_ss is None:
-            self.cc_ss = self.use_cc_ss
 
         self._icon_directory = None
         self._cc_style_sheet = None
 
-        # if it is a tree or table widget item skip the setup
-        if isinstance(self, (QtWidgets.QTreeWidgetItem, QtWidgets.QTableWidget)):
-            return
+        self.load_ui_file_and_set_window()
+        self.add_theme_directory()
+        self.set_widget_icons()
+        self.add_icons_to_tab()
+        self.load_cc_style_sheet()
+        self.apply_btn_style_sheet()
 
+        self.load_previous_ui_settings()
+        self.add_cc_header()
+
+    def load_ui_file_and_set_window(self):
         # load the ui file. If one has already been defined use that
         ui_file_path = self.get_relevant_ui_file()
         if os.path.exists(ui_file_path):
             uic.loadUi(ui_file_path, self)
 
         if self.title:
-            self.setWindowTitle(self.title)
+            if self.add_cc_title_name:
+                self.setWindowTitle(f"Control Chaos {self.title}")
+            else:
+                self.setWindowTitle(self.title)
 
         if self.window_icon:
-            window_icon_path = self.get_path(self.window_icon)
+            window_icon_path = self.get_icon_path(self.window_icon)
             qicon = QtGui.QIcon(window_icon_path)
             self.setWindowIcon(qicon)
-
-        self.set_project_widgets()
-        self.add_theme_directory()
-        self.set_widget_icons()
-        self.add_icons_to_tab()
-        #self.load_cc_style_sheet()
-        #self.apply_btn_style_sheet()
-        self.load_previous_ui_settings()
-        self.add_cc_header()
-
-    def set_project_widgets(self):
-        """
-        Set the project widgets icon and name
-        """
-        self.set_widget_icons({"project": "lbl_icon_project"})
-        project_name = os.environ.get("PROJECT_NAME")
-        lbl_project_name = self.findChild(QtWidgets.QLabel, "lbl_project_name")
-        if lbl_project_name and project_name:
-            lbl_project_name.setText(project_name)
 
     def check_subclasses_for_ui_file(self, subclass):
         # type: (Any) -> str
@@ -173,29 +159,12 @@ class Ui(object):
         """
         Load the cc Animation style sheet on to the current ui
         """
-        self._cc_style_sheet = self.read_css(cc_SS)
-        if self.cc_ss:
-            if self.additional_stylesheet:
-                self._cc_style_sheet += self.additional_stylesheet
-            self.setStyleSheet(self._cc_style_sheet)
-
-    def load_blender_style_sheet(self):
-        """
-        Load the Blender stylesheet on to the current ui
-        """
-        self.setStyleSheet(self.read_css(BLENDER_SS))
-
-    def load_houdini_style_sheet(self):
-        """
-        Load the Houdini stylesheet on to the current ui
-        """
-        self.setStyleSheet(self.read_css(HOUDINI_SS))
-
-    def load_ftrack_style_sheet(self):
-        """
-        Load the FTrack stylesheet on to the current ui
-        """
-        self.setStyleSheet(self.read_css(FTRACK_SS))
+        if not self.use_cc_ss:
+            return
+        self._cc_style_sheet = self.read_css(CONTROL_CHAOS_SS)
+        if self.additional_stylesheet:
+            self._cc_style_sheet += self.additional_stylesheet
+        self.setStyleSheet(self._cc_style_sheet)
 
     @staticmethod
     def lw_items_text(listwidget):
@@ -226,7 +195,7 @@ class Ui(object):
             self._icon_directory = os.path.join(os.environ["PIPELINE_ROOT"], "core", "icons")
         return self._icon_directory
 
-    def get_path(self, icon_name):
+    def get_icon_path(self, icon_name):
         # type: (str) -> str
         """
         Get the icon path from the icon name and icon directory
@@ -237,8 +206,23 @@ class Ui(object):
         Returns:
             icon_path: Path to the icon
         """
-        icon_path = os.path.join(self.icon_directory, icon_name + ".png")
-        return icon_path
+        if not icon_name.endswith(".png"):
+            icon_name = f"{icon_name}.png"
+
+        # if the icon name is already a path that exists return it
+        if "/" in icon_name and os.path.exists(icon_name):
+             return icon_name.replace("\\", "/")
+
+        # check the icon directory for the image
+        icon_path = os.path.join(self.icon_directory, icon_name)
+        if os.path.exists(icon_path):
+            return icon_path.replace("\\", "/")
+        
+        # check the directory from when the python file is launched
+        python_file_path = inspect.getfile(self.__class__)
+        current_image_path = os.path.join(os.path.dirname(python_file_path), icon_name)
+        if os.path.exists(current_image_path):
+            return current_image_path.replace("\\", "/")
 
     def get_qicon_from_name(self, icon_name):
         # type: (str) -> QtGui.QIcon
@@ -248,7 +232,7 @@ class Ui(object):
         Args:
             icon_name: Name of the icon to find
         """
-        icon_path = self.get_path(icon_name)
+        icon_path = self.get_icon_path(icon_name)
         return QtGui.QIcon(icon_path)
 
     def set_thumbnail_image(self, image_path=None):
@@ -282,39 +266,40 @@ class Ui(object):
         """
         use_icon_to_widget = icon_dict if icon_dict else self.icon_to_widget
         for icon_name, widget_name in use_icon_to_widget.items():
+            self.apply_icon_to_widget(widget_name, icon_name)
 
-            if isinstance(widget_name, QtWidgets.QWidget):
-                widget = widget_name
-            else:
-                widget = self.findChild(QtWidgets.QWidget, widget_name)
+    def apply_icon_to_widget(self, widget_name, icon_name):
+        # type: (QtWidgets.QWidget, str) -> None
+        """
+        From an icon name find its path and apply to the widget
 
-            icon_dir_image_path = self.get_path(icon_name)
+        Args:
+            widget: The widget to apply the icon to
+            icon_name: Name of the icon to set
+        """
+        if isinstance(widget_name, QtWidgets.QWidget):
+            widget = widget_name
+        else:
+            widget = self.findChild(QtWidgets.QWidget, widget_name)
+            
+        # if widget does not exist return
+        if not widget:
+            logging.getLogger().warning(f"Can not find widget name {widget_name}")
+            return
 
-            # the given python file path
-            python_file_path = inspect.getfile(self.__class__)
-            current_image_path = os.path.join(os.path.dirname(python_file_path), icon_name + ".png")
+        icon_path = self.get_icon_path(icon_name)
+        if not icon_path:
+            logging.getLogger().warning(f"Can not find icon name {icon_name}")
+            return
 
-            # find the icon path
-            icon_path = None
-            if "/" in icon_name and os.path.exists(icon_name):
-                icon_path = icon_name
+        if hasattr(widget, "setIcon"):
+            qicon = QtGui.QIcon(icon_path)
+            widget.setIcon(qicon)
 
-            elif os.path.exists(icon_dir_image_path):
-                icon_path = icon_dir_image_path
+        elif hasattr(widget, "setPixmap"):
+            pixmap = QtGui.QPixmap(icon_path)
+            widget.setPixmap(pixmap)
 
-            elif os.path.exists(current_image_path):
-                icon_path = current_image_path
-
-            if not icon_path:
-                return
-
-            if hasattr(widget, "setIcon"):
-                qicon = QtGui.QIcon(icon_path)
-                widget.setIcon(qicon)
-
-            elif hasattr(widget, "setPixmap"):
-                pixmap = QtGui.QPixmap(icon_path)
-                widget.setPixmap(pixmap)
 
     def add_icons_to_combo(self, combobox, icons_list):
         # type: (QtWidgets.QComboBox, list[str]) -> None
@@ -339,7 +324,7 @@ class Ui(object):
             icon_name: Name of the icon to set
             index: Index number of the item
         """
-        icon_path = self.get_path(icon_name)
+        icon_path = self.get_icon_path(icon_name)
         qicon = QtGui.QIcon(icon_path)
         combobox.setItemIcon(index, qicon)
 
@@ -366,7 +351,7 @@ class Ui(object):
         for tab_name, icons in self.tab_to_icons.items():
             tab_widget = self.findChild(QtWidgets.QTabWidget, tab_name)
             for index, icon_name in enumerate(icons):
-                icon_path = self.get_path(icon_name)
+                icon_path = self.get_icon_path(icon_name)
                 qicon = QtGui.QIcon(icon_path)
                 tab_widget.setTabIcon(index, qicon)
 
@@ -399,23 +384,11 @@ class Ui(object):
         for widget in widgets:
             widget.setStyleSheet(self._cc_style_sheet)
 
-    def apply_btn_style_sheet(self, use_btn=None):
-        # type: (Optional[QtWidgets.QPushButton]) -> None
+    def apply_btn_style_sheet(self):
         """
         Load the cc button style sheet on to the buttons tagged with "btn_ss"
-
-        Args:
-            use_btn: Button to apply stylesheet to
         """
-        if os.environ.get("APP_NAME") == "houdini":
-            btn_style_sheet = self.read_css(HOU_BTN_SS)
-        else:
-            btn_style_sheet = self.read_css(BTN_SS)
-
-        if use_btn:
-            use_btn.setStyleSheet(btn_style_sheet)
-            return
-
+        btn_style_sheet = self.read_css(BTN_SS)
         for btn in self.findChildren(QtWidgets.QPushButton):
             if btn.property("btn_ss") is not None:
                 btn.setStyleSheet(btn_style_sheet)
@@ -533,7 +506,7 @@ class Ui(object):
         style_sheet = ("background-repeat: no-repeat;"
                        "background-position: center;"
                        )
-        image_path = self.get_path(image_name)
+        image_path = self.get_icon_path(image_name)
         style_sheet += f'background-image: url("{image_path}");'
         widget.setStyleSheet(style_sheet)
 
@@ -601,18 +574,18 @@ class Ui(object):
         """
         for layout in self.findChildren(QtWidgets.QLayout):
             layout_name = layout.objectName()
-            if layout_name.startswith("cc_header"):
-                allow_spaces = layout_name.endswith("_narrow")
-                self.cc_header = ccHeader(
-                    self.title, self.window_icon, allow_spaces)
-                layout.addWidget(self.cc_header)
-                return
+            if not layout_name.startswith("lyt_header"):
+                continue
+            if layout_name.endswith("_narrow"):
+                cc_header = ControlChaosHeaderNarrow(self.title, self.window_icon)
+            else:
+                cc_header = ControlChaosHeader(self.title, self.window_icon)
+            layout.addWidget(cc_header)
+            return
 
 
 class WindowBase(Ui, QtWidgets.QMainWindow):
-    """
-    QWindow mixin
-    """
+    """ QWindow mixin """
     pass
 
 
@@ -622,31 +595,28 @@ class WidgetBase(Ui, QtWidgets.QWidget):
 
 
 class WizardBase(Ui, QtWidgets.QWizard):
-    """
-    QWizard mixin
-    """
+    """ QWizard mixin """
     pass
 
 
 class WizardPageBase(Ui, QtWidgets.QWizardPage):
-    """
-    QWizardPage mixin
-    """
+    """ QWizardPage mixin """
     pass
 
 
-def open_ui(ui_class, cc_ss=False, args=None):
-    # type: (Any, Optional[bool], Optional[bool]) -> None
+class StandaloneWindowBase(Ui, QtWidgets.QMainWindow):
+    use_cc_ss = True
+    add_banner = True
+
+
+def open_ui(ui_class, args=None):
+    # type: (Any, Optional[bool]) -> None
     """
     Function for opening standalone uis
 
     Args:
         ui_class: Class to open
-        cc_ss: Whether to apply the cc stylesheet
         args: Additional arguments
-
-    Returns:
-
     """
     if not QtWidgets.QApplication.instance():
         app = QtWidgets.QApplication(sys.argv)
@@ -654,20 +624,17 @@ def open_ui(ui_class, cc_ss=False, args=None):
         app = QtWidgets.QApplication.instance()
 
     if args:
-        window = ui_class(cc_ss=cc_ss, args=args)
+        window = ui_class(args=args)
     else:
-        window = ui_class(cc_ss=cc_ss)
-
+        window = ui_class()
     window.show()
     app.exec_()
 
 
-class ccHeader(WidgetBase):
-    icon_to_widget = {"cc_yellow": "lbl_cc_icon",
-                      }
+class ControlChaosHeader(WidgetBase):
     ui_name = "cc_header"
 
-    def __init__(self, title, window_icon, allow_spaces):
+    def __init__(self, title, window_icon):
         # type: (str, str, bool) -> None
         """
         Daydreamer ui header
@@ -676,40 +643,24 @@ class ccHeader(WidgetBase):
             title: The header title text
             window_icon: The windows icon
         """
-        super().__init__(title=title, window_icon=window_icon, allow_spaces=allow_spaces)
-        spaced_title = str()
-        for character in title:
-            if not allow_spaces and character == " ":
-                spaced_title += "\n"
-            else:
-                spaced_title += f" {character.upper()}"
-        self.lbl_title.setText(spaced_title)
+        super().__init__(title=title, window_icon=window_icon)
 
-        if window_icon:
-            self.set_widget_icons(
-                icon_dict={window_icon: self.tool_icon}
-            )
+        # get title text upper without name in it
+        self.lbl_title.setText(title.upper())
 
-
-def open_maya_ui(ui_class, *args, **kwargs):
-    """
-    Open a maya window
-
-    Args:
-        ui_class: Ui class to open
-        *args: Additional arguments
-        **kwargs: Additional optional arguments
-    """
-    main = ui_class()
-    main.show()
+        # set the style sheet
+        icon_dir_image_path = self.get_icon_path("control_chaos_logo_mid")
+        style_sheet = (
+            f"background-image: url('{icon_dir_image_path}');"
+            f"background-repeat: no-repeat;"
+            f"background-position: center;"
+        )
+        self.setStyleSheet(style_sheet)
 
 
-
-
-
-
-
-
-
-
-
+class ControlChaosHeaderNarrow(ControlChaosHeader):
+    ui_name = "cc_header_narrow"
+    def __init__(self, title, window_icon):
+        super().__init__(title=title, window_icon=window_icon)
+        text = f"\n{title.upper()}"
+        self.lbl_title.setText(text)

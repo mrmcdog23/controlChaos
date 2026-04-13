@@ -3,8 +3,10 @@ import os
 import re
 import sys
 import extract_pdf_data
+import cccore.base_ui as base_ui
 from dataclasses import asdict
 from CCPySide import QtWidgets, QtCore, QtGui
+from ccgeneral.widgets.line_browser import LineBrowser
 
 
 # constants
@@ -31,7 +33,11 @@ class PasteTableWidget(QtWidgets.QTableWidget):
             item.setText(text)
 
 
-class SlateMakerUI(QtWidgets.QMainWindow):
+class SlateMakerUI(base_ui.StandaloneWindowBase):
+    title = "Slate Maker"
+    window_icon = "slate_maker"
+    icon_to_widget = {"refresh": "btn_refresh"}
+
     def __init__(self):
         super().__init__()
         self.headers = [
@@ -39,123 +45,43 @@ class SlateMakerUI(QtWidgets.QMainWindow):
             "focal_length", "resolution", "version", "notes"
         ]
         self.pdf_data_inst = None
+        self.use_last_resolution = str()
         self.shot_to_data = dict()
         self.ui_settings = QtCore.QSettings('controlChaos', 'slate_maker')
 
         # set the ui size and title
         self.setWindowTitle("Control Chaos Slate Maker")
-        self.setMinimumSize(1200, 600)
+        self.setMinimumSize(1200, 800)
 
         # run the setup functions
         self.create_layout()
+        self.set_table_attributes()
         self.load_settings()
         self.connect_signals()
 
-    def create_line_edit(self, label_text, btn_label_text):
-        # type: (str, str) -> (QtWidgets.QLineEdit, QtWidgets.QPushButton)
-        """
-        Create a line edit widget with a label and browser button
-
-        Args:
-            label_text: The text to set on the label
-            btn_label_text: Text to set on the button
-
-        Returns:
-            le_dir: The line edit for the path
-            btn_dir: Button to browse the directories
-        """
-        lbl_dir = QtWidgets.QLabel(label_text)
-        le_dir = QtWidgets.QLineEdit()
-        btn_dir = QtWidgets.QPushButton(btn_label_text)
-
-        # add to the layout
-        lyt_dir = QtWidgets.QHBoxLayout()
-        lyt_dir.addWidget(lbl_dir)
-        lyt_dir.addWidget(le_dir)
-        lyt_dir.addWidget(btn_dir)
-        self.main_layout.addLayout(lyt_dir)
-        return le_dir, btn_dir
-
-    def create_spacer(self):
-        return QtWidgets.QSpacerItem(
-            40, 20,
-            QtWidgets.QSizePolicy.Policy.Expanding,
-            QtWidgets.QSizePolicy.Policy.Minimum
-        )
-
     def create_layout(self):
         """
-        Create the ui layout widget
+        Create the layout for the slate maker
         """
-        # Central widget
-        central_widget = QtWidgets.QWidget()
-        self.setCentralWidget(central_widget)
+        # add the line edits
+        self.browse_pdf_wdg = LineBrowser(self, "dir", "Select PDF Directory", "", "PDF Directory")
+        self.browse_pdf_wdg.label.setMinimumWidth(90)
 
-        # Layout
-        self.main_layout = QtWidgets.QVBoxLayout()
-        central_widget.setLayout(self.main_layout)
+        # movie folder widget
+        self.browse_movie_wdg = LineBrowser(self, "dir", "Select Movie Directory", "", "Movie Directory")
+        self.browse_movie_wdg.label.setMinimumWidth(90)
 
-        # browse the pdf directory
-        self.le_pdf_dir, self.btn_pdf_dir = self.create_line_edit("PDF Directory", "Browse PDF Directory")
+        # output directory widget
+        self.browse_output_wdg = LineBrowser(self, "dir", "Select Output Directory", "", "Output Directory")
 
-        # browse the movie directory
-        self.le_movie_dir, self.btn_movie_dir = self.create_line_edit("Movie Directory", "Browse Movie Directory")
-
-        # add check all button
-        lyt_options = QtWidgets.QHBoxLayout()
-        self.chk_all = QtWidgets.QCheckBox()
-        self.chk_all.setChecked(True)
-        self.chk_all.setMaximumWidth(20)
-
-        # add resolution field
-        self.le_new_res = QtWidgets.QLineEdit("1920 x 1080")
-        self.le_new_res.setMaximumWidth(70)
-        self.btn_new_res = QtWidgets.QPushButton("Set Resolution")
-        self.btn_new_res.setMaximumWidth(90)
-
-        self.btn_version_up = QtWidgets.QPushButton("Version Up")
-
-        self.chk_latest_rev = QtWidgets.QCheckBox("Latest Revisions Only")
-        self.chk_latest_rev.setMaximumWidth(150)
-        self.chk_latest_rev.setChecked(True)
-
-        self.rbn_icon_view = QtWidgets.QRadioButton("Icon View")
-        self.rbn_icon_view.setChecked(True)
-        self.rbn_list_view = QtWidgets.QRadioButton("List View")
-
-        self.btn_extract_data = QtWidgets.QPushButton("Extract Data")
-
-        lyt_options.addWidget(QtWidgets.QLabel("  "))
-        lyt_options.addWidget(self.chk_all)
-        lyt_options.addItem(self.create_spacer())
-
-        lyt_options.addWidget(self.le_new_res)
-        lyt_options.addWidget(self.btn_new_res)
-        lyt_options.addItem(self.create_spacer())
-
-        lyt_options.addWidget(self.rbn_icon_view)
-        lyt_options.addWidget(self.rbn_list_view)
-        lyt_options.addItem(self.create_spacer())
-
-        lyt_options.addWidget(self.btn_version_up)
-        lyt_options.addItem(self.create_spacer())
-
-        lyt_options.addWidget(self.chk_latest_rev)
-        self.main_layout.addLayout(lyt_options)
-
-        self.main_layout.addWidget(self.btn_extract_data)
-
+        # add table to layout
         self.tbw_shots = PasteTableWidget(0, len(self.headers))
-        self.main_layout.addWidget(self.tbw_shots)
+        self.lyt_table.addWidget(self.tbw_shots)
 
-        # browse the movie directory
-        self.le_output_dir, self.btn_output_dir = self.create_line_edit("Output Directory", "Browse Output Directory")
-
-        # Button
-        self.btn_create_slates = QtWidgets.QPushButton("Create Slates")
-        self.main_layout.addWidget(self.btn_create_slates)
-
-        self.set_table_attributes()
+        # add all browsers to the widget
+        self.lyt_browsers.addWidget(self.browse_pdf_wdg)
+        self.lyt_browsers.addWidget(self.browse_movie_wdg)
+        self.lyt_output_file.addWidget(self.browse_output_wdg)
 
     def set_table_attributes(self):
         """
@@ -165,6 +91,8 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.tbw_shots.setColumnWidth(self.headers.index(" "), CHECKED_WIDTH)
         self.tbw_shots.setHorizontalHeaderLabels(self.headers)
         self.tbw_shots.horizontalHeader().setStretchLastSection(True)
+        self.tbw_shots.verticalHeader().setVisible(False)
+        self.tbw_shots.setRowCount(0)
 
     def load_settings(self):
         """
@@ -172,47 +100,57 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         """
         # save the path in the q-settings
         le_pdf_dir = self.ui_settings.value("le_pdf_dir", str())
-        self.le_pdf_dir.setText(le_pdf_dir)
+        self.browse_pdf_wdg.set_file_path(le_pdf_dir)
 
         # save the path in the q-settings
         le_movie_dir = self.ui_settings.value("le_movie_dir", str())
-        self.le_movie_dir.setText(le_movie_dir)
+        self.browse_movie_wdg.set_file_path(le_movie_dir)
 
         # save the output directory
         le_output_dir = self.ui_settings.value("le_output_dir", str())
-        self.le_output_dir.setText(le_output_dir)
-
-        # save the new resolution directory
-        le_new_res = self.ui_settings.value("le_new_res", str())
-        self.le_new_res.setText(le_new_res)
+        self.browse_output_wdg.set_file_path(le_output_dir)
 
         # save the latest revision check box
         chk_latest_rev = self.ui_settings.value("chk_latest_rev", 1)
         self.chk_latest_rev.setChecked(int(chk_latest_rev))
 
+        self.use_last_resolution =  self.ui_settings.value("use_last_resolution", str())
+
     def save_settings(self):
         """
         Save the path in the q-settings
         """
-        self.ui_settings.setValue("le_pdf_dir", self.le_pdf_dir.text())
-        self.ui_settings.setValue("le_movie_dir", self.le_movie_dir.text())
-        self.ui_settings.setValue("le_output_dir", self.le_output_dir.text())
-        self.ui_settings.setValue("le_new_res", self.le_new_res.text())
+        self.ui_settings.setValue("le_pdf_dir", self.browse_pdf_wdg.file_path)
+        self.ui_settings.setValue("le_movie_dir", self.browse_movie_wdg.file_path)
+        self.ui_settings.setValue("le_output_dir", self.browse_output_wdg.file_path)
         self.ui_settings.setValue("chk_latest_rev", int(self.chk_latest_rev.isChecked()))
+
+        # get the resolution from the first row
+        resolution_index = self.headers.index("resolution")
+        resolution = self.tbw_shots.item(0, resolution_index).text()
+        self.ui_settings.setValue("use_last_resolution", resolution)
 
     def connect_signals(self):
         """
         Connect the signals to the widgets
         """
-        self.btn_pdf_dir.clicked.connect(self.select_pdf_dir)
-        self.btn_movie_dir.clicked.connect(self.select_movie_dir)
-        self.btn_output_dir.clicked.connect(self.select_output_dir)
         self.btn_extract_data.clicked.connect(self.extract_data)
         self.btn_create_slates.clicked.connect(self.create_slates)
-        self.btn_new_res.clicked.connect(self.set_new_resolution)
         self.chk_all.toggled.connect(self.check_all)
         self.rbn_icon_view.toggled.connect(self.toggle_view)
         self.btn_version_up.clicked.connect(self.version_up)
+        self.tbw_shots.model().rowsInserted.connect(self.enable_button)
+        self.tbw_shots.model().rowsRemoved.connect(self.enable_button)
+        self.tbw_shots.itemChanged.connect(self.enable_button)
+        self.btn_refresh.clicked.connect(self.refresh_ui)
+
+    def refresh_ui(self):
+        """
+        Clear the table and set the button
+        """
+        self.tbw_shots.clear()
+        self.set_table_attributes()
+        self.enable_button()
 
     def version_up(self):
         """
@@ -224,6 +162,24 @@ class SlateMakerUI(QtWidgets.QMainWindow):
             next_version = int(item.text()) + 1
             item.setText(str(next_version))
 
+    def enable_button(self):
+        """
+        If there are slates to create enable the main button
+        """
+        count = self.tbw_shots.rowCount()
+        if count:
+            # check for any slates that are checked
+            for row_index in range(count):
+                item = self.tbw_shots.item(row_index, CHECKED_INDEX)
+                if not item:
+                    continue
+
+                # if one is checked set enabled
+                if item.checkState() == QtCore.Qt.Checked:
+                    self.btn_create_slates.setEnabled(True)
+                    return
+        self.btn_create_slates.setEnabled(False)
+
     def toggle_view(self, icon_view):
         # type: (bool) -> None
         """
@@ -232,16 +188,6 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         height = THUMBNAIL_HEIGHT if icon_view else 30
         for row in range(self.tbw_shots.rowCount()):
             self.tbw_shots.setRowHeight(row, height)
-
-    def set_new_resolution(self):
-        """
-        Set the resolution on the rows of the slates
-        """
-        res_index = self.headers.index("resolution")
-        new_res = self.le_new_res.text()
-        for row_index in range(self.tbw_shots.rowCount()):
-            item = self.tbw_shots.item(row_index, res_index)
-            item.setText(new_res)
 
     def check_all(self, checked):
         # type: (bool) -> None
@@ -375,13 +321,11 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.tbw_shots.clear()
         self.set_table_attributes()
 
-        self.save_settings()
         # Populate table with data
         shot_name_index = self.headers.index("shot_name")
 
-        pdf_dir = self.le_pdf_dir.text()
-        movie_dir = self.le_movie_dir.text()
-        resolution = self.le_new_res.text()
+        pdf_dir = self.browse_pdf_wdg.file_path
+        movie_dir = self.browse_movie_wdg.file_path
         latest_rev = self.chk_latest_rev.isChecked()
 
         self.pdf_data_inst = extract_pdf_data.ExtractData(movie_dir)
@@ -392,7 +336,7 @@ class SlateMakerUI(QtWidgets.QMainWindow):
 
             # get the PDF data
             pdf_data = self.pdf_data_inst.get_data_from_pdf(pdf_path)
-            pdf_data.resolution = resolution
+            pdf_data.resolution = self.use_last_resolution
 
             # loop through the headers and populate the data
             for column, header in enumerate(self.headers):
@@ -425,6 +369,7 @@ class SlateMakerUI(QtWidgets.QMainWindow):
             # add the data to the table widget item
             shot_name = self.tbw_shots.item(row_index, shot_name_index).text()
             self.shot_to_data[shot_name] = pdf_data
+        self.save_settings()
 
     def update_pdf_data(self):
         """
@@ -465,7 +410,7 @@ class SlateMakerUI(QtWidgets.QMainWindow):
         self.save_settings()
         self.update_pdf_data()
 
-        output_dir = self.le_output_dir.text()
+        output_dir =  self.browse_output_wdg.file_path
         shot_name_index = self.headers.index("shot_name")
         for row_index in range(self.tbw_shots.rowCount()):
             # skip if the row is unchecked

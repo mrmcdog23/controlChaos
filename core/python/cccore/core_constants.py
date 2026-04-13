@@ -1,0 +1,1 @@
+PYTHON_EXE = "C:/Python/python311/python.exe"

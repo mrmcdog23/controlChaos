@@ -1,0 +1,289 @@
+QMainWindow {
+    background-color: rgb(0, 0, 0);
+}
+QWizard {
+    background-color: rgb(0, 0, 0);
+}
+/* radio button style */
+QRadioButton {
+    color: rgb(255, 255, 255);
+}
+QRadioButton:disabled {
+    color: rgb(90, 90, 90);
+}
+QRadioButton::indicator::unchecked:disabled {
+    border: 3px solid;
+    border-color: grey;
+    border-radius: 6px;
+    background-color: grey;
+    width: 7px;
+    height: 7px;
+}
+QRadioButton::indicator::checked:disabled {
+    border: 3px solid;
+    border-color: grey;
+    border-radius: 6px;
+    background-color: black;
+    width: 7px;
+    height: 7px;
+}
+QRadioButton::indicator::checked{
+    border: 3px solid;
+    border-color: white;
+    border-radius: 6px;
+    background-color: black;
+    width: 7px;
+    height: 7px;
+}
+
+
+QLabel {
+    color: rgb(255, 255, 255);
+}
+QLabel:disabled {
+    color: rgb(120, 120, 120);
+}
+
+QCheckBox:disabled {
+    color: rgb(120, 120, 120);
+}
+
+QCheckBox {
+    color: rgb(255, 255, 255);
+}
+
+QCheckBox:checked {
+    border-color: black black white white;
+}
+
+QTableWidget::indicator,
+QTreeView::indicator,
+QCheckBox::indicator {
+    background-color: rgb(30, 30, 30);
+    border-style: solid;
+    border-width: 1px;
+    border-color: white white white white;
+}
+
+QTableWidget::indicator:checked,
+QTreeView::indicator:checked,
+QCheckBox::indicator:checked {
+    background-color: qradialgradient(spread:pad,
+                            cx:0.5,
+                            cy:0.5,
+                            radius:0.9,
+                            fx:0.5,
+                            fy:0.5,
+                            stop:0 rgba(0, 255, 0, 255),
+                            stop:1 rgba(0, 64, 0, 255));
+}
+
+QTextEdit,
+QListWidget {
+    background-color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
+}
+QListWidget::item:selected {
+    background-color: rgb(0, 0, 185);
+    color: rgb(255, 255, 255);
+}
+QTreeWidget::item:selected {
+    background-color: rgb(0, 0, 185);
+    color: rgb(255, 255, 255);
+}
+
+QPushButton {
+    color: rgb(255, 255, 255);
+    background-color: rgb(60, 60, 60);
+}
+
+QPushButton:hover {
+    background-color: rgb(160, 160, 160);
+}
+
+QPushButton:pressed {
+    background-color: rgb(260, 260, 260);
+}
+
+QPushButton:disabled {
+    background-color: rgb(20, 20, 20);
+}
+QComboBox {
+    color: rgb(255, 255, 255);
+    background-color: rgb(60, 60, 60);
+}
+QComboBox:disabled {
+    color: rgb(120, 120, 120);
+    background-color: rgb(20, 20, 20);
+}
+QTableWidget,
+QTreeWidget {
+    color: rgb(255, 255, 255);
+    background-color: rgb(60, 60, 60);
+}
+QLineEdit {
+    color: rgb(255, 255, 255);
+    background-color: rgb(60, 60, 60);
+}
+QLineEdit:disabled {
+    color: rgb(120, 120, 120);
+    background-color: rgb(20, 20, 20);
+}
+QMessageBox {
+    color: rgb(255, 255, 255);
+    background-color: rgb(0, 0, 0);
+}
+QMessageBox QPushButton {
+    border-radius: 0px;
+    padding: 5px;
+    min-width: 90;
+    }
+QGroupBox::title {
+    color: rgb(255, 255, 255);
+}
+QGroupBox::title:disabled {
+    color: rgb(120, 120, 120);
+}
+QSpinBox,
+QDoubleSpinBox {
+    color: rgb(255, 255, 255);
+    background-color: rgb(60, 60, 60);
+}
+QPlainTextEdit {
+    color: rgb(255, 255, 255);
+    background-color: rgb(60, 60, 60);
+}
+
+QTabWidget::pane {
+    border: none;
+    background: rgb(70, 70, 70);
+}
+
+QTabBar::tab:selected {
+    color: rgb(255, 255, 255);
+    background: rgb(70, 70, 70);
+}
+
+QTabBar::tab:!selected {
+    color: rgb(255, 255, 255);
+    background: rgb(50, 50, 50);
+}
+
+QTabBar::tab:!selected:hover {
+    color: rgb(255, 255, 255);
+    background: rgb(6, 182, 92);
+}
+
+/* next button */
+QPushButton#__qt__passive_wizardbutton1{
+    color: rgb(255, 255, 255);
+    background-color: rgb(71, 71, 71);
+    border: 4px solid rgb(71, 71, 71);
+}
+QPushButton#__qt__passive_wizardbutton1:hover {
+    background-color: rgb(0, 0, 200);
+    border: 4px solid rgb(0, 0, 200);
+}
+QPushButton#__qt__passive_wizardbutton1:pressed {
+    background-color: rgb(0, 0, 255);
+    border: 4px solid rgb(0, 0, 255);
+}
+QPushButton#__qt__passive_wizardbutton1:disabled {
+    color: rgb(180, 180, 180);
+    background-color: rgb(90, 90, 90);
+    border: 4px solid rgb(90, 90, 90);
+}
+
+/* cancel button */
+QPushButton#qt_wizard_cancel{
+    color: rgb(255, 255, 255);
+    background-color: rgb(71, 71, 71);
+    border: 4px solid rgb(71, 71, 71);
+}
+QPushButton#qt_wizard_cancel:hover {
+    background-color: rgb(0, 0, 200);
+    border: 4px solid rgb(0, 0, 200);
+}
+QPushButton#qt_wizard_cancel:pressed {
+    background-color: rgb(0, 0, 255);
+    border: 4px solid rgb(0, 0, 255);
+}
+QPushButton#qt_wizard_cancel:disabled {
+    background-color: rgb(90, 90, 90);
+    border: 4px solid rgb(90, 90, 90);
+}
+
+/* back button */
+QPushButton#__qt__passive_wizardbutton0{
+    color: rgb(255, 255, 255);
+    background-color: rgb(71, 71, 71);
+    border: 4px solid rgb(71, 71, 71);
+}
+QPushButton#__qt__passive_wizardbutton0:hover {
+    background-color: rgb(0, 0, 200);
+    border: 4px solid rgb(0, 0, 200);
+}
+QPushButton#__qt__passive_wizardbutton0:pressed {
+    background-color: rgb(0, 0, 255);
+    border: 4px solid rgb(0, 0, 255);
+}
+QPushButton#__qt__passive_wizardbutton0:disabled {
+    background-color: rgb(90, 90, 90);
+    border: 4px solid rgb(90, 90, 90);
+}
+/* finish button */
+QPushButton#qt_wizard_finish{
+    color: rgb(255, 255, 255);
+    background-color: rgb(71, 71, 71);
+    border: 4px solid rgb(71, 71, 71);
+}
+QPushButton#qt_wizard_finish:hover {
+    background-color: rgb(0, 0, 200);
+    border: 4px solid rgb(0, 0, 200);
+}
+QPushButton#qt_wizard_finish:pressed {
+    background-color: rgb(0, 0, 255);
+    border: 4px solid rgb(0, 0, 255);
+}
+QPushButton#qt_wizard_finish:disabled {
+    background-color: rgb(90, 90, 90);
+    border: 4px solid rgb(90, 90, 90);
+}
+/* treewidget style sheet */
+QHeaderView::section {
+    color: rgb(255, 255, 255);
+    background-color: rgb(30, 30, 30);
+}
+QHeaderView::section:disabled {
+    color: rgb(120, 120, 120);
+    background-color: rgb(50, 50, 50);
+}
+QWizard,
+QWizardPage {
+    background-color: rgb(0, 0, 0);
+}
+
+QComboBox QAbstractItemView
+{
+    color: rgb(255, 255, 255);
+    background-color: rgb(60, 60, 60);
+    selection-background-color: rgb(0, 0, 185);
+    selection-color: rgb(255, 255, 255);
+}
+QMenu
+{
+    color: rgb(255, 255, 255);
+    background-color: rgb(60, 60, 60);
+}
+
+QMenu::item:selected{
+    background-color: rgb(0, 0, 185);
+    color: rgb(255, 255, 255);
+}
+QScrollArea,
+scrollAreaWidgetContents
+{
+    color: rgb(255, 255, 255);
+    background-color: rgb(60, 60, 60);
+}
+
