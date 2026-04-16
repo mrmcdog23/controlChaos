@@ -31,7 +31,7 @@ class PDFData:
     shot_name: str = str()
     duration: str = str()
     focal_length: str = str()
-    thumbnail_path: str = str()
+    thumbnail_path: str = NO_THUMBNAIL
     resolution: str = str()
     version: str = str()
     notes: str = str()
@@ -53,7 +53,6 @@ class ExtractData(object):
         self.shot_name = str()
         self.pdf_path = str()
         self.pdf_data = PDFData()
-        self.thumbnail_path = NO_THUMBNAIL
 
     def get_shot_name(self, pdf_path):
         # type: (str) -> str
@@ -160,7 +159,7 @@ class ExtractData(object):
         # find the movie file path
         movie_file_path = None
         for movie_file in os.listdir(self.movie_dir):
-            if movie_file.startswith(self.pdf_data.shot_name):
+            if movie_file.startswith(self.pdf_data.shot_name) and movie_file.endswith((".mp4", ".mov")):
                 movie_file_path = os.path.join(self.movie_dir, movie_file)
                 break
 
