@@ -32,6 +32,7 @@ class PDFData:
     shot_name: str = str()
     duration: str = str()
     focal_length: str = str()
+    date: str = datetime.datetime.now().strftime("%Y/%d/%m")
     thumbnail_path: str = NO_THUMBNAIL
     resolution: str = str()
     version: str = str()
@@ -230,16 +231,13 @@ class ExtractData(object):
         self.run_ffmpeg_command(command)
         self.created_message(temp_image_overlay_path)
 
-        # text in format in year, day, month format
-        date_string = datetime.datetime.now().strftime("%Y/%d/%m")
-
         # build the slate shot name
         version_padded = str(int(pdf_data.version)).zfill(4)
         slate_shot_name = f"{pdf_data.shot_name}_pstv_c{version_padded}"
 
         # build text args of the display text and x positions
         text_dict = {
-            f"Date\: {date_string}": 385,
+            f"Date\: {pdf_data.date}": 385,
             f"Show\: {pdf_data.show_name}": 435,
             f"Name\: {slate_shot_name}": 557,
             f"Resolution\: {pdf_data.resolution}": 652,

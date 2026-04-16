@@ -42,7 +42,7 @@ class SlateMakerUI(base_ui.StandaloneWindowBase):
         super().__init__()
         self.headers = [
             " ", "thumbnail", "show_name", "shot_name", "duration",
-            "focal_length", "resolution", "version", "notes"
+            "focal_length", "resolution", "date", "version", "notes"
         ]
         self.pdf_data_inst = None
         self.use_last_resolution = str()
@@ -380,6 +380,7 @@ class SlateMakerUI(base_ui.StandaloneWindowBase):
         duration_index = self.headers.index("duration")
         focal_length_index = self.headers.index("focal_length")
         res_index = self.headers.index("resolution")
+        date_index = self.headers.index("date")
         version_index = self.headers.index("version")
         notes_index = self.headers.index("notes")
 
@@ -396,6 +397,9 @@ class SlateMakerUI(base_ui.StandaloneWindowBase):
 
             # update the PDF data with the table information
             pdf_data.resolution = self.tbw_shots.item(row_index, res_index).text()
+
+            # update the PDF data with the table information
+            pdf_data.date = self.tbw_shots.item(row_index, date_index).text()
 
             # update the table version
             pdf_data.version = self.tbw_shots.item(row_index, version_index).text()
