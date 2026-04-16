@@ -18,6 +18,7 @@ set "PIPELINE_ROOT=%CURRENT_ROOT:~0,-5%"
 for %%I in ("%PIPELINE_ROOT%") do set ROOT_DIR=%%~dpI
 echo Pipeline root: %PIPELINE_ROOT%
 
+call %PIPELINE_ROOT%\bat\git_update.bat
 
 set PYTHONPATH=%PYTHONPATH%;%ROOT_DIR%virtual_env\python311\Lib\site-packages
 set PYTHONPATH=%PYTHONPATH%;%PIPELINE_ROOT%\core\python
