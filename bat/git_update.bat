@@ -43,7 +43,6 @@ if "%LOCAL%"=="%REMOTE%" (
     echo.
     echo Already up to date. No reset or pull needed.
     echo ========================================
-    pause
     exit /b 0
 )
 
