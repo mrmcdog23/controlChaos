@@ -56,13 +56,19 @@ class ExtractData(object):
         self.thumbnail_path = NO_THUMBNAIL
 
     def get_shot_name(self, pdf_path):
-        pdf_base_name = os.path.basename(pdf_path)
-        focal_length_match = re.search(r"(\d+)_([a-z|A-Z]+)_(\d+)(.*)", pdf_base_name)
-        groups = focal_length_match.groups()
-        shot_name = f"{groups[0]}_{groups[1]}_{groups[2]}"
-        print (shot_name)
-        return shot_name
+        # type: (str) -> str
+        """
+        Get the name of the shot from the pdf file
 
+        Args:
+            pdf_path: Path of the pdf file
+
+        Returns:
+            shot_name: Name of the shot to use
+        """
+        pdf_base_name = os.path.basename(pdf_path)
+        shot_name = pdf_base_name.split("_rev")[0]
+        return shot_name
 
     def get_data_from_pdf(self, pdf_path):
         # type: (str) -> PDFData
