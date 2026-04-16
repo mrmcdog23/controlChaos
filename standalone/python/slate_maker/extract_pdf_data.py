@@ -55,6 +55,15 @@ class ExtractData(object):
         self.pdf_data = PDFData()
         self.thumbnail_path = NO_THUMBNAIL
 
+    def get_shot_name(self, pdf_path):
+        pdf_base_name = os.path.basename(pdf_path)
+        focal_length_match = re.search(r"(\d+)_([a-z|A-Z]+)_(\d+)(.*)", pdf_base_name)
+        groups = focal_length_match.groups()
+        shot_name = f"{groups[0]}_{groups[1]}_{groups[2]}"
+        print (shot_name)
+        return shot_name
+
+
     def get_data_from_pdf(self, pdf_path):
         # type: (str) -> PDFData
         """
@@ -68,7 +77,8 @@ class ExtractData(object):
         """
         self.pdf_data = PDFData()
         self.extract_with_pdfplumber(pdf_path)
-        self.build_data_dict()
+        shot_name = self.get_shot_name(pdf_path)
+        self.build_data_dict(shot_name)
         self.generate_thumbnail()
         return self.pdf_data
 
@@ -98,19 +108,23 @@ class ExtractData(object):
         """
         self.pages_text = list()
         self.logger.info(f"Reading: {pdf_path}")
-        with pdfplumber.open(pdf_path) as pdf:
-            for i, page in enumerate(pdf.pages, 1):
-                text = page.extract_text() or ""
-                self.pages_text.extend(text.split("\n"))
+        try:
+            with pdfplumber.open(pdf_path) as pdf:
+                for i, page in enumerate(pdf.pages, 1):
+                    text = page.extract_text() or ""
+                    self.pages_text.extend(text.split("\n"))
 
-    def build_data_dict(self):
+        except pdfplumber.utils.exceptions.PdfminerException:
+            pass
+
+    def build_data_dict(self, shot_name):
         """
         From the list of page text get the data of the shot
         """
         self.pdf_data.resolution = "n/a"
         self.pdf_data.version = "n/a"
         self.pdf_data.notes = "n/a"
-        self.pdf_data.shot_name = self.pages_text[2]
+        self.pdf_data.shot_name = shot_name
         self.pdf_data.show_name = self.pages_text[0].title()
 
         for index, line in enumerate(self.pages_text):
@@ -121,10 +135,17 @@ class ExtractData(object):
                 end_frame = numbers[-1]
                 self.pdf_data.duration = f"{start_frame}-{end_frame}"
 
+            if self.pdf_data.focal_length:
+                continue
             # extract the focal length and set in the data
             focal_length_match = re.search(r"(.*) (\d+)([mm|MM])", line)
             if focal_length_match:
                 self.pdf_data.focal_length = focal_length_match.groups()[1] + "mm"
+                continue
+
+            focal_length_match = re.search(r"(\d+)MM", line)
+            if focal_length_match:
+                self.pdf_data.focal_length = focal_length_match.groups()[0] + "mm"
 
     def generate_thumbnail(self):
         """

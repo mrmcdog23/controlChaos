@@ -311,7 +311,8 @@ class SlateMakerUI(base_ui.StandaloneWindowBase):
                         continue
 
             pdf_path = os.path.join(pdf_dir, pdf_file_name)
-            pdf_files_list.append(pdf_path)
+            if pdf_file_name.endswith(".pdf"):
+                pdf_files_list.append(pdf_path)
         return pdf_files_list
 
     def extract_data(self):
