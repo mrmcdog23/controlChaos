@@ -246,11 +246,35 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
             return False
         return True
 
+    @property
+    def is_slate_ffmpeg_installed(self):
+        # type: () -> bool
+        """
+        Check if the slate creator is running and if the ffmpeg is installed
+        """
+        selected_app = self.get_selected_app()
+
+        # if it is not the slate creator continue
+        if selected_app.name != "slate_maker_tool":
+            return True
+
+        # if ffmpeg is installed continue
+        if os.path.exists(core_constants.FFMPEG_EXE):
+            return True
+
+        # give message and return false if not installed
+        message = f"{core_constants.FFMPEG_EXE} is not installed"
+        QtWidgets.QMessageBox.critical(self, "No ffmpeg", message)
+        return False
+
     def launch_selected(self):
         """
         Launch the selected application or tool
         under the selected pipeline version
         """
+        if not self.is_slate_ffmpeg_installed:
+            return
+
         # store the launch version
         app_version = self.cmb_application_version.currentText()
         os.environ["APP_VERSION"] = app_version

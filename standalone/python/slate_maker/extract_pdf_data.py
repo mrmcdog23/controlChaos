@@ -6,13 +6,14 @@ import datetime
 import tempfile
 import logging
 from dataclasses import dataclass
-
-
-FFMPEG_EXE = "C:/ffmpeg/bin/ffmpeg.exe"
+import cccore.core_constants as core_constants
 
 
 # constants
 logging.basicConfig(level=logging.INFO)
+
+
+FFMPEG_EXE = core_constants.FFMPEG_EXE
 THUMBNAIL_SIZE = "750x450"
 FONT_SIZE = "35"
 current_dir = os.path.dirname(__file__).replace("\\", "/")
@@ -170,16 +171,27 @@ class ExtractData(object):
 
         # define the movie file name
         thumbnail_name = f"{self.pdf_data.shot_name}_thumbnail.png"
-        self.pdf_data.thumbnail_path = self.get_temp_file_path(thumbnail_name)
-        self.logger.info(f"Saved: {self.pdf_data.thumbnail_path}")
+        thumbnail_path = self.get_temp_file_path(thumbnail_name)
+        self.logger.info(f"Saved: {thumbnail_path}")
 
         # extract the thumbnail from the movie file
         command = (f"{FFMPEG_EXE} -y -i {movie_file_path} -frames:v 1 "
                    f"-s {THUMBNAIL_SIZE} {self.pdf_data.thumbnail_path}")
         self.run_ffmpeg_command(command)
-        self.created_message(self.pdf_data.thumbnail_path)
+        self.created_message(thumbnail_path)
+
+        # if the thumbnail exists then use that
+        if os.path.exists(thumbnail_path):
+            self.pdf_data.thumbnail_path = thumbnail_path
 
     def created_message(self, path):
+        # type: (str) -> None
+        """
+        Give the created message if the file exists
+
+        Args:
+            path: Path of the file to check exists
+        """
         if os.path.exists(path):
             self.logger.info(f"Created thumbnail: {path}")
         else:
@@ -250,9 +262,6 @@ class ExtractData(object):
         command = f'{FFMPEG_EXE} -y -i {temp_image_overlay_path} -vf "{full_text_cmd}" {finished_slate_path}'
         self.run_ffmpeg_command(command)
         self.created_message(finished_slate_path)
+
         # log the final output
         self.logger.info(f"Created slate: {finished_slate_path}")
-
-        # remove the temp thumbnail and the temp overlay image
-        #os.remove(self.pdf_data.thumbnail_path)
-        #os.remove(temp_image_overlay_path)
