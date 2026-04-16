@@ -248,7 +248,9 @@ class ExtractData(object):
         }
 
         # get the output file path
-        finished_slate_path = os.path.join(output_dir, f"{pdf_data.shot_name}_slate.png")
+        version_padded = str(pdf_data.version).zfill(3)
+        file_name = f"{pdf_data.shot_name}_slate_v{version_padded}.png"
+        finished_slate_path = os.path.join(output_dir, file_name)
 
         # build a list of the arguments of the overlay text
         text_args = list()
