@@ -1,4 +1,4 @@
-echo "Installing python 3.12 site-packages..."
+echo "Installing python 3.11 site-packages..."
 
 SET CURRENT_ROOT=%~dp0
 SET "PIPELINE_ROOT=%CURRENT_ROOT:~0,-5%"
