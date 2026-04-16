@@ -176,13 +176,14 @@ class ExtractData(object):
 
         # extract the thumbnail from the movie file
         command = (f"{FFMPEG_EXE} -y -i {movie_file_path} -frames:v 1 "
-                   f"-s {THUMBNAIL_SIZE} {self.pdf_data.thumbnail_path}")
+                   f"-s {THUMBNAIL_SIZE} {thumbnail_path}")
         self.run_ffmpeg_command(command)
         self.created_message(thumbnail_path)
 
         # if the thumbnail exists then use that
         if os.path.exists(thumbnail_path):
             self.pdf_data.thumbnail_path = thumbnail_path
+
 
     def created_message(self, path):
         # type: (str) -> None
