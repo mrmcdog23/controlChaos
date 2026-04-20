@@ -110,12 +110,15 @@ class ImportFBXCam(base_ui.WindowBase):
         # set tag and label
         camera_actor.set_actor_label(camera_name)
 
-        # apply the sequence animation
-        ue.CameraFbxImporter.load_camera(
-            self.map, self.ls, [binding],
+        # ── 6. Import! ─────────────────────────────────────────────────────────────
+        ue.SequencerTools.import_level_sequence_fbx(
+            self.map,
+            self.ls,
+            [binding],
             unreal_utils.camera_ue_options(),
             fbx_path,
         )
+
 
 
 def launch():
