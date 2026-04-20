@@ -16,7 +16,6 @@ class CamerasToUnreal(base_ui.WindowBase):
         super().__init__(parent=parent)
         self.logger = cc_logging.cc_logger()
 
-
         # run setup functions
         self.load_fbx_plugin()
         self.create_layout()
@@ -24,10 +23,16 @@ class CamerasToUnreal(base_ui.WindowBase):
         self.connect_signals()
 
     def load_fbx_plugin(self):
+        """
+        Load the fbx maya plugin
+        """
         if not cmds.pluginInfo("fbxmaya", query=True, loaded=True):
             cmds.loadPlugin("fbxmaya")
 
     def create_layout(self):
+        """
+        Create the layout for the ui
+        """
         self.browse_output_wdg = LineBrowser(
             self, "dir", "Select Out Directory", "", "Output Directory")
         self.lyt_browse.addWidget(self.browse_output_wdg)
@@ -155,18 +160,17 @@ class CamerasToUnreal(base_ui.WindowBase):
 
     def export_cameras(self):
         """
-        Either playblast or render the checked cameras
+        Export the checked cameras from Maya as fbxs
         """
         start_frame = int(cmds.playbackOptions(q=True, min=True))
         end_frame = int(cmds.playbackOptions(q=True, max=True))
         output_dir = self.browse_output_wdg.file_path
         for camera_name in self.checked_cameras:
             self.export_unreal_fbx(camera_name, output_dir, start_frame, end_frame)
+
+        # show completed message
         QtWidgets.QMessageBox.information(
-            self,
-            "Export Cameras",
-            f"Exported FBX Cameras",
-            QtWidgets.QMessageBox.Ok
+            self, "Export Cameras", "Exported FBX Cameras", QtWidgets.QMessageBox.Ok
         )
 
 
