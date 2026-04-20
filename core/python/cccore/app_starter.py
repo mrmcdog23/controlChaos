@@ -1,15 +1,8 @@
 """ Define classes of applications and tools to launch """
 import os
-import re
-import glob
-import shutil
-import pathlib
 import subprocess
 import logging
-import platform
 import cccore.core_constants as core_constants
-import cccore.utils.file_utils as file_utils
-from typing import Optional
 
 
 logging.basicConfig(level=logging.INFO)
