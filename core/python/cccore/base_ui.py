@@ -23,7 +23,7 @@ class Ui(object):
     window_icon = str()
     tab_to_icons = dict()
     additional_stylesheet = None
-    use_cc_ss = False
+    use_cc_ss = True
     previous_ui_settings = None
     cc_header = None
     add_cc_title_name = False
@@ -605,7 +605,6 @@ class WizardPageBase(Ui, QtWidgets.QWizardPage):
 
 
 class StandaloneWindowBase(Ui, QtWidgets.QMainWindow):
-    use_cc_ss = True
     add_banner = True
 
 

@@ -58,3 +58,22 @@ def get_files_recursively(directory, extensions=None):
                 file_path = join_file_names([root, file_name])
                 list_of_files.append(file_path)
     return list_of_files
+
+
+def get_file_name(file_path):
+    # type: (str) -> str
+    """
+    Get the file name from the file path.
+    e.g. /home/docs/filename.ext will return filename
+
+    Args:
+        file_path: The original file path
+
+    Returns:
+        file_name: Name of the file with no extension
+    """
+    basename = os.path.basename(file_path)
+    file_name, _ = os.path.splitext(basename)
+    if "." in file_name:
+        file_name = file_name.split(".")[0]
+    return file_name

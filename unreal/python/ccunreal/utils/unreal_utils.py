@@ -1,5 +1,39 @@
 import unreal as ue
 
+""" Utilities relating to Unreal """
+import sys
+import unreal as ue
+from CCPySide import QtWidgets, QUiLoader
+from typing import Optional
+
+
+def launch_unreal_win(win_class):
+    # type: (QtWidgets.QMainWindow) -> None
+    """
+    Launch the unreal window
+
+    Args:
+        win_class: Class of ui to open
+    """
+    # delete all current versions of the tool
+    for inst in QtWidgets.QApplication.topLevelWidgets():
+        if win_class.title == inst.windowTitle():
+            inst.close()
+            inst.deleteLater()
+
+    # NOTICE: Initialized before "QApplication"
+    # unreal freezes without this
+    loader = QUiLoader()
+    if not QtWidgets.QApplication.instance():
+        QtWidgets.QApplication(sys.argv)
+    else:
+        QtWidgets.QApplication.instance()
+
+    global window
+    window = win_class(None)
+    window.show()
+    ue.parent_external_window_to_slate(window.winId())
+
 
 def find_binding_by_actor_class(actor_class, sequence):
     # type: (ue.Actor, ue.LevelSequence) -> Optional[ue.SequencerBindingProxy]

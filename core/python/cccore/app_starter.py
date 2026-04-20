@@ -254,7 +254,7 @@ class UnrealApp(BaseApp):
     """
     Launching Unreal application
     """
-    app_versions = ["5.27", "5.26"]
+    app_versions = ["5.6"]
     name = "unreal"
 
     def __init__(self):
@@ -267,25 +267,8 @@ class UnrealApp(BaseApp):
     @property
     def python_version(self):
         # type: () -> str
-        """
-        Python version to use to add site packages
-        """
-        project_data = server_data.ProjectData()
-        unreal_py_mappings = project_data.data["unreal_py_mappings"]
-        unreal_py_version = unreal_py_mappings[float(self.version)]
-        return str(unreal_py_version)
-
-    def set_site_packages(self):
-        """
-        Add the site packages to the python path
-        """
-        version_no_decimal = self.python_version.replace(".", "")
-        code_root = self.project_data.code_root
-
-        # add the site packages to the python path
-        site_packages = f"{code_root}virtual_env/venv{version_no_decimal}_win/Lib/site-packages"
-        logging.info(f"Site packages: {site_packages}")
-        self.python_paths.append(site_packages)
+        """ Python version to use to add site packages """
+        return "311"
 
     def set_environment(self):
         """
@@ -301,7 +284,7 @@ class UnrealApp(BaseApp):
         Set the core unreal python paths
         """
         unreal_paths = [f"{self.pipeline_root}/unreal/python",
-                        f"{self.pipeline_root}/unreal/python/no8unreal/startup"
+                        f"{self.pipeline_root}/unreal/python/ccunreal/startup"
                         ]
         unreal_paths_str = ";".join(unreal_paths)
         os.environ["UE_PYTHONPATH"] += ";" + unreal_paths_str
@@ -310,18 +293,14 @@ class UnrealApp(BaseApp):
     def exe_path(self):
         # type: () -> str
         """ Work out the unreal exe path """
-        exe_path = self.launch_path.format(version=self.version)
+        exe_path = self.launch_path.format(version=self.app_version)
         return exe_path
 
     def make_command_list(self):
         """
         Launch the unreal project
         """
-        ue_project_path = os.environ.get("UE_PROJECT_PATH")
-        if not ue_project_path:
-            logging.critical("Project not found!")
-            return
-        self.cmd_list = [self.exe_path, ue_project_path]
+        self.cmd_list = [self.exe_path]
 
 
 class SlateMakerTool(BaseTool):
