@@ -32,3 +32,29 @@ def join_file_names(*folder_list):
         folder_path = os.path.join(*folder_list)
     folder_path_clean = folder_path.replace("\\", "/")
     return folder_path_clean
+
+
+def get_files_recursively(directory, extensions=None):
+    # type: (str, list[str]) -> Optional[list[str]]
+    """
+    Get all sub files of type recursively
+
+    Args:
+        directory: Path of the directory to check
+        extensions: File types to file
+
+    Returns:
+        list_of_files: List of files found
+    """
+    list_of_files = list()
+    extensions_set = tuple(extensions) if extensions else None
+    for root, dirs, files in os.walk(directory):
+        for file_name in files:
+            if not extensions_set:
+                file_path = join_file_names([root, file_name])
+                list_of_files.append(file_path)
+
+            elif file_name.endswith(extensions_set):
+                file_path = join_file_names([root, file_name])
+                list_of_files.append(file_path)
+    return list_of_files
