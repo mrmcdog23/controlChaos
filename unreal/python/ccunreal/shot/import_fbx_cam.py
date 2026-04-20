@@ -25,6 +25,7 @@ class ImportFBXCam(base_ui.WindowBase):
         self.browse_fbx_wdg.line_edit.textChanged.connect(self.populate_fbx)
         self.btn_import_cameras.clicked.connect(self.import_cameras)
         self.chk_all.toggled.connect(self.check_all)
+        #self.browse_fbx_wdg.set_file_path("//192.168.1.10/storage/jobs/011231_TestProject/vfx/appdata")
 
     def check_all(self, checked):
         # type: (bool) -> None
@@ -107,6 +108,7 @@ class ImportFBXCam(base_ui.WindowBase):
         api_wrap.add_actors_to_current_sequence([camera_actor])
         binding = unreal_utils.find_binding_by_actor_class(ue.CineCameraActor, self.ls)
 
+        binding.set_name(camera_name)
         # set tag and label
         camera_actor.set_actor_label(camera_name)
 
