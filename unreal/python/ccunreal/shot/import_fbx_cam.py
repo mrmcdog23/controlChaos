@@ -88,7 +88,6 @@ class ImportFBXCam(base_ui.WindowBase):
             fbx_path = file_utils.join_file_names(fbx_dir, camera_file_name)
             self.import_camera_animation(fbx_path)
 
-    '''
     def import_camera_animation(self, fbx_path):
         # type: (str) -> None
         """
@@ -98,51 +97,20 @@ class ImportFBXCam(base_ui.WindowBase):
         Args:
             fbx_path: Path of the camera fbx file
         """
-        # check for existing camera first
-        camera_name = file_utils.get_file_name(fbx_path)
-
-        # spawn a no8 camera to the map
-        camera_actor = ue.EditorLevelLibrary.spawn_actor_from_class(
-            ue.CineCameraActor, ue.Vector(0, 0, 0))
-
-        # add to the level sequence
-        api_wrap.add_actors_to_current_sequence([camera_actor])
-        binding = unreal_utils.find_binding_by_actor_class(ue.CineCameraActor, self.ls)
-
-        binding.set_name(camera_name)
-        # set tag and label
-        camera_actor.set_actor_label(camera_name)
-
-        # ── 6. Import! ─────────────────────────────────────────────────────────────
-        ue.SequencerTools.import_level_sequence_fbx(
-            self.map,
-            self.ls,
-            [binding],
-            unreal_utils.camera_ue_options(),
-            fbx_path,
-        )
-        '''
-
-    def import_camera_animation(self, fbx_path):
-        # ── 1. Create a new Level Sequence ────────────────────────────────────────────
-        asset_tools = ue.AssetToolsHelpers.get_asset_tools()
-        camera_name = file_utils.get_file_name(fbx_path)
-
-        # ── 3. Spawn a CineCameraActor as a Spawnable binding ─────────────────────────
+        # Spawn a CineCameraActor as a Spawnable binding
         ls_system = ue.get_editor_subsystem(ue.LevelSequenceEditorSubsystem)
         camera_binding, camera_cut_track = ls_system.create_camera(spawnable=True)
 
-        # ── 4. Build the FBX import settings ─────────────────────────────────────────
+        # Build the FBX import settings
         import_settings = ue.MovieSceneUserImportFBXSettings()
         import_settings.set_editor_property("create_cameras", False)   # camera already exists
         import_settings.set_editor_property("force_front_x_axis", False)
         import_settings.set_editor_property("match_by_name_only", False)
         import_settings.set_editor_property("reduce_keys", False)
 
-        # ── 5. Import FBX onto the camera binding ─────────────────────────────────────
+        #  Import FBX onto the camera binding
         world = ue.EditorLevelLibrary.get_editor_world()
-
-        success = ue.SequencerTools.import_level_sequence_fbx(
+        ue.SequencerTools.import_level_sequence_fbx(
             world=world,
             sequence=self.ls,
             bindings=[camera_binding],
@@ -150,8 +118,9 @@ class ImportFBXCam(base_ui.WindowBase):
             import_filename=fbx_path
         )
 
-
-
+        camera_name = file_utils.get_file_name(fbx_path)
+        camera_binding.set_name(camera_name)
+        camera_cut_track.set_actor_label(camera_name)
 
 
 def launch():
