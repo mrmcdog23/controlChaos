@@ -25,7 +25,7 @@ class ImportFBXCam(base_ui.WindowBase):
         self.browse_fbx_wdg.line_edit.textChanged.connect(self.populate_fbx)
         self.btn_import_cameras.clicked.connect(self.import_cameras)
         self.chk_all.toggled.connect(self.check_all)
-        self.browse_fbx_wdg.set_file_path("//192.168.1.10/storage/jobs/011231_TestProject/vfx/appdata")
+        #self.browse_fbx_wdg.set_file_path("//192.168.1.10/storage/jobs/011231_TestProject/vfx/appdata")
 
     def check_all(self, checked):
         # type: (bool) -> None
@@ -47,6 +47,7 @@ class ImportFBXCam(base_ui.WindowBase):
         self.lw_cameras.clear()
         import_dir = self.browse_fbx_wdg.file_path
         fbx_files = file_utils.get_files_recursively(import_dir, ["fbx"])
+        fbx_files.sort()
         for fbx_path in fbx_files:
             item = QtWidgets.QListWidgetItem(os.path.basename(fbx_path))
             item.setCheckState(QtCore.Qt.Checked)
@@ -59,6 +60,7 @@ class ImportFBXCam(base_ui.WindowBase):
         self.browse_fbx_wdg = LineBrowser(
             self, "dir", "Select FBX Directory", "", "FBX Directory")
         self.lyt_browse.addWidget(self.browse_fbx_wdg)
+        self.btn_import_cameras.setMinimumHeight(25)
 
     @property
     def checked_cameras(self):
@@ -82,7 +84,6 @@ class ImportFBXCam(base_ui.WindowBase):
             QtWidgets.QMessageBox.critical(self, "No Level Sequence", "No level sequence open")
             return
 
-        self.map = api_wrap.get_editor_world()
         fbx_dir = self.browse_fbx_wdg.file_path
         for camera_file_name in self.checked_cameras:
             fbx_path = file_utils.join_file_names(fbx_dir, camera_file_name)
@@ -121,6 +122,7 @@ class ImportFBXCam(base_ui.WindowBase):
         camera_name = file_utils.get_file_name(fbx_path)
         camera_binding.set_name(camera_name)
         camera_cut_track.set_actor_label(camera_name)
+        camera_cut_track.set_folder_path("FBX_Cameras")
 
 
 def launch():
