@@ -3,7 +3,6 @@ import os
 import unreal as ue
 import cccore.base_ui as base_ui
 import cccore.utils.file_utils as file_utils
-import ccunreal.utils.api_wrap as api_wrap
 import ccunreal.utils.unreal_utils as unreal_utils
 from ccgeneral.widgets.line_browser import LineBrowser
 from CCPySide import QtWidgets, QtCore
