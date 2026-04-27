@@ -147,35 +147,35 @@ global proc shelf_ControlChaos () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 33
+        -flexibleWidthValue 32
         -enable 1
-        -width 36
+        -width 35
         -height 34
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Convert image plane to mesh"
+        -annotation "Convert image plane to mesh" 
         -enableBackground 0
-        -backgroundColor 0 0 0
-        -highlightColor 0.321569 0.521569 0.65098
-        -align "center"
-        -label "Mesh"
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Mesh" 
         -labelOffset 0
         -rotation 0
         -flipX 0
         -flipY 0
         -useAlpha 1
-        -font "plainLabelFont"
-        -imageOverlayLabel "Mesh"
-        -overlayLabelColor 0.8 0.8 0.8
-        -overlayLabelBackColor 0 0 0 0.2
-        -image "im_to_mesh.png"
-        -image1 "im_to_mesh.png"
-        -style "iconOnly"
+        -font "plainLabelFont" 
+        -imageOverlayLabel "Mesh" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.2 
+        -image "im_to_mesh.png" 
+        -image1 "im_to_mesh.png" 
+        -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "import ccmaya.asset.image_plane_to_mesh as iptm;iptm.convert_to_mesh()"
-        -sourceType "python"
+        -command "import ccmaya.asset.image_plane_to_mesh as iptm;iptm.convert_to_mesh()" 
+        -sourceType "python" 
         -commandRepeatable 1
         -flat 1
     ;
