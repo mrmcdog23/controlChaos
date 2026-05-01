@@ -85,8 +85,16 @@ def convert_to_mesh():
 
     # create a mesh and get start and end frame
     mesh_plane = cmds.polyPlane(sx=1, sy=1)[0]
-    start_frame = int(cmds.playbackOptions(q=True, min=True))
-    end_frame = int(cmds.playbackOptions(q=True, max=True))
+
+    # create the aim locator for the center of the image plane
+    aim_loc = cmds.spaceLocator(n="aim_loc")[0]
+    point_con = cmds.pointConstraint(mesh_plane, aim_loc)[0]
+    orient_con = cmds.orientConstraint(mesh_plane, aim_loc)[0]
+    cmds.delete([point_con, orient_con])
+
+    # parent the plane under the locator and aim constraint it
+    cmds.parent(mesh_plane, aim_loc)
+    cmds.aimConstraint(cam_transform, aim_loc)
 
     # build set of the vertexes to bake
     vertex_key_set = set()
@@ -95,6 +103,8 @@ def convert_to_mesh():
 
     # step through each frame and snap the vertexes to the
     # corners of the image plane and set the keyframes
+    start_frame = int(cmds.playbackOptions(q=True, min=True))
+    end_frame = int(cmds.playbackOptions(q=True, max=True))
     for frame_num in range(start_frame, end_frame+1):
         cmds.currentTime(frame_num, e=True)
         corners = get_image_plane_corners_cmds(ip_shape, camera_shape)
