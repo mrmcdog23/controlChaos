@@ -1,0 +1,85 @@
+# always use the first in the subfolder list
+maya:
+  scenes:
+    asset:
+      - animation
+      - lookdev
+      - rigging
+      - modeling
+      - texture
+    shot:
+      - tracking
+      - layout
+      - animation
+      - lighting
+unreal:
+  cache:
+    asset:
+      - lookdev
+      - rigging
+      - modeling
+    shot:
+      - animation
+      - lighting
+      - previz
+houdini:
+  hip:
+    asset:
+      - lightcomp
+      - camera
+      - modeling
+      - lookdev
+      - fx
+      - lighting
+    shot:
+      - camera
+      - animation
+      - fx
+      - lighting
+  render:
+    asset:
+      - camera
+      - modeling
+      - lookdev
+      - fx
+      - lighting
+    shot:
+      - camera
+      - animation
+      - fx
+      - lighting
+nuke:
+  scripts:
+    asset:
+      - comp
+      - lightcomp
+      - precomp
+    shot:
+      - comp
+      - lightcomp
+      - precomp
+  render:
+    asset:
+      - comp
+      - lightcomp
+      - precomp
+    shot:
+      - comp
+      - lightcomp
+      - precomp
+  stills:
+    asset:
+      - comp
+      - lightcomp
+      - precomp
+    shot:
+      - comp
+      - lightcomp
+      - precomp
+blender:
+  scenes:
+    asset:
+      - modeling
+    shot:
+      - animation
+

@@ -1,3 +1,4 @@
 pymel
 qtpy
 requests
+pyyaml

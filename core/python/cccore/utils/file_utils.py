@@ -1,5 +1,7 @@
 import os
 import sys
+import logging
+import cccore.utils.read_write as read_write
 
 
 def reload_cc_modules():
@@ -77,3 +79,29 @@ def get_file_name(file_path):
     if "." in file_name:
         file_name = file_name.split(".")[0]
     return file_name
+
+
+def read_file(file_path):
+    if file_path.endswith(".yml"):
+        data = read_write.read_yaml(file_path)
+        return data
+
+
+def write_file(file_path, data):
+    if file_path.endswith(".json"):
+        read_write.write_json(file_path, data)
+
+
+def create_directories(directory):
+    # type: (str) -> None
+    """
+    Create a directory path if it doesn't exist
+
+    Args:
+        directory: Path to the directory to create
+    """
+    if not os.path.exists(directory):
+        logging.info(f"Creating directory: {directory}")
+        os.makedirs(directory, exist_ok=True)
+    else:
+        logging.debug(f"Directory Exists: {directory}")

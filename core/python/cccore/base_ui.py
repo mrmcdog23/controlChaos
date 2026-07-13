@@ -663,3 +663,10 @@ class ControlChaosHeaderNarrow(ControlChaosHeader):
         super().__init__(title=title, window_icon=window_icon)
         text = f"\n{title.upper()}"
         self.lbl_title.setText(text)
+
+
+def open_standalone_ui(ui_class):
+    app = QtWidgets.QApplication(sys.argv)
+    window = ui_class()
+    window.show()
+    sys.exit(app.exec())

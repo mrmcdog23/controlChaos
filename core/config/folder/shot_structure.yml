@@ -1,0 +1,58 @@
+flame:
+  exr:
+  setups:
+  v000:
+houdini:
+  abc:
+  archive:
+  audio:
+  backup:
+  cache:
+  geo:
+  hda:
+  hip:
+  otls:
+  render:
+  renderPublish:
+  scripts:
+  sim:
+  tex:
+  video:
+maya:
+  abc:
+  assets:
+  cache:
+  clips:
+  data:
+  images:
+  movies:
+  render:
+  renderData:
+  renderPublish:
+  sceneAssembly:
+  scenes:
+  scripts:
+  sounds:
+  sourceimages:
+nuke:
+  render:
+  scripts:
+  stills:
+unreal:
+  render:
+  cache:
+blender:
+  abc:
+  cache:
+  scenes:
+prep:
+brief:
+roto:
+  in:
+source:
+tracking:
+  in:
+dmp:
+  working:
+  render:
+  scripts:

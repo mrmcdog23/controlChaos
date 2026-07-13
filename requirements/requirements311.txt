@@ -2,3 +2,4 @@ pdfplumber
 PySide6
 qtpy
 requests
+pyyaml

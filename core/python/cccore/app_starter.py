@@ -313,10 +313,21 @@ class SlateMakerTool(BaseTool):
         self.launch_path = "{0}/standalone/python/slate_maker/slate_maker_ui.py"
 
 
+class ProjectCreatorTool(BaseTool):
+    name = "project_creator"
+
+    def __init__(self):
+        super().__init__()
+        self.display_text = "Project Creator"
+        self.icon = "project_creator.png"
+        self.launch_path = "{0}/standalone/python/creators/project_creator.py"
+
+
 APPLICATIONS = [
     MayaApp,
     UnrealApp
 ]
 TOOLS = [
-    SlateMakerTool
+    SlateMakerTool,
+    ProjectCreatorTool
 ]

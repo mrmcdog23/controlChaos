@@ -1,0 +1,52 @@
+maya:
+  abc:
+  assets:
+  cache:
+  clips:
+  data:
+  images:
+  movies:
+  render:
+  renderData:
+  sceneAssembly:
+  scenes:
+  scripts:
+  sounds:
+  sourceimages:
+houdini:
+  abc:
+  archive:
+  audio:
+  backup:
+  cache:
+  comp:
+  desk:
+  flip:
+  geo:
+  hda:
+  hip:
+  otls:
+  render:
+  scripts:
+  sim:
+  tex:
+  video:
+nuke:
+  render:
+  scripts:
+  stills:
+unreal:
+  render:
+  cache:
+mari:
+  photoshop:
+  published:
+  substance:
+  texturesDownloaded:
+  texturesToPublish:
+blender:
+  scenes:
+zbrush:
+  paint:
+  sculpt:
+  texturesToPublish:
