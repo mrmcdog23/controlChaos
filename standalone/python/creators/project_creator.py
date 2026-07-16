@@ -29,21 +29,24 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
         self.logger = cc_logging.cc_logger()
         self.ui_settings = QtCore.QSettings('controlChaos', 'project_creator')
 
-        self.populate_files()
         self.create_layout()
+        self.load_settings()
+        self.populate_yamls()
         self.populate_structure()
         self.populate_app_versions()
-        self.load_settings()
         self.connect_signals()
 
     def load_settings(self):
         """
         Load the previous settings to the widgets
         """
-        project_dir = self.ui_settings.value("project_dir", str())
-        self.wdg_browse_root.set_file_path(project_dir)
         project_name = self.ui_settings.value("project_name", str())
         self.le_project_name.setText(project_name)
+        rbn_standard = self.ui_settings.value("rbn_standard", 1)
+        self.rbn_custom.setChecked(not rbn_standard)
+        self.wdg_custom_yaml.setHidden(rbn_standard)
+        project_structures_dir = self.ui_settings.value("project_structures_dir", str())
+        self.wdg_custom_yaml.set_file_path(project_structures_dir)
 
     def create_layout(self):
         """
@@ -54,20 +57,43 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
             self, "dir", "Select Project Directory", project_dir, "Project Directory")
         self.lyt_project_root.addWidget(self.wdg_browse_root)
 
+        # add the custom yaml folder widget
+        project_structures_dir = self.ui_settings.value("project_structures_dir", str())
+        self.wdg_custom_yaml = LineBrowser(
+            self, "dir", "Select Custom Directory", project_structures_dir, "Custom Directory")
+        self.wdg_custom_yaml.setHidden(True)
+        self.lyt_custom_folder.addWidget(self.wdg_custom_yaml)
+
         # hide the headers of the tree widget
         self.tw_project_structure.setHeaderHidden(True)
 
-    def populate_files(self):
+    def populate_yamls(self):
         """
         Populate the list of potential project structures
         """
-        project_structures_dir = data_utils.get_relative_path("core/config/project_structures")
-        project_structures_files = file_utils.get_files_recursively(project_structures_dir)
+        self.cmb_project_structure.blockSignals(True)
+        self.cmb_project_structure.clear()
+
+        if self.rbn_standard.isChecked():
+            project_structures_dir = data_utils.get_relative_path("core/config/project_structures")
+        else:
+            project_structures_dir = self.wdg_custom_yaml.file_path
+            self.ui_settings.setValue("project_structures_dir", project_structures_dir)
+
+        if not project_structures_dir or not os.path.exists(project_structures_dir):
+            return
+
+        project_structures_files = file_utils.get_files_recursively(
+            project_structures_dir, extensions=["yml"])
 
         # add the files to the combo box
         for project_structure_file in project_structures_files:
             file_name = file_utils.get_file_name(project_structure_file)
             self.cmb_project_structure.addItem(file_name, project_structure_file)
+
+        # store the settings
+        self.cmb_project_structure.blockSignals(False)
+        self.populate_structure()
 
     def insert_nodes(self, parent_item, data):
         # type: (QtWidgets.QTreeWidgetItem, dict) -> None
@@ -108,10 +134,20 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
         self.btn_collapse.clicked.connect(self.collapse_all)
         self.le_project_name.textChanged.connect(self.enable_button)
         self.wdg_browse_root.line_edit.textChanged.connect(self.enable_button)
+        self.wdg_custom_yaml.line_edit.textChanged.connect(self.populate_yamls)
         self.btn_create_project.clicked.connect(self.create_new_project)
         self.cmb_project_structure.currentIndexChanged.connect(self.populate_structure)
         self.tw_project_structure.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tw_project_structure.customContextMenuRequested.connect(self.action_menu)
+        self.rbn_standard.toggled.connect(self.show_custom)
+
+    def show_custom(self, show):
+        """
+        Show the custom config directly
+        """
+        self.wdg_custom_yaml.setHidden(show)
+        self.ui_settings.setValue("rbn_standard", int(show))
+        self.populate_yamls()
 
     def action_menu(self, event):
         """
@@ -280,9 +316,13 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
             "project_root": self.project_root
         }
 
-        user_profile = os.environ["USERPROFILE"]
-        write_path = f"{user_profile}/Documents/{project_name}.json"
-        file_utils.write_file(write_path, project_settings)
+        write_path = core_constants.LOCAL_PROJECT_CONFIG
+        data = dict()
+        if os.path.exists(write_path):
+            data = file_utils.read_file(write_path)
+            
+        data[project_name] = project_settings
+        file_utils.write_file(write_path, data)
 
 
 if __name__ == "__main__":

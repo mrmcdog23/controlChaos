@@ -86,6 +86,9 @@ def read_file(file_path):
         data = read_write.read_yaml(file_path)
         return data
 
+    if file_path.endswith(".json"):
+        data = read_write.read_json(file_path)
+        return data
 
 def write_file(file_path, data):
     if file_path.endswith(".json"):

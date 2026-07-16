@@ -1,5 +1,6 @@
-""" Core constants for the pipeline"""
-from enum import Enum, auto
+""" Core constants for the pipeline """
+import os
+from enum import Enum
 
 
 PYTHON_EXE = "C:/Python/python311/python.exe"
@@ -16,3 +17,8 @@ class APPS(Enum):
     NUKE = ["16.0v6", "16.0v4"]
     MAYA = ["2027", "2026", "2025", "2024", "2023"]
     UNREAL = ["5.8", "5.7", "5.6", "5.5"]
+
+
+# project configurations
+SERVER_PROJECT_CONFIG = "X:/Config_CC/projects_config.json"
+LOCAL_PROJECT_CONFIG = f"{os.environ['USERPROFILE']}/Documents/projects_config.json"
