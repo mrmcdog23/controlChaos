@@ -1,11 +1,13 @@
 """ Launcher of daydreamer tools and applications """
 import os
 import subprocess
-import logging
 import cccore.base_ui as base_ui
 import cccore.app_starter as app_starter
 import cccore.core_constants as core_constants
 import cccore.utils.cc_logging as cc_logging
+import cccore.utils.file_utils as file_utils
+import cccore.utils.data_utils as data_utils
+from ccgeneral.widgets.line_browser import LineBrowser
 from CCPySide import QtWidgets, QtCore, QtGui
 
 
@@ -85,14 +87,25 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.tool_list = list()
         self.app_widgets = list()
         self.app_versions = list()
+        self.all_projects_data = dict()
 
         # initialize data
         self.ui_settings = QtCore.QSettings('control_chaos', 'launcher')
         self.logger = cc_logging.cc_logger()
 
+        self.create_layout()
         self.populate_apps_and_tools()
         self.load_from_settings()
+        self.populate_projects()
         self.connect_signals()
+
+    def create_layout(self):
+        """
+        Create the layout of the config
+        """
+        self.wdg_project_config = LineBrowser(
+            self, "file", "Select Project Config", "", "Project Config")
+        self.lyt_project_config.addWidget(self.wdg_project_config)
 
     def load_from_settings(self):
         """
@@ -108,6 +121,20 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.rbn_tools.setChecked(int(tools))
         app = self.ui_settings.value("app", 0)
         self.rbn_apps.setChecked(int(app))
+
+        saved_config_path = self.ui_settings.value("project_config", str())
+        default_config_path = data_utils.get_relative_path("core/config/default_config.json")
+
+        potential_configs = [
+            saved_config_path,
+            core_constants.SERVER_PROJECT_CONFIG,
+            core_constants.LOCAL_PROJECT_CONFIG,
+            default_config_path
+        ]
+        for config_path in potential_configs:
+            if os.path.exists(config_path):
+                self.wdg_project_config.set_file_path(config_path)
+                break
 
         # set the flame users name
         self.filter_app_or_tool_list()
@@ -133,6 +160,19 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.rbn_apps.clicked.connect(self.filter_app_or_tool_list)
         self.rbn_tools.clicked.connect(self.filter_app_or_tool_list)
         self.btn_launch.clicked.connect(self.launch_selected)
+        self.wdg_project_config.line_edit.textChanged.connect(self.populate_projects)
+        self.cmb_project.currentIndexChanged.connect(self.update_selection)
+        self.cmb_application_version.currentIndexChanged.connect(self.update_button_text)
+
+    def populate_projects(self):
+        """
+        Populate the projects
+        """
+        self.all_projects_data = file_utils.read_file(self.wdg_project_config.file_path)
+        project_names_list = list(self.all_projects_data.keys())
+        self.cmb_project.clear()
+        self.cmb_project.addItems(project_names_list)
+        self.create_completer(self.cmb_project, items_list=project_names_list)
 
     def create_app_tool_list(self, app_tool_list):
         """
@@ -206,28 +246,33 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         if not selected_app:
             return
 
-        # update the launch button
-        self.update_btn_text()
-
         app_versions = selected_app.app_versions
-        if not app_versions:
-            return
+        if app_versions:
+            # if there are application versions
+            # populate the list and set the default
+            self.cmb_application_version.clear()
+            self.cmb_application_version.addItems(app_versions)
 
-        self.cmb_application_version.clear()
-        self.cmb_application_version.addItems(app_versions)
+            project_name = self.cmb_project.currentText()
+            project_data = self.all_projects_data[project_name]
+            app_version = project_data["application_versions"][selected_app.name]
+            self.set_combobox_index(self.cmb_application_version, app_version)
 
-    def update_btn_text(self):
+        self.update_button_text()
+
+    def update_button_text(self):
         """
-        Update the button text when the selection changes
+        Update the launch button text
         """
+        app_version = self.cmb_application_version.currentText()
         selected_app = self.get_selected_app()
+
+        # get the button text. add the version
+        launch_text = f"L A U N C H: {selected_app.display_text}"
         if selected_app.is_app:
-            app_version = self.cmb_application_version.currentText()
-            launch_text = f"{selected_app.display_text} {app_version}"
-        else:
-            launch_text = f"{selected_app.display_text}"
-        button_text = f"L A U N C H: {launch_text}"
-        self.btn_launch.setText(button_text)
+            launch_text = f"{launch_text} {app_version}"
+
+        self.btn_launch.setText(launch_text)
         self.btn_launch.setEnabled(True)
 
     def does_exe_path_exist_on_disk(self):

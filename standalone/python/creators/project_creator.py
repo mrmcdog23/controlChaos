@@ -5,6 +5,7 @@ import cccore.base_ui as base_ui
 import cccore.core_constants as core_constants
 import cccore.utils.data_utils as data_utils
 import cccore.utils.file_utils as file_utils
+import cccore.app_starter as app_starter
 from ccgeneral.widgets.line_browser import LineBrowser
 from PySide6 import QtWidgets, QtCore, QtGui
 
@@ -34,6 +35,7 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
         self.populate_yamls()
         self.populate_structure()
         self.populate_app_versions()
+        self.enable_button()
         self.connect_signals()
 
     def load_settings(self):
@@ -44,9 +46,13 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
         self.le_project_name.setText(project_name)
         rbn_standard = self.ui_settings.value("rbn_standard", 1)
         self.rbn_custom.setChecked(not rbn_standard)
+
         self.wdg_custom_yaml.setHidden(rbn_standard)
         project_structures_dir = self.ui_settings.value("project_structures_dir", str())
         self.wdg_custom_yaml.set_file_path(project_structures_dir)
+
+        project_dir = self.ui_settings.value("project_dir")
+        self.wdg_browse_root.set_file_path(project_dir)
 
     def create_layout(self):
         """
@@ -121,10 +127,10 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
         self.set_combobox_index(self.cmb_fps, core_constants.DEFAULT_FPS)
 
         # populate application versions
-        self.cmb_unreal.addItems(core_constants.APPS.UNREAL.value)
-        self.cmb_nuke.addItems(core_constants.APPS.NUKE.value)
-        self.cmb_maya.addItems(core_constants.APPS.MAYA.value)
-        self.cmb_houdini.addItems(core_constants.APPS.HOUDINI.value)
+        self.cmb_unreal.addItems(app_starter.UnrealApp.app_versions)
+        self.cmb_nuke.addItems(app_starter.NukeApp.app_versions)
+        self.cmb_maya.addItems(app_starter.MayaApp.app_versions)
+        self.cmb_houdini.addItems(app_starter.HoudiniApp.app_versions)
 
     def connect_signals(self):
         """
@@ -299,11 +305,11 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
         project_name = self.le_project_name.text()
         general_settings = {
             "project_name": project_name,
-            "project_code": self.le_project_code.text()
+            "project_code": self.le_project_code.text(),
+            "fps": self.cmb_fps.currentText(),
         }
 
         application_versions = {
-            "fps": self.cmb_fps.currentText(),
             "unreal": self.cmb_unreal.currentText(),
             "maya": self.cmb_maya.currentText(),
             "houdini": self.cmb_houdini.currentText(),

@@ -188,7 +188,7 @@ class BaseApp(BaseEntity):
 
 
 class MayaApp(BaseApp):
-    app_versions = ["2026", "2024"]
+    app_versions = ["2027", "2026", "2024"]
     name = "maya"
 
     def __init__(self):
@@ -254,12 +254,11 @@ class UnrealApp(BaseApp):
     """
     Launching Unreal application
     """
-    app_versions = ["5.6"]
+    app_versions = ["5.8", "5.7", "5.6"]
     name = "unreal"
 
     def __init__(self):
         super().__init__()
-        self.name = "unreal"
         self.display_text = "Unreal"
         self.icon = "unreal.png"
         self.launch_path = "C:/Program Files/Epic Games/UE_{version}/Engine/Binaries/Win64/UnrealEditor.exe"
@@ -301,6 +300,30 @@ class UnrealApp(BaseApp):
         Launch the unreal project
         """
         self.cmd_list = [self.exe_path]
+
+
+class HoudiniApp(BaseApp):
+    """
+    Launching Houdini application
+    """
+    app_versions = ["21.0.512", "20.5.445", "20.0.590"]
+    name = "houdini"
+
+    def __init__(self):
+        super().__init__()
+
+
+class NukeApp(BaseApp):
+    """
+    Launching Houdini application
+    """
+    app_versions =  ["16.0v6", "16.0v4"]
+    name = "nuke"
+
+    def __init__(self):
+        super().__init__()
+
+
 
 
 class SlateMakerTool(BaseTool):

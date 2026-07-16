@@ -28,6 +28,7 @@ if "%USERNAME%"=="joele" (
 
 set PYTHONPATH=%PYTHONPATH%;%ROOT_DIR%virtual_env\python311\Lib\site-packages
 set PYTHONPATH=%PYTHONPATH%;%PIPELINE_ROOT%\core\python
+set PYTHONPATH=%PYTHONPATH%;%PIPELINE_ROOT%\general\python
 set PYTHONPATH=%PYTHONPATH%;%PIPELINE_ROOT%\core\python\cccore\pyside
 
 "C:/Python/python311/python.exe" %PIPELINE_ROOT%\standalone\python\launcher\control_chaos_launcher.py

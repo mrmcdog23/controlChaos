@@ -106,4 +106,5 @@ class LineBrowser(base_ui.WidgetBase):
         Args:
             file_path: Path of the file to set
         """
-        self.line_edit.setText(file_path)
+        file_path_clean = file_path.replace("\\", "/")
+        self.line_edit.setText(file_path_clean)

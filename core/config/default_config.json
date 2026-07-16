@@ -1,0 +1,16 @@
+{
+    "default": {
+        "application_versions": {
+            "fps": "24",
+            "houdini": "21.0.512",
+            "maya": "2026",
+            "nuke": "16.0v6",
+            "unreal": "5.6"
+        },
+        "general_settings": {
+            "project_code": "",
+            "project_name": "default"
+        },
+        "project_root": "X:/"
+    }
+}
