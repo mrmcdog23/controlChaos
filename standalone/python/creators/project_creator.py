@@ -322,13 +322,24 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
             "project_root": self.project_root
         }
 
-        write_path = core_constants.LOCAL_PROJECT_CONFIG
-        data = dict()
-        if os.path.exists(write_path):
-            data = file_utils.read_file(write_path)
-            
-        data[project_name] = project_settings
-        file_utils.write_file(write_path, data)
+        # loop through both potential config paths to write to
+        config_paths = [
+            core_constants.SERVER_PROJECT_CONFIG,
+            core_constants.LOCAL_PROJECT_CONFIG
+        ]
+        for config_path in config_paths:
+
+            # if the directory does not exist then continue
+            directory_path = os.path.dirname(config_path)
+            if not os.path.dirname(directory_path):
+                continue
+
+            # read and update the data
+            data = dict()
+            if os.path.exists(config_path):
+                data = file_utils.read_file(config_path)
+            data[project_name] = project_settings
+            file_utils.write_file(config_path, data)
 
 
 if __name__ == "__main__":
