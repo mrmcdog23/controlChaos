@@ -7,7 +7,7 @@ import cccore.utils.data_utils as data_utils
 import cccore.utils.file_utils as file_utils
 import cccore.app_starter as app_starter
 from ccgeneral.widgets.line_browser import LineBrowser
-from PySide6 import QtWidgets, QtCore, QtGui
+from CCPySide import QtWidgets, QtCore, QtGui
 
 
 class ProjectCreator(base_ui.StandaloneWindowBase):

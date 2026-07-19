@@ -10,11 +10,6 @@ from qtpy import uic
 from pathlib import Path
 
 
-CONTROL_CHAOS_SS = "../../css/cc_stylesheet.css"
-BTN_SS = "../../css/btn_stylesheet.css"
-
-
-
 class Ui(object):
     """ Base class for building uis """
     title = None
@@ -27,6 +22,8 @@ class Ui(object):
     previous_ui_settings = None
     cc_header = None
     add_cc_title_name = False
+    control_chaos_ss = "../../css/cc_stylesheet.css"
+    btn_ss = "../../css/btn_stylesheet.css"
 
     def __init__(self, parent=None, *args, **kwargs):
         super(Ui, self).__init__(parent)
@@ -161,7 +158,7 @@ class Ui(object):
         """
         if not self.use_cc_ss:
             return
-        self._cc_style_sheet = self.read_css(CONTROL_CHAOS_SS)
+        self._cc_style_sheet = self.read_css(self.control_chaos_ss)
         if self.additional_stylesheet:
             self._cc_style_sheet += self.additional_stylesheet
         self.setStyleSheet(self._cc_style_sheet)
@@ -388,7 +385,7 @@ class Ui(object):
         """
         Load the cc button style sheet on to the buttons tagged with "btn_ss"
         """
-        btn_style_sheet = self.read_css(BTN_SS)
+        btn_style_sheet = self.read_css(self.btn_ss)
         for btn in self.findChildren(QtWidgets.QPushButton):
             if btn.property("btn_ss") is not None:
                 btn.setStyleSheet(btn_style_sheet)

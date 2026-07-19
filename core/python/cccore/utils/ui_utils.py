@@ -1,4 +1,4 @@
-from PySide6 import QtWidgets, QtCore, QtGui
+from CCPySide import QtWidgets, QtCore, QtGui
 
 
 def messagebox(title, message, msg_type, buttons=None, parent=None, launch=True):

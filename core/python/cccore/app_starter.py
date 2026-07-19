@@ -188,7 +188,7 @@ class BaseApp(BaseEntity):
 
 
 class MayaApp(BaseApp):
-    app_versions = ["2027", "2026", "2024"]
+    app_versions = ["2027", "2026", "2025", "2024"]
     name = "maya"
 
     def __init__(self):
@@ -203,8 +203,9 @@ class MayaApp(BaseApp):
     def python_version(self):
         # type: () -> str
         """ Python version to use to add site packages """
-        version_to_py = {"2026": "311_nopyside", "2024": "311_nopyside"}
-        return version_to_py[self.app_version]
+        #version_to_py = {"2026": "311_nopyside", "2024": "311_nopyside"}
+        #return version_to_py[self.app_version]
+        return "311_nopyside"
 
     def set_app_environment(self):
         """

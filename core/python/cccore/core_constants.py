@@ -14,3 +14,6 @@ FRAME_RATES = ["23.976", "24", "25", "29.97", "30"]
 # project configurations
 SERVER_PROJECT_CONFIG = "X:/Config_CC/projects_config.json"
 LOCAL_PROJECT_CONFIG = f"{os.environ['USERPROFILE']}/Documents/projects_config.json"
+
+PROGRESS_TEXT = "PROGRESS:"
+MAXIMUM_VALUE_TEXT = "MAXIMUM VALUE:"

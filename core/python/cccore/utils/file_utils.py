@@ -1,6 +1,7 @@
 import os
 import sys
 import logging
+import datetime
 import cccore.utils.read_write as read_write
 
 
@@ -106,5 +107,41 @@ def create_directories(directory):
     if not os.path.exists(directory):
         logging.info(f"Creating directory: {directory}")
         os.makedirs(directory, exist_ok=True)
-    else:
-        logging.debug(f"Directory Exists: {directory}")
+
+
+def create_directory(directory):
+    # type: (str) -> None
+    """
+    Create a directory if it doesn't exist
+
+    Args:
+        directory: Path to the directory to create
+    """
+    # if the path is a file name strip to directory path
+    if "." in os.path.basename(directory):
+        directory = os.path.dirname(directory)
+
+    if not os.path.exists(directory):
+        logging.info(f"Creating directory: {directory}")
+        os.mkdir(directory)
+
+
+def temp_file_path(prefix, extension, directory=None):
+    # type: (str, str, Optional[str]) -> str
+    """
+    Get a path to a temp file with a unique name
+
+    Args:
+        prefix: File name prefix
+        extension: The file type to write
+        directory: The directory to write the file to
+
+    Returns:
+        temp_path: Path of the temp file
+    """
+    directory = directory or os.environ["TEMP"]
+    today = datetime.datetime.now()
+    unique_name = today.strftime("%d%m%Y_%H%M%S")
+    file_name = f"{prefix}_{unique_name}.{extension}"
+    temp_path = join_file_names(directory, file_name)
+    return temp_path

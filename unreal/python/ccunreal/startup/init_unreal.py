@@ -1,3 +1,3 @@
-""" Build the No8 Unreal menu"""
+""" Build the cc Unreal menu"""
 import unreal_menu
 unreal_menu.main()

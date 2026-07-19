@@ -1,12 +1,12 @@
 """ Class to create folder structure on a project """
 import os
 from typing import Optional
-import no8ftrack.asset as asset
-import no8ftrack.shot as shot
-import no8core.utils.file_utils as file_utils
-import no8core.data.server_data as server_data
-import no8core.utils.no8_logging as no8_logging
-import no8core.core_constants as core_constants
+import ccftrack.asset as asset
+import ccftrack.shot as shot
+import cccore.utils.file_utils as file_utils
+import cccore.data.server_data as server_data
+import cccore.utils.cc_logging as cc_logging
+import cccore.core_constants as core_constants
 
 
 class CreateFolders(object):
@@ -21,9 +21,7 @@ class CreateFolders(object):
         """
         super().__init__()
         self.data = server_data.ProjectData(project_name=project_name)
-        self.ftshot = shot.FtShot(input_project=project_name)
-        self.ftasset = asset.FtAsset(input_project=project_name, session=self.ftshot.session)
-        self.logger = no8_logging.no8_logger()
+        self.logger = cc_logging.cc_logger()
 
         # initialise class variables
         self.project_name = project_name

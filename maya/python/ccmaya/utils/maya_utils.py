@@ -44,3 +44,27 @@ def launch_maya_win(win_class):
 
     # set the window
     loading.show()
+
+
+def launch_wizard(wizard_cls):
+    """
+    Launch the asset publish wizard
+    """
+    wizard_cls.control_chaos_ss = "../../css/maya_stylesheet.css"
+    maya_window = get_maya_main_window()
+    wizard = wizard_cls(parent=maya_window)
+    wizard.show()
+    wizard.exec_()
+
+
+def load_plugins(plugin_list):
+    # type: (list[str]) -> None
+    """
+    Load a list of plugins into Maya
+
+    Args:
+        plugin_list: List of plugins to load
+    """
+    for plugin in plugin_list:
+        if not cmds.pluginInfo(plugin, query=True, loaded=True):
+            cmds.loadPlugin(plugin)
