@@ -51,7 +51,7 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
         project_structures_dir = self.ui_settings.value("project_structures_dir", str())
         self.wdg_custom_yaml.set_file_path(project_structures_dir)
 
-        project_dir = self.ui_settings.value("project_dir")
+        project_dir = self.ui_settings.value("project_dir", str())
         self.wdg_browse_root.set_file_path(project_dir)
 
     def create_layout(self):
@@ -331,7 +331,7 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
 
             # if the directory does not exist then continue
             directory_path = os.path.dirname(config_path)
-            if not os.path.dirname(directory_path):
+            if not os.path.exists(directory_path):
                 continue
 
             # read and update the data
