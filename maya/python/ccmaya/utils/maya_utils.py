@@ -68,3 +68,20 @@ def load_plugins(plugin_list):
     for plugin in plugin_list:
         if not cmds.pluginInfo(plugin, query=True, loaded=True):
             cmds.loadPlugin(plugin)
+
+
+def add_export_attribute():
+    """
+    Add export attributes to the node
+    """
+    selected_nodes = cmds.ls(sl=True)
+    if not selected_nodes:
+        cmds.warning("Nothing selected!")
+        return
+
+    # if the attribute exists then skip
+    selected_node = selected_nodes[0]
+    if not cmds.objExists( f"{selected_node}.export"):
+        cmds.addAttr(selected_node, longName="export", at='bool')
+    else:
+        cmds.warning("Export attribute already exists!")

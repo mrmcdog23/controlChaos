@@ -56,9 +56,8 @@ class MayaSceneAssetsPage(BasePublishPage):
         """
         Load the scene assets that are published rigs
         """
-        all_transforms = cmds.ls(assemblies=True)
-        list_of_assets = [n for n in all_transforms if n not in maya_constants.DEFAULT_CAMERAS]
-        for asset_name in list_of_assets:
+        for node in cmds.ls("*.export"):
+            asset_name = node.split(".export")[0]
             item = QtWidgets.QListWidgetItem(asset_name)
             self.lw_scene_assets.addItem(item)
 
