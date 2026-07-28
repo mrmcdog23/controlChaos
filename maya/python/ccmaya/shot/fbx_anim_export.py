@@ -27,6 +27,7 @@ class FbxAnimExport(object):
         self.objects_to_bake = list()
         self.name_fbx_path = dict()
         self.namespace_to_objects = dict()
+        self.fbx_paths = list()
 
     def run_fbx_exports(self):
         """
@@ -41,11 +42,12 @@ class FbxAnimExport(object):
         """
         Setup the scene for fbx exporting
         """
-        self.logger.info("Unparent joints for baking")
+        self.logger.info(f"Unparent joints for baking: {self.namespaces}")
         for namespace in self.namespaces:
             scene_asset_inst = scene_asset.SceneAsset(namespace)
 
             # store objects to export
+            self.logger.info(f"{namespace} -> {scene_asset_inst.cam_grp}")
             if scene_asset_inst.cam_grp:
                 self.namespace_to_objects[namespace] = [scene_asset_inst.cam_grp]
                 continue
@@ -56,6 +58,8 @@ class FbxAnimExport(object):
 
             # check the root joint exists on the asset
             root_joint = scene_asset_inst.root_joint
+            if not root_joint:
+                continue
 
             # update the root joint and get its descendants
             root_joint = cmds.parent(root_joint, world=True)[0]
@@ -80,11 +84,13 @@ class FbxAnimExport(object):
             # if there is no
             cam = scene_asset_inst.cam
             if not scene_asset_inst.cam:
+                self.logger.warning(f"No camera found on {namespace}")
                 continue
 
             # need to set the camera to far focus distance for Unreal
             cmds.setAttr(f"{cam}.focusDistance", 100000)
             self.objects_to_bake.append(cam)
+            self.logger.info(f"Camera found for {namespace}")
 
     def bake_fbx_nodes(self):
         """
@@ -111,10 +117,12 @@ class FbxAnimExport(object):
         Args:
             namespace: The namespace of the asset to export
         """
+        self.logger.info(f"Namespaces.... {self.namespace_to_objects}")
         objects_to_select = self.namespace_to_objects.get(namespace)
         if not objects_to_select:
             self.logger.info(f"No fbx elements for namespace {namespace}")
             return
+
         cmds.select(objects_to_select)
         self.logger.info(f"FBX frame range: {self.start}-{self.end} - {namespace}")
 
@@ -125,6 +133,7 @@ class FbxAnimExport(object):
         self.name_fbx_path[namespace] = fbx_path
         self.logger.info(f"{namespace}: {fbx_path}")
         self.export_unreal_fbx(fbx_path, self.start, self.end)
+        self.fbx_paths.append(fbx_path)
 
     @staticmethod
     def export_unreal_fbx(fbx_path, cache_start, cache_end):
@@ -173,4 +182,3 @@ class FbxAnimExport(object):
 
         # export the fbx path
         pm.mel.FBXExport(f=fbx_path, s=True)
-

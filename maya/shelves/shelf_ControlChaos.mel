@@ -182,35 +182,35 @@ global proc shelf_ControlChaos () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 33
+        -flexibleWidthValue 32
         -enable 1
-        -width 36
+        -width 35
         -height 34
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Add export attribute"
+        -annotation "Add export attribute" 
         -enableBackground 0
-        -backgroundColor 0 0 0
-        -highlightColor 0.321569 0.521569 0.65098
-        -align "center"
-        -label "add attr"
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "add attr" 
         -labelOffset 0
         -rotation 0
         -flipX 0
         -flipY 0
         -useAlpha 1
-        -font "plainLabelFont"
-        -imageOverlayLabel "addattr"
-        -overlayLabelColor 0.8 0.8 0.8
-        -overlayLabelBackColor 0 0 0 0.2
-        -image "addattr.png"
-        -image1 "addattr.png"
-        -style "iconOnly"
+        -font "plainLabelFont" 
+        -imageOverlayLabel "addattr" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.2 
+        -image "addattr.png" 
+        -image1 "addattr.png" 
+        -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "import ccmaya.utils.maya_utils as mu;mu.add_export_attribute()"
-        -sourceType "python"
+        -command "import ccmaya.utils.maya_utils as mu;mu.add_export_attribute()" 
+        -sourceType "python" 
         -commandRepeatable 1
         -flat 1
     ;
@@ -236,7 +236,7 @@ global proc shelf_ControlChaos () {
         -flipY 0
         -useAlpha 1
         -font "plainLabelFont" 
-        -imageOverlayLabel "export"
+        -imageOverlayLabel "export" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.2 
         -image "export_shot.png" 

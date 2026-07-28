@@ -22,8 +22,7 @@ class ShotExporter(BaseExporter):
     def __init__(self):
         super().__init__()
         self.save_dir = str()
-        self.scene_data = dict()
-        self.additional_components = dict()
+        self.exported_files = list()
 
     @BaseExporter.add_to_percentage(10)
     def open_file(self):
@@ -38,6 +37,7 @@ class ShotExporter(BaseExporter):
         Export the shot assets as fbx and alembic files
         """
         self.cache_assets()
+        self.write_metadata()
         self.log(f"Export Complete")
 
     def save_scene_metadata(self):
@@ -59,11 +59,13 @@ class ShotExporter(BaseExporter):
         self.save_dir = self.data["save_dir"]
         all_namespaces = self.data["namespaces"]
         for namespace in all_namespaces:
-            self.abc_export(namespace)
+            abc_path = self.abc_export(namespace)
+            self.exported_files.append(abc_path)
 
         # run the fbx export separately
-        fbx_class = fbx_anim_export.FbxAnimExport(all_namespaces, self.save_dir)
-        fbx_class.run_fbx_exports()
+        fbx_inst = fbx_anim_export.FbxAnimExport(all_namespaces, self.save_dir)
+        fbx_inst.run_fbx_exports()
+        self.exported_files.extend(fbx_inst.fbx_paths)
 
     @BaseExporter.add_to_percentage(5)
     def abc_export(self, namespace):
@@ -94,6 +96,7 @@ class ShotExporter(BaseExporter):
         )
         self.logger.info(f"Export args: {abc_args}")
         cmds.AbcExport(j=abc_args, verbose=True)
+        return abc_path
 
     @BaseExporter.add_to_percentage(5)
     def bake_export_camera(self):
@@ -109,6 +112,16 @@ class ShotExporter(BaseExporter):
                 if relatives:
                     maya_utils.bake_objects_in_world_space(transform)
                     return
+
+    def write_metadata(self):
+        """
+        Write the metadata json file
+        """
+        file_name = file_utils.get_file_name(self.data['wip_file_path'])
+        metadata_path = file_utils.join_file_names(
+            self.save_dir, f"{file_name}_metadata.json")
+        file_utils.write_file(metadata_path, self.exported_files)
+
 
 
 if __name__ == "__main__":
