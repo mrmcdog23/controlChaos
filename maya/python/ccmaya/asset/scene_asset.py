@@ -7,6 +7,7 @@ class SceneAsset(object):
         self.namespace = namespace
         self._geo_grp = str()
         self._cam_grp = str()
+        self._env_grp = str()
         self._jnt_grp = str()
 
     @property
@@ -26,19 +27,26 @@ class SceneAsset(object):
 
     @property
     def export_grp(self):
-        if self.cam_grp:
-            return self.cam_grp
-        return self.geo_grp
+        for grp in [self.cam_grp, self.env_grp, self.geo_grp]:
+            if grp:
+                return grp
 
     @property
     def geo_grp(self):
         # type: () -> str
-        """
-        Get the root node to export the fullpath
-        """
+        """ Get the root node to export the fullpath """
         if not self._geo_grp:
             self._geo_grp = self.find_group(maya_constants.GEO_GROUP)
         return self._geo_grp
+
+    @property
+    def env_grp(self):
+        # type: () -> str
+        """ Get the root node to export the fullpath """
+        if not self._env_grp:
+            self._env_grp = self.find_group(maya_constants.ENV_GROUP)
+        return self._env_grp
+
 
     @property
     def jnt_grp(self):

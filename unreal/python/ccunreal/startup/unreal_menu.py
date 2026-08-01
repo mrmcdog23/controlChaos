@@ -59,6 +59,14 @@ def main():
     shot_menu = create_submenu(control_chaos_menu, "Shot")
     command = "import ccunreal.shot.import_fbx_cam as ifc;ifc.launch()"
     create_command(shot_menu, "Load FBX Cameras", command)
+    
+    command = "import ccunreal.shot.load_shot_ui as load_shot_ui;load_shot_ui.launch()"
+    create_command(shot_menu, "Load Shot", command)
+
+    # lighting menu
+    lighting_menu = create_submenu(control_chaos_menu, "Lighting")
+    command = "import ccunreal.utils.unreal_utils as uu;uu.create_sky_and_lights()"
+    create_command(lighting_menu, "Create Sky and Lights", command)
 
     add_separator(control_chaos_menu)
 

@@ -5,6 +5,7 @@ import sys
 import unreal as ue
 from CCPySide import QtWidgets, QUiLoader
 from typing import Optional
+import ccunreal.utils.api_wrap as api_wrap
 
 
 def launch_unreal_win(win_class):
@@ -120,3 +121,83 @@ def get_objects_from_list(object_paths, find_asset_type):
         asset_type = asset.get_class().get_fname()
         if asset_type == find_asset_type:
             return object_path
+
+
+
+def actor_type_on_level(actor_type):
+    # type: (str) -> Optional[ue.Object]
+    """
+    Check an actor of particular type exists on a level
+
+    Args:
+        actor_type: Actor type to find
+
+    Returns:
+        actor: The actor that matches the type
+    """
+    actors = ue.GameplayStatics.get_all_actors_of_class(
+        ue.EditorLevelLibrary.get_editor_world(), ue.CineCameraActor
+    )
+    for actor in actors:
+        if isinstance(actor, actor_type):
+            return actor
+
+
+def spawn_actor_if_not_exists(actor_type):
+    # type: (Any) -> ue.Object
+    """
+    Spawn an actor of a class only if it doesnt exists already
+
+    Args:
+        actor_type: Object class to create
+
+    Returns:
+        Found or created object
+    """
+    actor = actor_type_on_level(actor_type)
+    if actor:
+        return actor
+    actor = api_wrap.spawn_actor_from_object(actor_type())
+    ue.log(f"Created actor: {actor}")
+    return actor
+
+
+def fbx_from_actor_tag(actor):
+    # type: (ue.Actor) -> str
+    """
+    get the fbx path from and actor
+
+    Args:
+        actor: The actor to check
+
+    Returns:
+        path of the fbx
+    """
+    try:
+        return actor.tags[0]
+    except IndexError:
+        return str()
+
+
+def create_sky_and_lights():
+    """
+    Create sky atmosphere and direct light
+    """
+    # create atmosphere and cloud
+    spawn_actor_if_not_exists(ue.SkyAtmosphere)
+    spawn_actor_if_not_exists(ue.VolumetricCloud)
+
+    # create directional light
+    direct_light_actor = spawn_actor_if_not_exists(ue.DirectionalLight)
+    rot = ue.Rotator(0, -20, -40.0)
+    direct_light_actor.set_actor_rotation(rot, False)
+    direct_light_actor.light_component.set_editor_property("Intensity", 3)
+
+    # create point light
+    point_light_actor = spawn_actor_if_not_exists(ue.PointLight)
+    point_light_location = ue.Vector(130, -140, 250)
+    point_light_actor.set_actor_location(point_light_location, False, False)
+    point_light_actor.light_component.set_editor_property("Intensity", 3)
+
+    # create cloud
+    spawn_actor_if_not_exists(ue.VolumetricCloud)

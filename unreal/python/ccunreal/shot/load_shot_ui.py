@@ -56,6 +56,8 @@ class LoadShotUI(base_ui.WidgetBase):
 
         exported_files = data["exported_files"]
         for file_path in exported_files:
+            if not file_path.endswith(".fbx"):
+                continue
             item = QtWidgets.QListWidgetItem(os.path.basename(file_path))
             item.setCheckState(QtCore.Qt.Checked)
             item.setData(QtCore.Qt.UserRole, file_path)
