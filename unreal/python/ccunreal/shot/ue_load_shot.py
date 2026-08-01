@@ -1,6 +1,7 @@
 """ Load the unreal shot """
 import unreal as ue
 import ccunreal.utils.sequencer_utils as sequencer_utils
+import ccunreal.utils.unreal_utils as unreal_utils
 import ccunreal.unreal_constants as unreal_constants
 import ccunreal.shot.cache_importer as cache_importer
 '''
@@ -131,6 +132,72 @@ class UELoadShot(object):
             version_dir = f"/Game/Shot/{self.shot_name}"
             anim_importer = cache_importer.CacheImporter(version_dir, fbx_path)
             anim_importer.import_animation()
+
+            # get the object path to its type and remove the other asset types
+            object_paths = anim_importer.imported_object_paths
+            anim_sequence_path = unreal_utils.get_objects_from_list(
+                object_paths, unreal_constants.ANIM_SEQUENCE)
+            skeleton_mesh_path = unreal_utils.get_objects_from_list(
+                object_paths, unreal_constants.SKELETON_MESH)
+            skeleton = ue.load_asset(skeleton_mesh_path)
+            ue.log_warning(f"Animation sequence path: {anim_sequence_path}")
+
+            # add the actor to the level
+            self.spawn_actor_to_level(skeleton, anim_sequence_path, "STEVEO")
+
+
+    def spawn_actor_to_level(self, skeleton, anim_sequence_path, asset_key):
+        # type: (ue.Object, str, str) -> None
+        """
+        Add the actor to the level along with the animation
+
+        Args:
+            skeleton: The skeleton asset to add
+            anim_sequence_path: Path of the new animation sequence
+            asset_key: Name of the actor component
+        """
+        actor = self.find_actor_with_label(asset_key)
+        print (f"Found actor: {actor}")
+        if not actor:
+            actor = unreal_utils.spawn_actor(skeleton)
+            actor.set_actor_label(asset_key)
+
+        # find the binding and use it to find the animation section
+        actor_binding = sequencer_utils.find_binding_by_display_name(asset_key, self.ls)
+        print(f"Actor binding: {actor_binding}")
+        if actor_binding:
+            anim_track = actor_binding.get_tracks()[0]
+            anim_section = anim_track.get_sections()[0]
+        else:
+            # add the actor and create the track and the section
+            actor_binding = self.ls.add_possessable(actor)
+            anim_track = actor_binding.add_track(ue.MovieSceneSkeletalAnimationTrack)
+            anim_section = anim_track.add_section()
+
+        # Get level sequence start and end frame
+        # Set section range to level sequence start and end frame
+        anim_section.set_range(self.start_frame, self.end_frame)
+
+        # Get the section, get the parameters, set animation to anim sequence asset
+        anim_seq = ue.load_asset(anim_sequence_path)
+        anim_section.params.animation = anim_seq
+
+    @staticmethod
+    def find_actor_with_label(actor_label):
+        # type: (str) -> Optional[ue.Actor]
+        """
+        Find an actor with a label on the level
+
+        Args:
+            actor_label: Actor label to find
+
+        Returns:
+            actor: The actor found matching the label
+        """
+        level_actors = ue.EditorLevelLibrary.get_all_level_actors()
+        for actor in level_actors:
+            if actor.get_actor_label() == actor_label:
+                return actor
 
     '''
             if not cache_path.endswith(".fbx"):
