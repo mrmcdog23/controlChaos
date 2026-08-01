@@ -71,14 +71,14 @@ class CacheImporter(object):
         """
         Import static mesh into the project
         """
-        self.create_asset_import_task()
-        self.task.options = ue.FbxImportUI()
+        asset_import_task = self.create_asset_import_task()
+        asset_import_task.options = ue.FbxImportUI()
 
         # add static mesh import data
         sm_import_data = ue.FbxStaticMeshImportData()
         sm_import_data.set_editor_property("combine_meshes", True)
-        self.task.options.static_mesh_import_data = sm_import_data
-        self.run_task()
+        asset_import_task.options.static_mesh_import_data = sm_import_data
+        self.run_task(asset_import_task)
 
     def import_animation(self, skeleton=None):
         # type: (ue.Skeleton) -> None

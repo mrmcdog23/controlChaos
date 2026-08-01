@@ -18,6 +18,7 @@ class LoadShotUI(base_ui.WidgetBase):
         super().__init__(parent=parent)
         self.ui_settings = QtCore.QSettings('controlChaos', 'ue_load_shot')
         self.create_layout()
+        self.populate_levels()
         self.connect_signals()
 
     def create_layout(self):
@@ -39,10 +40,35 @@ class LoadShotUI(base_ui.WidgetBase):
         """
         self.wdg_import_dir.line_edit.textChanged.connect(self.populate_values)
         self.le_shot_name.textChanged.connect(self.enable_btn)
+        self.le_new.textChanged.connect(self.enable_btn)
+        self.rbn_existing.toggled.connect(self.enable_existing_level)
         self.btn_import_files.clicked.connect(self.import_files)
 
-    def enable_btn(self, text):
-        self.btn_import_files.setEnabled(bool(text))
+    def enable_existing_level(self, enable):
+        self.lbl_existing.setEnabled(enable)
+        self.cmb_existing.setEnabled(enable)
+        self.lbl_new.setEnabled(not enable)
+        self.le_new.setEnabled(not enable)
+
+    @property
+    def level_path(self):
+        if self.rbn_existing.isChecked():
+            level_path = self.cmb_existing.currentText()
+        else:
+            map_name = self.le_new.text()
+            level_path = f"/Game/Level/{map_name}"
+        return level_path
+
+    def enable_btn(self):
+        if not self.le_shot_name.text():
+            self.btn_import_files.setEnabled(False)
+            return
+
+        if self.rbn_new.isChecked():
+            new_name = self.le_new.text()
+            self.btn_import_files.setEnabled(bool(new_name))
+        else:
+            self.btn_import_files.setEnabled(True)
 
     def populate_values(self):
         """
@@ -67,6 +93,25 @@ class LoadShotUI(base_ui.WidgetBase):
         self.sb_end_frame.setValue(data["end_frame"])
         self.ui_settings.setValue("import_json", import_json)
 
+    def populate_levels(self):
+        asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
+
+        # Filter for World assets (levels/maps)
+        filter = ue.ARFilter(
+            class_names=["World"],
+            package_paths=["/Game"],
+            recursive_paths=True,
+            recursive_classes=True
+        )
+        assets = asset_registry.get_assets(filter)
+
+        level_paths = []
+        for asset in assets:
+            path = str(asset.package_name)
+            level_paths.append(path)
+        level_paths.sort()
+        self.cmb_existing.addItems(level_paths)
+
     @property
     def import_files_list(self):
         # type: () -> list[str]
@@ -89,55 +134,8 @@ class LoadShotUI(base_ui.WidgetBase):
         start_frame = self.sb_start_frame.value()
         end_frame = self.sb_end_frame.value()
         ue_load_shot.UELoadShot(
-            self.import_files_list, shot_name, start_frame, end_frame
+            self.import_files_list, shot_name, self.level_path, start_frame, end_frame
         )
-        '''
-        # Get the current level sequence
-        self.ls = ue.LevelSequenceEditorBlueprintLibrary.get_current_level_sequence()
-        if not self.ls:
-            QtWidgets.QMessageBox.critical(self, "No Level Sequence", "No level sequence open")
-            return
-
-        fbx_dir = self.browse_fbx_wdg.file_path
-        for camera_file_name in self.checked_cameras:
-            fbx_path = file_utils.join_file_names(fbx_dir, camera_file_name)
-            self.import_camera_animation(fbx_path)
-
-    def import_camera_animation(self, fbx_path):
-        # type: (str) -> None
-        """
-        Import a camera into the level sequence by
-        creating then importing the fbx afterward
-
-        Args:
-            fbx_path: Path of the camera fbx file
-        """
-        # Spawn a CineCameraActor as a Spawnable binding
-        ls_system = ue.get_editor_subsystem(ue.LevelSequenceEditorSubsystem)
-        camera_binding, camera_cut_track = ls_system.create_camera(spawnable=True)
-
-        # Build the FBX import settings
-        import_settings = ue.MovieSceneUserImportFBXSettings()
-        import_settings.set_editor_property("create_cameras", False)   # camera already exists
-        import_settings.set_editor_property("force_front_x_axis", False)
-        import_settings.set_editor_property("match_by_name_only", False)
-        import_settings.set_editor_property("reduce_keys", False)
-
-        #  Import FBX onto the camera binding
-        world = ue.EditorLevelLibrary.get_editor_world()
-        ue.SequencerTools.import_level_sequence_fbx(
-            world=world,
-            sequence=self.ls,
-            bindings=[camera_binding],
-            import_fbx_settings=import_settings,
-            import_filename=fbx_path
-        )
-
-        camera_name = file_utils.get_file_name(fbx_path)
-        camera_binding.set_name(camera_name)
-        camera_cut_track.set_actor_label(camera_name)
-        camera_cut_track.set_folder_path("FBX_Cameras")
-        '''
 
 
 def launch():
