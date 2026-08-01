@@ -120,8 +120,14 @@ class ShotExporter(BaseExporter):
         file_name = file_utils.get_file_name(self.data['wip_file_path'])
         metadata_path = file_utils.join_file_names(
             self.save_dir, f"{file_name}_metadata.json")
-        file_utils.write_file(metadata_path, self.exported_files)
 
+        data = {
+            "exported_files": self.exported_files,
+            "start_frame": int(cmds.playbackOptions(q=True, min=True)),
+            "end_frame": int(cmds.playbackOptions(q=True, max=True)),
+            "master_scene": cmds.file(q=True, sn=True)
+        }
+        file_utils.write_file(metadata_path, data)
 
 
 if __name__ == "__main__":

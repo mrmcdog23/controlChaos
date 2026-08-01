@@ -1,5 +1,9 @@
 """ Load the unreal shot """
 import unreal as ue
+import ccunreal.utils.sequencer_utils as sequencer_utils
+import ccunreal.unreal_constants as unreal_constants
+import ccunreal.shot.cache_importer as cache_importer
+'''
 import cccore.utils.file_utils as file_utils
 import cccore.core_constants as core_constants
 import ccunreal.asset.import_fbx_asset as import_fbx_asset
@@ -12,19 +16,19 @@ import ccunreal.unreal_constants as unreal_constants
 #import ccunreal.api_wrap as api_wrap
 from typing import Optional, Any
 
-
+'''
 # constants
 MATERIAL = unreal_constants.MATERIAL
 LS_PREFIX = unreal_constants.LS_PREFIX
 MP_PREFIX = unreal_constants.MP_PREFIX
-LOW_RES = core_constants.LOW_RES
+
 
 
 class UELoadShot(object):
     """
     Load the shot into unreal from its selected asset version
     """
-    def __init__(self, fbx_dir, destination_folder):
+    def __init__(self, import_file_list, shot_name, start_frame, end_frame):
         # type: (str, str, Optional[str], Optional[dict], Optional[ftrack_api.Session]) -> None
         """
         Args:
@@ -36,16 +40,12 @@ class UELoadShot(object):
         """
         self.ls = None
         self.ctx = None
-        self.start = int()
-        self.end = int()
-        self.fps = float()
-        self.ls_master = None
-        self.map_master = None
-        self.map_master_actors = dict()
+        self.start_frame = start_frame
+        self.end_frame = end_frame
+        self.fps = 24.0
         self.imported_obj_paths = list()
-
-        self.fbx_dir = fbx_dir
-        self.destination_folder = destination_folder
+        self.import_file_list = import_file_list
+        self.shot_name = shot_name
         self.asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
         self.run_import()
 
@@ -53,6 +53,10 @@ class UELoadShot(object):
         """
         Import the shot into Unreal
         """
+        self.create_shot_level_and_sequence()
+        self.open_sequence()
+        self.animation_import()
+        '''
         for fbx_path in file_utils.get_files_recursively(self.fbx_dir, extensions=["fbx"]):
             #self.set_shot_and_context()
             self.create_master_level_and_sequence()
@@ -60,72 +64,113 @@ class UELoadShot(object):
             self.open_sequence()
             self.animation_import()
             self.add_to_master_sequence()
-
-    def set_shot_and_context(self):
-        """
-        Set the ftrack shot and context
-        """
-        # use the import data to set the context.
-        # If there is no import data use the shot info
-        self.ctx = unreal_utils.context_from_ftver(self.ftver)
-        if self.ftver.episode_name:
-            self.ftshot.episode_name = self.ftver.episode_name
-        self.ftshot.sequence_name = self.ftver.sequence_name
-        self.ftshot.shot_name = self.ftver.shot_name
-
-        self.start = self.ftshot.start
-        self.end = self.ftshot.end
-        self.fps = self.ftshot.fps
-
-    def create_master_level_and_sequence(self):
-        """
-        Create the master level sequence and map
-        """
-        # Create master map level
-        subsys = ue.LevelEditorSubsystem()
-        project_map_path = self.ctx.project_map_path
-        if not ue.EditorAssetLibrary.does_asset_exist(project_map_path):
-            subsys.new_level(project_map_path)
-        self.map_master = ue.load_asset(project_map_path)
-
-        # create master level sequence
-        self.ls_master = sequencer_utils.create_level_sequence(self.ctx.ls_master_path, self.fps)
-
-        # show the map and sequence in the browser
-        ue.EditorAssetLibrary.sync_browser_to_objects([project_map_path])
-
-        # save the map and level sequence
-        subsys = ue.get_editor_subsystem(ue.EditorAssetSubsystem)
-        subsys.save_asset(self.ls_master.get_full_name())
+        '''
 
     def create_shot_level_and_sequence(self):
         """
         Create the shot level and level sequence
         """
         # the shot level sequence
-        ls_path = self.ctx.ls_path
+        ls_path = f"/Game/Shot/{self.shot_name}/{LS_PREFIX}_{self.shot_name}"
+        sequencer_utils.create_level_sequence(ls_path, 24)
+        subsys = ue.get_editor_subsystem(ue.EditorAssetSubsystem)
+
+        # create the level sequence first
         if not ue.EditorAssetLibrary.does_asset_exist(ls_path):
-            self.ls = sequencer_utils.create_level_sequence(
-                self.ctx.ls_path, self.fps)
+            self.ls = sequencer_utils.create_level_sequence(ls_path, self.fps)
+            subsys.save_asset(self.ls.get_full_name())
+            ue.log_warning(f"Level sequence path: {self.ls.get_full_name()}")
+
         else:
-            self.map_master_actors = self.get_map_actors()
+            #self.map_master_actors = self.get_map_actors()
             self.ls = ue.load_asset(ls_path)
-        sequencer_utils.set_level_sequence_view_range(self.ls, self.start, self.end, self.fps)
+        sequencer_utils.set_level_sequence_view_range(
+            self.ls, self.start_frame, self.end_frame, self.fps)
 
         # Create a new empty level
+        level_name = "mrdog"
+        level_dir = "/Game/Level/"
+        level_path = f"{level_dir}/{level_name}"
+        if ue.EditorAssetLibrary.does_asset_exist(level_path):
+            return
+
         asset_tools = ue.AssetToolsHelpers.get_asset_tools()
-        asset_tools.create_asset(
-            asset_name=self.ctx.map_name,
-            package_path=self.ctx.ue_shot_directory,
+        self.level = asset_tools.create_asset(
+            asset_name=level_name,
+            package_path=level_dir,
             asset_class=ue.World,
             factory=ue.WorldFactory()
         )
 
+        '''
         # Ensure a persistent level is loaded
+        level_path = f"/Game/Level/{MP_PREFIX}_{level_name}"
         persistent_level = ue.EditorLevelLibrary.get_editor_world()
         ue.EditorLevelUtils.add_level_to_world(
-            persistent_level, self.ctx.map_path, ue.LevelStreamingAlwaysLoaded
+            persistent_level, level_path, ue.LevelStreamingAlwaysLoaded
         )
+        '''
+        # save the map and level sequence
+        subsys.save_asset(self.level.get_full_name())
+        ue.log_warning(f"Level path: {self.level.get_full_name()}")
+
+    def open_sequence(self):
+        """
+        Open the level sequence at the end of the import
+        """
+        ue.LevelSequenceEditorBlueprintLibrary.open_level_sequence(self.ls)
+
+    def animation_import(self):
+        """
+        Check for the scene assets and load them if their missing
+        """
+        for fbx_path in self.import_file_list:
+            if not fbx_path.endswith(".fbx"):
+                continue
+            ue.log_warning(f"Importing cache: {fbx_path}")
+            version_dir = f"/Game/Shot/{self.shot_name}"
+            anim_importer = cache_importer.CacheImporter(version_dir, fbx_path)
+            anim_importer.import_animation()
+
+    '''
+            if not cache_path.endswith(".fbx"):
+                continue
+
+            scene_asset = self.get_scene_asset(component_name)
+            if scene_asset:
+                asset_key = component_name.replace("fbx_", "")
+
+                # get the fbx file path and convert to windows
+                cache_path = file_utils.convert_path_to_win(cache_path)
+                ue.log_warning(f"Importing cache: {cache_path}")
+
+                # load the environment asset
+                asset_build_type_name = scene_asset["asset_build_type_name"]
+
+                if asset_build_type_name == "Environment":
+                    self.import_environment_mesh(ftver_asset, scene_asset, cache_path)
+                elif asset_build_type_name == "Camera":
+                    self.import_camera_animation(cache_path)
+                else:
+                    self.import_actor_animation(ftver_asset, scene_asset, cache_path, asset_key)
+
+            else:
+                # for unpublished fbx paths most likely tracking
+                if "cam" in cache_path.lower():
+                    self.import_camera_animation(cache_path)
+                else:
+                    # import the fbx of geometry and add it to the level sequence
+                    self.import_unpublished_geo(cache_path)
+
+        # set the metadata on the asset
+        unreal_utils.apply_metadata(self.ftver.as_dict, self.ls)
+        unreal_utils.apply_metadata(self.ftver.as_dict, self.map_master)
+
+        # save the map and level sequence
+        subsys = ue.get_editor_subsystem(ue.EditorAssetSubsystem)
+        subsys.save_asset(self.ls.get_full_name())
+        subsys.save_asset(self.map_master.get_full_name())
+
 
     @staticmethod
     def find_actor_with_label(actor_label):
@@ -196,51 +241,6 @@ class UELoadShot(object):
         asset_key = component_name.replace("fbx_", "")
         scene_asset = scene_assets.get(asset_key)
         return scene_asset
-
-    def animation_import(self):
-        """
-        Check for the scene assets and load them if their missing
-        """
-        ftver_asset = asset_version.FtAssetVersion(session=self.session)
-        for component_name, cache_path in self.component_to_path.items():
-            ue.log_warning(f"Importing cache: {cache_path}")
-            if not cache_path.endswith(".fbx"):
-                continue
-
-            scene_asset = self.get_scene_asset(component_name)
-            if scene_asset:
-                asset_key = component_name.replace("fbx_", "")
-
-                # get the fbx file path and convert to windows
-                cache_path = file_utils.convert_path_to_win(cache_path)
-                ue.log_warning(f"Importing cache: {cache_path}")
-
-                # load the environment asset
-                asset_build_type_name = scene_asset["asset_build_type_name"]
-
-                if asset_build_type_name == "Environment":
-                    self.import_environment_mesh(ftver_asset, scene_asset, cache_path)
-                elif asset_build_type_name == "Camera":
-                    self.import_camera_animation(cache_path)
-                else:
-                    self.import_actor_animation(ftver_asset, scene_asset, cache_path, asset_key)
-
-            else:
-                # for unpublished fbx paths most likely tracking
-                if "cam" in cache_path.lower():
-                    self.import_camera_animation(cache_path)
-                else:
-                    # import the fbx of geometry and add it to the level sequence
-                    self.import_unpublished_geo(cache_path)
-
-        # set the metadata on the asset
-        unreal_utils.apply_metadata(self.ftver.as_dict, self.ls)
-        unreal_utils.apply_metadata(self.ftver.as_dict, self.map_master)
-
-        # save the map and level sequence
-        subsys = ue.get_editor_subsystem(ue.EditorAssetSubsystem)
-        subsys.save_asset(self.ls.get_full_name())
-        subsys.save_asset(self.map_master.get_full_name())
 
     def import_environment_mesh(self, ftver_asset, scene_asset, cache_path):
         # type: (Any, dict, str) -> None
@@ -417,13 +417,6 @@ class UELoadShot(object):
         # add the actor to the level
         self.spawn_actor_to_level(asset_importer.skeleton, anim_sequence_path, asset_key)
 
-    def open_sequence(self):
-        """
-        Open the level sequence at the end of the import
-        """
-        ue.LevelSequenceEditorBlueprintLibrary.open_level_sequence(self.ls)
-        ue_cc.popup_message(f"Created shot: {self.ftver.full_shot_name}")
-
     def add_to_master_sequence(self):
         """
         Add the shot to the master sequence
@@ -456,3 +449,4 @@ class UELoadShot(object):
             self.ls_master, min(all_frames), max(all_frames), self.fps)
 
         ue.LevelSequenceEditorBlueprintLibrary.open_level_sequence(self.ls_master)
+    '''

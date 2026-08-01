@@ -12,60 +12,69 @@ from CCPySide import QtWidgets, QtCore
 class LoadShotUI(base_ui.WidgetBase):
     title = "Import Unreal Shot"
     window_icon = "shot"
+    control_chaos_ss = "../../css/ue_stylesheet.css"
 
     def __init__(self, parent):
         super().__init__(parent=parent)
+        self.ui_settings = QtCore.QSettings('controlChaos', 'ue_load_shot')
         self.create_layout()
         self.connect_signals()
-
-    def connect_signals(self):
-        """
-        Connect the signals to the widgets
-        """
-        self.wdg_import_dir.line_edit.textChanged.connect(self.populate_files)
-        self.btn_import_files.clicked.connect(self.import_files)
-
-    def populate_files(self):
-        """
-        Populate the list widget with the fbx files
-        """
-        self.lw_import_files.clear()
-        import_json = self.wdg_import_dir.file_path
-        file_list = file_utils.read_file(import_json)
-        for file_path in file_list:
-            print (file_path)
-            item = QtWidgets.QListWidgetItem(os.path.basename(file_path))
-            item.setCheckState(QtCore.Qt.Checked)
-            self.lw_import_files.addItem(item)
 
     def create_layout(self):
         """
         Create the layout for the ui
         """
-        self.main_layout = QtWidgets.QVBoxLayout()
+        default_text = self.ui_settings.value("import_json")
         self.wdg_import_dir = LineBrowser(
-            self, "file", "Select Import file", "", "Import File", file_filter="*.json")
-        self.main_layout.addWidget(self.wdg_import_dir)
+            self, "file", "Select Import file", "",
+            "Import File", file_filter="*.json", default_text=default_text
+        )
+        self.lyt_import_dir.addWidget(self.wdg_import_dir)
+        if default_text:
+            self.populate_values()
 
-        self.lw_import_files = QtWidgets.QListWidget()
-        self.main_layout.addWidget(self.lw_import_files)
+    def connect_signals(self):
+        """
+        Connect the signals to the widgets
+        """
+        self.wdg_import_dir.line_edit.textChanged.connect(self.populate_values)
+        self.le_shot_name.textChanged.connect(self.enable_btn)
+        self.btn_import_files.clicked.connect(self.import_files)
 
-        self.btn_import_files = QtWidgets.QPushButton("Import Files")
-        self.main_layout.addWidget(self.btn_import_files)
+    def enable_btn(self, text):
+        self.btn_import_files.setEnabled(bool(text))
 
-        self.setLayout(self.main_layout)
+    def populate_values(self):
+        """
+        Populate the list widget with the fbx files
+        """
+        self.lw_import_files.clear()
+        import_json = self.wdg_import_dir.file_path
+        if not os.path.exists(import_json):
+            return
+        data = file_utils.read_file(import_json)
+
+        exported_files = data["exported_files"]
+        for file_path in exported_files:
+            item = QtWidgets.QListWidgetItem(os.path.basename(file_path))
+            item.setCheckState(QtCore.Qt.Checked)
+            item.setData(QtCore.Qt.UserRole, file_path)
+            self.lw_import_files.addItem(item)
+
+        self.sb_start_frame.setValue(data["start_frame"])
+        self.sb_end_frame.setValue(data["end_frame"])
+        self.ui_settings.setValue("import_json", import_json)
 
     @property
     def import_files_list(self):
         # type: () -> list[str]
         """ Get a list of checked cameras """
         import_files = list()
-        import_dir = self.wdg_import_dir.file_path
         for index in range(self.lw_import_files.count()):
-            item = self.lw_cameras.item(index)
+            item = self.lw_import_files.item(index)
             if item.checkState() != QtCore.Qt.CheckState.Checked:
                 continue
-            file_path = file_utils.join_file_names(import_dir, item.text())
+            file_path = item.data(QtCore.Qt.UserRole)
             import_files.append(file_path)
         return import_files
 
@@ -73,6 +82,14 @@ class LoadShotUI(base_ui.WidgetBase):
         """
         Import cameras into unreal
         """
+        ue.log_warning("Building shot...")
+        shot_name = self.le_shot_name.text()
+        start_frame = self.sb_start_frame.value()
+        end_frame = self.sb_end_frame.value()
+        ue_load_shot.UELoadShot(
+            self.import_files_list, shot_name, start_frame, end_frame
+        )
+        '''
         # Get the current level sequence
         self.ls = ue.LevelSequenceEditorBlueprintLibrary.get_current_level_sequence()
         if not self.ls:
@@ -118,6 +135,7 @@ class LoadShotUI(base_ui.WidgetBase):
         camera_binding.set_name(camera_name)
         camera_cut_track.set_actor_label(camera_name)
         camera_cut_track.set_folder_path("FBX_Cameras")
+        '''
 
 
 def launch():
