@@ -40,16 +40,6 @@ class ShotExporter(BaseExporter):
         self.write_metadata()
         self.log(f"Export Complete")
 
-    def save_scene_metadata(self):
-        """
-        Save the scene data file in the same
-        place as the published scene
-        """
-        metadata_path = self.ctx.metadata_path
-        self.log(f"Saving metadata path: {metadata_path}")
-        file_utils.write_json(metadata_path, self.scene_data)
-        self.additional_components["Metadata"] = metadata_path
-
     @BaseExporter.add_to_percentage(15)
     def cache_assets(self):
         """
@@ -120,8 +110,14 @@ class ShotExporter(BaseExporter):
         file_name = file_utils.get_file_name(self.data['wip_file_path'])
         metadata_path = file_utils.join_file_names(
             self.save_dir, f"{file_name}_metadata.json")
-        file_utils.write_file(metadata_path, self.exported_files)
 
+        data = {
+            "exported_files": self.exported_files,
+            "start_frame": int(cmds.playbackOptions(q=True, min=True)),
+            "end_frame": int(cmds.playbackOptions(q=True, max=True)),
+            "master_scene": cmds.file(q=True, sn=True)
+        }
+        file_utils.write_file(metadata_path, data)
 
 
 if __name__ == "__main__":

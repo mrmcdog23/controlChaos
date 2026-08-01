@@ -5,9 +5,10 @@ VISIBILITY = ["v"]
 
 
 DEFAULT_CAMERAS = ["persp", "top", "front", "side"]
-EXPORT_GROUPS = ["GEO", "CAM"]
+EXPORT_GROUPS = ["GEO", "CAM", "ENV"]
 GEO_GROUP = "GEO"
 CAM_GROUP = "CAM"
+ENV_GROUP = "ENV"
 JNT_GROUP = "JNT"
 
 # alembic arguments

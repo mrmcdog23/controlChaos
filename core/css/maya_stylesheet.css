@@ -1,9 +1,9 @@
-QMainWindow {
+QMainWindow,
+QWizard
+{
     background-color: rgb(40, 40, 40);
 }
-QWizard {
-    background-color: rgb(40, 40, 40);
-}
+
 /* radio button style */
 QRadioButton {
     color: rgb(255, 255, 255);

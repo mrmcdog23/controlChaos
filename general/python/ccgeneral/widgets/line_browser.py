@@ -8,8 +8,8 @@ class LineBrowser(base_ui.WidgetBase):
     """
     A widget to browse and set a line edit
     """
-    def __init__(self, pw, mode, title, start_dir, label_text, file_filter=None):
-        # type: (QtWidgets.QWidget, str, str, str, str, Optional[str]) -> None
+    def __init__(self, pw, mode, title, start_dir, label_text, file_filter=None, default_text=None):
+        # type: (QtWidgets.QWidget, str, str, str, str, Optional[str], Optional[str]) -> None
         """
         Args:
             mode: Search folder or file: "dir", "file", "save"
@@ -17,6 +17,7 @@ class LineBrowser(base_ui.WidgetBase):
             start_dir: Open the dialog at the directory
             label_text: The label text
             file_filter : Filter for files
+            default_text: Text to start with
         """
         super(LineBrowser, self).__init__(mode=mode)
 
@@ -32,6 +33,7 @@ class LineBrowser(base_ui.WidgetBase):
         self.start_dir = start_dir
         self.label_text = label_text
         self.file_filter = file_filter
+        self.default_text = default_text
 
         # run setup functions
         self.create_layout()
@@ -51,6 +53,9 @@ class LineBrowser(base_ui.WidgetBase):
 
         # create the line edit for the path
         self.line_edit = QtWidgets.QLineEdit()
+        if self.default_text:
+            self.line_edit.setText(self.default_text)
+
         main_layout.addWidget(self.line_edit)
 
         # create browse button
