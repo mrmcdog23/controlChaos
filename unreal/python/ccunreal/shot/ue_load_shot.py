@@ -4,6 +4,7 @@ import ccunreal.utils.sequencer_utils as sequencer_utils
 import ccunreal.utils.unreal_utils as unreal_utils
 import ccunreal.unreal_constants as unreal_constants
 import ccunreal.shot.cache_importer as cache_importer
+import ccunreal.utils.api_wrap as api_wrap
 '''
 import cccore.utils.file_utils as file_utils
 import cccore.core_constants as core_constants
@@ -92,17 +93,16 @@ class UELoadShot(object):
         level_name = "mrdog"
         level_dir = "/Game/Level/"
         level_path = f"{level_dir}/{level_name}"
+
         if ue.EditorAssetLibrary.does_asset_exist(level_path):
-            return
+            ue.log_warning(f"Loading level path: {level_path}")
+            ue.EditorLevelLibrary.load_level(level_path)
+        else:
+            ue.log_warning(f"Creating level path: {level_path}")
+            ue.EditorLevelLibrary.new_level(level_path)
 
-        asset_tools = ue.AssetToolsHelpers.get_asset_tools()
-        self.level = asset_tools.create_asset(
-            asset_name=level_name,
-            package_path=level_dir,
-            asset_class=ue.World,
-            factory=ue.WorldFactory()
-        )
-
+        #self.level = ue.load_asset(level_path)
+        #ue.log_warning(f"Level loaded: {self.level}")
         '''
         # Ensure a persistent level is loaded
         level_path = f"/Game/Level/{MP_PREFIX}_{level_name}"
@@ -112,8 +112,8 @@ class UELoadShot(object):
         )
         '''
         # save the map and level sequence
-        subsys.save_asset(self.level.get_full_name())
-        ue.log_warning(f"Level path: {self.level.get_full_name()}")
+        subsys.save_asset(level_path)
+        ue.log_warning(f"Level path: {level_path}")
 
     def open_sequence(self):
         """
@@ -137,14 +137,15 @@ class UELoadShot(object):
             object_paths = anim_importer.imported_object_paths
             anim_sequence_path = unreal_utils.get_objects_from_list(
                 object_paths, unreal_constants.ANIM_SEQUENCE)
+            ue.log_warning(f"Animation sequence path: {anim_sequence_path}")
+
             skeleton_mesh_path = unreal_utils.get_objects_from_list(
                 object_paths, unreal_constants.SKELETON_MESH)
             skeleton = ue.load_asset(skeleton_mesh_path)
-            ue.log_warning(f"Animation sequence path: {anim_sequence_path}")
+            ue.log_warning(f"Skewleton mesh path: {skeleton_mesh_path}")
 
             # add the actor to the level
-            self.spawn_actor_to_level(skeleton, anim_sequence_path, "STEVEO")
-
+            self.spawn_actor_to_level(skeleton, anim_sequence_path, "Cunt")
 
     def spawn_actor_to_level(self, skeleton, anim_sequence_path, asset_key):
         # type: (ue.Object, str, str) -> None
@@ -157,14 +158,14 @@ class UELoadShot(object):
             asset_key: Name of the actor component
         """
         actor = self.find_actor_with_label(asset_key)
-        print (f"Found actor: {actor}")
+        ue.log_warning(f"Found actor: {actor}")
         if not actor:
-            actor = unreal_utils.spawn_actor(skeleton)
+            actor = api_wrap.spawn_actor_from_object(skeleton)
             actor.set_actor_label(asset_key)
 
         # find the binding and use it to find the animation section
         actor_binding = sequencer_utils.find_binding_by_display_name(asset_key, self.ls)
-        print(f"Actor binding: {actor_binding}")
+        ue.log_warning(f"Actor binding: {actor_binding}")
         if actor_binding:
             anim_track = actor_binding.get_tracks()[0]
             anim_section = anim_track.get_sections()[0]

@@ -185,10 +185,11 @@ def destroy_actors(actors):
     return subsys.destroy_actors(actors)
 
 
-def spawn_actor_from_object(object_, location, rotation=None, transient=False):
+def spawn_actor_from_object(object_, location=None, rotation=None, transient=False):
     # type: (ue.Object, ue.Vector, Optional[ue.Rotator], Optional[bool]) -> ue.Actor
     """spawns an actor from the given object, setting the transform as specified"""
-    rotation = rotation or (0.0, 0.0, 0.0)
+    location = location or ue.Vector()
+    rotation = rotation or ue.Rotator()
     subsys = _get_editor_actor_subsystem()
     return subsys.spawn_actor_from_object(object_, location, rotation, transient)
 
