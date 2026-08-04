@@ -301,7 +301,7 @@ class UnrealApp(BaseApp):
         Launch the unreal project
         """
         uproject_path = "C:/Users/joele/Documents/Unreal Projects/new_test/new_test.uproject"
-        self.cmd_list = [self.exe_path, uproject_path]
+        self.cmd_list = [self.exe_path]
 
 
 class HoudiniApp(BaseApp):
