@@ -61,6 +61,7 @@ class FbxAnimExport(object):
             root_joint = scene_asset_inst.root_joint
             if not root_joint:
                 self.logger.error(f"Not root joint found for {namespace}")
+                self.namespace_to_objects[namespace] = [scene_asset_inst.geo_grp]
                 continue
 
             self.logger.info(f"Found root joint {root_joint} for {namespace}")
