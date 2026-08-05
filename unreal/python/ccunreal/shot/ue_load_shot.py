@@ -228,7 +228,7 @@ class UELoadShot(object):
         """
         asset_importer = cache_importer.CacheImporter(self.version_dir, fbx_path)
         asset_importer.import_static_mesh()
-        '''
+
         object_paths = asset_importer.imported_object_paths
         static_mesh_path = unreal_utils.get_objects_from_list(
             object_paths, unreal_constants.STATIC_MESH)
@@ -236,4 +236,3 @@ class UELoadShot(object):
         ue.log_warning(f"Skeleton mesh path: {static_mesh}")
 
         api_wrap.spawn_actor_from_object(static_mesh)
-        '''
