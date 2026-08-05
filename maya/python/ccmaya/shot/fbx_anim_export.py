@@ -47,9 +47,9 @@ class FbxAnimExport(object):
             scene_asset_inst = scene_asset.SceneAsset(namespace)
 
             # store objects to export
-            self.logger.info(f"{namespace} -> {scene_asset_inst.cam_grp}")
             if scene_asset_inst.cam_grp:
                 self.namespace_to_objects[namespace] = [scene_asset_inst.cam_grp]
+                self.logger.info(f"Camera node {namespace} so no joints will be found")
                 continue
 
             # if there is no
@@ -59,16 +59,20 @@ class FbxAnimExport(object):
 
             # check the root joint exists on the asset
             root_joint = scene_asset_inst.root_joint
-            if root_joint:
-                # update the root joint and get its descendants
-                root_joint = cmds.parent(root_joint, world=True)[0]
+            if not root_joint:
+                self.logger.error(f"Not root joint found for {namespace}")
+                continue
 
-                cmds.select(cl=True)
-                new_root_joint = cmds.joint()
-                cmds.parent(root_joint, new_root_joint)
-                all_joints = cmds.listRelatives(new_root_joint, ad=True, f=True)
-                self.objects_to_bake.extend(all_joints)
-                self.objects_to_bake.append(new_root_joint)
+            self.logger.info(f"Found root joint {root_joint} for {namespace}")
+            # update the root joint and get its descendants
+            root_joint = cmds.parent(root_joint, world=True)[0]
+
+            cmds.select(cl=True)
+            new_root_joint = cmds.joint()
+            cmds.parent(root_joint, new_root_joint)
+            all_joints = cmds.listRelatives(new_root_joint, ad=True, f=True)
+            self.objects_to_bake.extend(all_joints)
+            self.objects_to_bake.append(new_root_joint)
 
             # add the geo group and joint root to the list
             self.namespace_to_objects[namespace] = [new_root_joint, scene_asset_inst.geo_grp]
