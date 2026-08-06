@@ -22,9 +22,9 @@ class ValidatorWidget(base_ui.WidgetBase):
                       "fix": "btn_autofix"
                       }
 
-    def __init__(self, parent, valid_cls, session, data):
-        super(ValidatorWidget, self).__init__(parent, valid_cls, session, data)
-        self.valid_cls = valid_cls(session, data)
+    def __init__(self, parent, valid_cls, data):
+        super(ValidatorWidget, self).__init__(parent, valid_cls, data)
+        self.valid_cls = valid_cls(data)
         self.pw = parent
         self.is_selected = False
 
@@ -172,7 +172,7 @@ class ValidatePage(BasePublishPage):
         self.gather_validators()
 
         for valid_cls in self.registered_validators:
-            valid_widget = ValidatorWidget(self, valid_cls, session, self.data)
+            valid_widget = ValidatorWidget(self, valid_cls, self.data)
             valid_widget.setHidden(valid_widget.valid_cls.is_valid)
             layout.addWidget(valid_widget)
             self.valid_widgets.append(valid_widget)
