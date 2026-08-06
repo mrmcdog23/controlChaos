@@ -21,9 +21,9 @@ class GroupsNamedCorrectlyValidator(BaseValidator):
         self.message = "All groups are named correctly"
 
         type_to_prefix = {
-            "mesh":  maya_constants.GEO_GROUP,
-            "camera": maya_constants.CAM_GROUP,
-            "joint": maya_constants.JNT_GROUP
+            "mesh":  maya_constants.GEO_GRP,
+            "camera": maya_constants.CAM_GRP,
+            "joint": maya_constants.JNT_GRP
             }
         missing_groups = list()
         for node in cmds.ls("*.export"):

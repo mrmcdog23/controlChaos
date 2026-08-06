@@ -36,7 +36,7 @@ class SceneAsset(object):
         # type: () -> str
         """ Get the root node to export the fullpath """
         if not self._geo_grp:
-            self._geo_grp = self.find_group(maya_constants.GEO_GROUP)
+            self._geo_grp = self.find_group(maya_constants.GEO_GRP)
         return self._geo_grp
 
     @property
@@ -44,7 +44,7 @@ class SceneAsset(object):
         # type: () -> str
         """ Get the root node to export the fullpath """
         if not self._env_grp:
-            self._env_grp = self.find_group(maya_constants.ENV_GROUP)
+            self._env_grp = self.find_group(maya_constants.ENV_GRP)
         return self._env_grp
 
 
@@ -55,7 +55,7 @@ class SceneAsset(object):
         Get the root node to export the fullpath
         """
         if not self._jnt_grp:
-            self._jnt_grp = self.find_group(maya_constants.JNT_GROUP)
+            self._jnt_grp = self.find_group(maya_constants.JNT_GRP)
         return self._jnt_grp
 
     @property
@@ -65,7 +65,7 @@ class SceneAsset(object):
         Get the root node to export the fullpath
         """
         if not self._cam_grp:
-            self._cam_grp = self.find_group(maya_constants.CAM_GROUP)
+            self._cam_grp = self.find_group(maya_constants.CAM_GRP)
         return self._cam_grp
 
     @property
