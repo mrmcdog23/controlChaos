@@ -74,7 +74,7 @@ class UELoadShot(object):
         Create the shot level and level sequence
         """
         # the shot level sequence
-        ls_path = f"/Game/Shot/{self.shot_name}/{LS_PREFIX}_{self.shot_name}"
+        ls_path = f"{self.version_dir}/{LS_PREFIX}_{self.shot_name}"
 
         # create the level sequence first
         if ue.EditorAssetLibrary.does_asset_exist(ls_path):
