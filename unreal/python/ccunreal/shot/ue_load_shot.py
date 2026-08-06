@@ -20,8 +20,8 @@ class UELoadShot(object):
     """
     Load the shot into unreal from its selected asset version
     """
-    def __init__(self, import_file_list, shot_name, level_path, start_frame, end_frame):
-        # type: (list[str], str, str, int, int) -> None
+    def __init__(self, import_file_list, shot_name, version_dir, level_path, start_frame, end_frame):
+        # type: (list[str], str, str, str, int, int) -> None
         """
         Args:
             import_file_list: List of files to import
@@ -34,12 +34,13 @@ class UELoadShot(object):
         self.end_frame = end_frame
         self.import_file_list = import_file_list
         self.shot_name = shot_name
+        self.version_dir = version_dir
         self.level_path = level_path
 
         self.ls = None
         self.fps = 24.0
         self.imported_obj_paths = list()
-        self.version_dir = f"/Game/Shot/{self.shot_name}"
+
         self.asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
         self.run_import()
 
