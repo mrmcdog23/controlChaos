@@ -30,7 +30,7 @@ class ShotExporter(BaseExporter):
         Open the wip maya file
         """
         maya_utils.load_plugins(["AbcExport"])
-        #cmds.file(self.data['wip_file_path'],  open=True, force=True)
+        cmds.file(self.data['wip_file_path'],  open=True, force=True)
 
     def export(self):
         """
@@ -112,12 +112,14 @@ class ShotExporter(BaseExporter):
         metadata_path = file_utils.join_file_names(
             self.save_dir, f"{file_name}_metadata.json")
 
+        # update and save all metadata
         data = {
             "exported_files": self.exported_files,
             "start_frame": int(cmds.playbackOptions(q=True, min=True)),
             "end_frame": int(cmds.playbackOptions(q=True, max=True)),
             "master_scene": cmds.file(q=True, sn=True)
         }
+        data.update(self.data)
         file_utils.write_file(metadata_path, data)
 
 
