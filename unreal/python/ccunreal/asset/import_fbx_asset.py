@@ -1,4 +1,5 @@
 """ Import fbx asset from asset version """
+import re
 import os
 import unreal as ue
 import ccunreal.unreal_constants as unreal_constants
@@ -23,18 +24,33 @@ class ImportAsset(object):
         self.asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
         self.asset_fbx_path = asset_fbx_path
         self.is_skeleton_mesh = is_skeleton_mesh
-        self.destination_dir = ue.Paths.combine([self.asset_root, namespace])
+        self.namespace = namespace
 
         # initialize class variables
         self.error_msg = str()
+        self.destination_dir = str()
         self._skeleton = None
         self._skeleton_mesh = None
         self._static_mesh = None
+
+    def set_destination_dir(self):
+        """
+        Workout the destination directory
+        """
+        destination_dir = ue.Paths.combine([self.asset_root, self.namespace])
+        match = re.search(r"(\d+)\.fbx$", self.asset_fbx_path)
+        if not match:
+            self.destination_dir = destination_dir
+            return
+        version_number = match.group(1)
+        self.destination_dir = ue.Paths.combine([destination_dir, f"v{version_number}"])
 
     def import_asset(self):
         """
         Function to import asset
         """
+        self.set_destination_dir()
+
         loaded_asset = unreal_utils.get_asset_from_path(
             self.asset_fbx_path, folder_root=self.destination_dir)
         if loaded_asset:

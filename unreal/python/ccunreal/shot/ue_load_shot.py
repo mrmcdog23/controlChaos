@@ -84,15 +84,12 @@ class UELoadShot(object):
         """
         Create or load the map to use
         """
-        ue.log_warning(f"Creating level: {self.level_path}")
-        
         # Create a new empty level
         if ue.EditorAssetLibrary.does_asset_exist(self.level_path):
             ue.EditorLevelLibrary.load_level(self.level_path)
         else:
             ue.EditorLevelLibrary.new_level(self.level_path)
             unreal_utils.create_sky_and_lights()
-            ue.log_warning("Create sky...")
 
         # save the map and level sequence
         subsys = ue.get_editor_subsystem(ue.EditorAssetSubsystem)
@@ -137,15 +134,13 @@ class UELoadShot(object):
             elif file_data["is_skeleton_mesh"]:
                 self.import_skeleton_mesh_animation(fbx_path, file_data)
             else:
-                self.import_static_mesh_animation(fbx_path, file_data)
+                self.import_static_mesh(file_data)
 
     def import_skeleton_asset(self, file_data):
         # import the actor and its fbx path
-        asset_fbx_path = file_data["asset_fbx_path"]
-        namespace = file_data["namespace"]
-        asset_importer = import_fbx_asset.ImportAsset(asset_fbx_path, namespace, True)
+        asset_importer = import_fbx_asset.ImportAsset(
+            file_data["asset_fbx_path"], file_data["namespace"], True)
         asset_importer.import_asset()
-        ue.log_warning(f"Importing skeleton: {asset_importer.skeleton}")
         return asset_importer.skeleton, asset_importer.skeleton_mesh
 
     def import_skeleton_mesh_animation(self, fbx_path, file_data):
@@ -156,13 +151,9 @@ class UELoadShot(object):
         Args:
             fbx_path: Path of the fbx file to import
         """
-        ue.log(f"Importing cache: {fbx_path}")
-
         # import the actor and its fbx path
         skeleton, skeleton_mesh = self.import_skeleton_asset(file_data)
-        ue.log_warning(f"Skeleton in project: {skeleton}")
-        ue.log_warning(f"SkeletonMesh in project: {skeleton_mesh}")
-
+        ue.log_warning(f"Skeleton: {skeleton}")
         anim_importer = cache_importer.CacheImporter(self.version_dir, fbx_path)
         anim_importer.import_animation(skeleton=skeleton)
 
@@ -170,7 +161,7 @@ class UELoadShot(object):
         object_paths = anim_importer.imported_object_paths
         anim_sequence_path = unreal_utils.get_objects_from_list(
             object_paths, unreal_constants.ANIM_SEQUENCE)
-        ue.log(f"Animation sequence path: {anim_sequence_path}")
+        ue.log_warning(f"Animation sequence path: {anim_sequence_path}")
 
         # add the actor to the level
         actor_name = file_utils.get_file_name(fbx_path)
@@ -258,7 +249,7 @@ class UELoadShot(object):
             world, self.ls, [binding], unreal_utils.camera_ue_options(), fbx_path
         )
 
-    def import_static_mesh_animation(self, fbx_path, file_data):
+    def import_static_mesh(self, file_data):
         # type: (Any, dict, str) -> None
         """
         Import environment asset as a static mesh
@@ -268,18 +259,10 @@ class UELoadShot(object):
             fbx_path: Path of the environment fbx file
         """
         # import the actor and its fbx path
-        asset_fbx_path = file_data["asset_fbx_path"]
-        namespace = file_data["namespace"]
-        asset_importer = import_fbx_asset.ImportAsset(asset_fbx_path, namespace, False)
+        asset_importer = import_fbx_asset.ImportAsset(
+            file_data["asset_fbx_path"], file_data["namespace"], False)
         asset_importer.import_asset()
-
-        asset_importer = cache_importer.CacheImporter(self.version_dir, fbx_path)
-        asset_importer.import_static_mesh()
-
-        object_paths = asset_importer.imported_object_paths
-        static_mesh_path = unreal_utils.get_objects_from_list(
-            object_paths, unreal_constants.STATIC_MESH)
-        #static_mesh = ue.load_asset(static_mesh_path)
-        #ue.log_warning(f"Skeleton mesh path: {static_mesh}")
+        static_mesh = asset_importer.static_mesh
+        ue.log_warning(f"Static mesh path: {static_mesh}")
 
         #api_wrap.spawn_actor_from_object(static_mesh)
