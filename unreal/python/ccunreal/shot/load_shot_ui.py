@@ -18,6 +18,7 @@ class LoadShotUI(base_ui.WidgetBase):
     def __init__(self, parent):
         super().__init__(parent=parent)
         self.ui_settings = QtCore.QSettings('controlChaos', 'ue_load_shot')
+        self.data = dict()
         self.create_layout()
         self.populate_levels()
         self.populate_sequences()
@@ -76,19 +77,6 @@ class LoadShotUI(base_ui.WidgetBase):
         else:
             self.btn_import_files.setEnabled(True)
 
-    def list_subfolders(self, folder_path, recursive=False):
-        asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
-        if not ue.EditorAssetLibrary.does_directory_exist(folder_path):
-            ue.log_warning(f"Folder not found: {folder_path}")
-            return list()
-
-        subfolders = asset_registry.get_sub_paths(folder_path, recursive)
-        folder_names = list()
-        for folder_path in subfolders:
-            base_name = ue.Paths.get_base_filename(folder_path)
-            folder_names.append(base_name)  # "SubFolder"
-        return folder_names
-
     def populate_values(self):
         """
         Populate the list widget with the fbx files
@@ -97,9 +85,9 @@ class LoadShotUI(base_ui.WidgetBase):
         import_json = self.wdg_import_dir.file_path
         if not os.path.exists(import_json):
             return
-        data = file_utils.read_file(import_json)
+        self.data = file_utils.read_file(import_json)
 
-        exported_files = data["exported_files"]
+        exported_files = self.data["exported_files"]
         for file_path in exported_files:
             if not file_path.endswith(".fbx"):
                 continue
@@ -108,14 +96,14 @@ class LoadShotUI(base_ui.WidgetBase):
             item.setData(QtCore.Qt.UserRole, file_path)
             self.lw_import_files.addItem(item)
 
-        self.sb_start_frame.setValue(data["start_frame"])
-        self.sb_end_frame.setValue(data["end_frame"])
+        self.sb_start_frame.setValue(self.data["start_frame"])
+        self.sb_end_frame.setValue(self.data["end_frame"])
         self.ui_settings.setValue("import_json", import_json)
 
     def populate_sequence_shots(self):
         selected_sequence = self.cmb_sequence.currentText()
         shots_path = f"{self.sequence_root}/{selected_sequence}/Shots"
-        shot_names = self.list_subfolders(shots_path, recursive=False)
+        shot_names = unreal_utils.list_subfolders(shots_path, recursive=False)
         self.cmb_existing_shots.clear()
         self.cmb_existing_shots.addItems(shot_names)
 
@@ -139,7 +127,7 @@ class LoadShotUI(base_ui.WidgetBase):
         self.cmb_existing.addItems(level_paths)
 
     def populate_sequences(self):
-        folder_names = self.list_subfolders(self.sequence_root, recursive=False)
+        folder_names = unreal_utils.list_subfolders(self.sequence_root, recursive=False)
         self.cmb_sequence.addItems(folder_names)
 
     @property
@@ -160,23 +148,16 @@ class LoadShotUI(base_ui.WidgetBase):
         Import cameras into unreal
         """
         ue.log_warning("Building shot...")
-        start_frame = self.sb_start_frame.value()
-        end_frame = self.sb_end_frame.value()
-
         if self.rbn_existing_shot.isChecked():
             shot_name = self.cmb_existing_shots.currentText()
         else:
             shot_name = self.le_new_shot.text()
 
         sequence_name = self.cmb_sequence.currentText()
-        shot_path = f"{self.sequence_root}/{sequence_name}/Shots/{shot_name}"
-        number_of_versions = self.list_subfolders(shot_path, recursive=False)
-        next_version_number = len(number_of_versions) + 1
-        version_dir = f"{shot_path}/v{next_version_number}"
-        ue.log_warning(f"version_dir: {version_dir}")
-        ue_load_shot.UELoadShot(
-            self.import_files_list, shot_name, version_dir, self.level_path, start_frame, end_frame
-        )
+        shot_folders = [self.sequence_root, sequence_name, "Shots", "shot_name"]
+        shot_path = ue.Paths.combine(shot_folders)
+        ue.log_warning(f"shot_path: {shot_path}")
+        ue_load_shot.UELoadShot(self.import_files_list, self.data, self.level_path, shot_name, shot_path)
 
 
 def launch():

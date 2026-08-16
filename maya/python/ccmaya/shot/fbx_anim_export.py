@@ -25,9 +25,8 @@ class FbxAnimExport(object):
 
         # initialize the class variables
         self.objects_to_bake = list()
-        self.name_fbx_path = dict()
+        self.namespace_to_fbx_path = dict()
         self.namespace_to_objects = dict()
-        self.fbx_paths = list()
 
     def run_fbx_exports(self):
         """
@@ -141,10 +140,9 @@ class FbxAnimExport(object):
         fbx_path = file_utils.join_file_names(self.save_dir, f"{namespace}.fbx")
 
         # add the fbx path to the dictionary
-        self.name_fbx_path[namespace] = fbx_path
+        self.namespace_to_fbx_path[namespace] = fbx_path
         self.logger.info(f"{namespace}: {fbx_path}")
         self.export_unreal_fbx(fbx_path, self.start, self.end)
-        self.fbx_paths.append(fbx_path)
 
     @staticmethod
     def export_unreal_fbx(fbx_path, cache_start, cache_end):

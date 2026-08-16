@@ -20,7 +20,7 @@ class UELoadShot(object):
     """
     Load the shot into unreal from its selected asset version
     """
-    def __init__(self, import_file_list, shot_name, version_dir, level_path, start_frame, end_frame):
+    def __init__(self, import_file_list, data, level_path, shot_name, shot_path):
         # type: (list[str], str, str, str, int, int) -> None
         """
         Args:
@@ -30,16 +30,16 @@ class UELoadShot(object):
             start_frame: First frame of the sequence
             end_frame: Last frame of the sequence
         """
-        self.start_frame = start_frame
-        self.end_frame = end_frame
         self.import_file_list = import_file_list
+        self.data = data
         self.shot_name = shot_name
-        self.version_dir = version_dir
         self.level_path = level_path
+        self.shot_path = shot_path
 
         self.ls = None
         self.fps = 24.0
         self.imported_obj_paths = list()
+        self._version_dir = str()
 
         self.asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
         self.run_import()
@@ -52,6 +52,33 @@ class UELoadShot(object):
         self.create_ls()
         self.open_sequence()
         self.animation_import()
+
+    @property
+    def start_frame(self):
+        # type: () -> int
+        """ The first frame to import """
+        return self.data["start_frame"]
+
+    @property
+    def end_frame(self):
+        # type: () -> int
+        """ The last frame to import """
+        return self.data["end_frame"]
+
+    @property
+    def version_dir(self):
+        # type: () -> str
+        """
+        Workout and set the version import directory
+        """
+        if self._version_dir:
+            return self._version_dir
+
+        number_of_versions = unreal_utils.list_subfolders(self.shot_path, recursive=False)
+        next_version_number = len(number_of_versions) + 1
+        self._version_dir = ue.Paths.combine([self.shot_path, f"v{next_version_number}"])
+        ue.log_warning(f"version_dir: {self._version_dir}")
+        return self._version_dir
 
     def create_level(self):
         """
@@ -74,7 +101,7 @@ class UELoadShot(object):
         Create the shot level and level sequence
         """
         # the shot level sequence
-        ls_path = f"{self.version_dir}/{LS_PREFIX}_{self.shot_name}"
+        ls_path = ue.Paths.combine([self.version_dir, f"{LS_PREFIX}_{self.shot_name}"])
 
         # create the level sequence first
         if ue.EditorAssetLibrary.does_asset_exist(ls_path):

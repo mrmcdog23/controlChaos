@@ -22,7 +22,7 @@ class ShotExporter(BaseExporter):
     def __init__(self):
         super().__init__()
         self.save_dir = str()
-        self.exported_files = list()
+        self.namespace_to_exported_files = dict()
 
     @BaseExporter.add_to_percentage(10)
     def open_file(self):
@@ -47,16 +47,22 @@ class ShotExporter(BaseExporter):
         """
         self.logger.info("Caching assets...")
         self.save_dir = self.data["save_dir"]
-        namespaces_to_fbx = self.data["namespaces_to_fbx"]
-        all_namespaces = list(namespaces_to_fbx.keys())
+        namespaces_to_rig = self.data["namespaces_to_rig"]
+        all_namespaces = list(namespaces_to_rig.keys())
+
         for namespace in all_namespaces:
             abc_path = self.abc_export(namespace)
-            self.exported_files.append(abc_path)
+            self.namespace_to_exported_files[namespace] = [abc_path]
 
         # run the fbx export separately
         fbx_inst = fbx_anim_export.FbxAnimExport(all_namespaces, self.save_dir)
         fbx_inst.run_fbx_exports()
-        self.exported_files.extend(fbx_inst.fbx_paths)
+
+        # add the fbx paths to the exported files dictionary
+        for namespace, fbx_path in fbx_inst.namespace_to_fbx_path.items():
+            exported_files = self.namespace_to_exported_files[namespace]
+            exported_files.append(fbx_path)
+            self.namespace_to_exported_files[namespace] = exported_files
 
     @BaseExporter.add_to_percentage(5)
     def abc_export(self, namespace):
@@ -114,7 +120,7 @@ class ShotExporter(BaseExporter):
 
         # update and save all metadata
         data = {
-            "exported_files": self.exported_files,
+            "namespace_to_exported_files": self.namespace_to_exported_files,
             "start_frame": int(cmds.playbackOptions(q=True, min=True)),
             "end_frame": int(cmds.playbackOptions(q=True, max=True)),
             "master_scene": cmds.file(q=True, sn=True)

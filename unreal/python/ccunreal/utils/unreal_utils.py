@@ -201,3 +201,25 @@ def create_sky_and_lights():
 
     # create cloud
     spawn_actor_if_not_exists(ue.VolumetricCloud)
+
+
+def list_subfolders(folder_path, recursive=False):
+    # type: (str, Optional[bool]) ->  list[str]
+    """
+    Within unreal list the subfolders from the current folder
+
+    Args:
+        folder_path: Unreal folder path to check subfolders
+        recursive: Whether to check the immediate subfolders
+    """
+    asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
+    if not ue.EditorAssetLibrary.does_directory_exist(folder_path):
+        ue.log_warning(f"Folder not found: {folder_path}")
+        return list()
+
+    subfolders = asset_registry.get_sub_paths(folder_path, recursive)
+    folder_names = list()
+    for folder_path in subfolders:
+        base_name = ue.Paths.get_base_filename(folder_path)
+        folder_names.append(base_name)  # "SubFolder"
+    return folder_names
