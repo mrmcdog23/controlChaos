@@ -73,3 +73,12 @@ class DragDropListWidget(QtWidgets.QListWidget):
             if data:
                 item.setData(QtCore.Qt.UserRole, data)
             self.addItem(item)
+
+    @property
+    def items_text(self):
+        # type: () -> list[str]
+        """ Get all items text """
+        text_list = list()
+        for item in self.list_items:
+            text_list.append(item.text())
+        return text_list

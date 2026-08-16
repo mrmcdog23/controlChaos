@@ -7,6 +7,7 @@ import ccunreal.unreal_constants as unreal_constants
 import ccunreal.shot.cache_importer as cache_importer
 import ccunreal.utils.api_wrap as api_wrap
 import cccore.utils.file_utils as file_utils
+import ccunreal.asset.import_fbx_asset as import_fbx_asset
 
 
 # constants
@@ -20,7 +21,7 @@ class UELoadShot(object):
     """
     Load the shot into unreal from its selected asset version
     """
-    def __init__(self, import_file_list, data, level_path, shot_name, shot_path):
+    def __init__(self, import_file_list, data, level_path, shot_path):
         # type: (list[str], str, str, str, int, int) -> None
         """
         Args:
@@ -32,9 +33,9 @@ class UELoadShot(object):
         """
         self.import_file_list = import_file_list
         self.data = data
-        self.shot_name = shot_name
         self.level_path = level_path
         self.shot_path = shot_path
+        self.shot_name = ue.Paths.get_base_filename(shot_path)
 
         self.ls = None
         self.fps = 24.0
@@ -77,7 +78,6 @@ class UELoadShot(object):
         number_of_versions = unreal_utils.list_subfolders(self.shot_path, recursive=False)
         next_version_number = len(number_of_versions) + 1
         self._version_dir = ue.Paths.combine([self.shot_path, f"v{next_version_number}"])
-        ue.log_warning(f"version_dir: {self._version_dir}")
         return self._version_dir
 
     def create_level(self):
@@ -126,17 +126,15 @@ class UELoadShot(object):
         Check for the scene assets and load them if their missing
         """
         for fbx_path in self.import_file_list:
-            if not fbx_path.endswith(".fbx"):
-                continue
-            file_name = file_utils.get_file_name(fbx_path)
-            if "cam" in file_name.lower():
-                self.import_camera_animation(fbx_path)
-            elif "env" in file_name.lower():
-                self.import_environment_mesh(fbx_path)
+            file_data = self.data["exported_files_to_data"][fbx_path]
+            if file_data["is_camera"]:
+                self.import_camera_animation(fbx_path, file_data)
+            elif file_data["is_skeleton_mesh"]:
+                self.import_skeleton_mesh_animation(fbx_path, file_data)
             else:
-                self.import_actor_animation(fbx_path)
+                self.import_static_mesh_animation(fbx_path, file_data)
 
-    def import_actor_animation(self, fbx_path):
+    def import_skeleton_mesh_animation(self, fbx_path, file_data):
         # type: (str) -> None
         """
         Import the actor with the animation
@@ -145,6 +143,13 @@ class UELoadShot(object):
             fbx_path: Path of the fbx file to import
         """
         ue.log(f"Importing cache: {fbx_path}")
+
+        # import the actor and its fbx path
+        asset_fbx_path = file_data["asset_fbx_path"]
+        namespace = file_data["namespace"]
+        asset_importer = import_fbx_asset.ImportAsset(asset_fbx_path, namespace, True)
+        asset_importer.import_asset()
+
         anim_importer = cache_importer.CacheImporter(self.version_dir, fbx_path)
         anim_importer.import_animation()
 
@@ -216,7 +221,7 @@ class UELoadShot(object):
             if actor.get_actor_label() == actor_label:
                 return actor
 
-    def import_camera_animation(self, fbx_path):
+    def import_camera_animation(self, fbx_path, file_data):
         # type: (str) -> None
         """
         Import a camera into the level sequence by
@@ -245,7 +250,7 @@ class UELoadShot(object):
             world, self.ls, [binding], unreal_utils.camera_ue_options(), fbx_path
         )
 
-    def import_environment_mesh(self, fbx_path):
+    def import_static_mesh_animation(self, fbx_path, file_data):
         # type: (Any, dict, str) -> None
         """
         Import environment asset as a static mesh
@@ -254,13 +259,19 @@ class UELoadShot(object):
         Args:
             fbx_path: Path of the environment fbx file
         """
+        # import the actor and its fbx path
+        asset_fbx_path = file_data["asset_fbx_path"]
+        namespace = file_data["namespace"]
+        asset_importer = import_fbx_asset.ImportAsset(asset_fbx_path, namespace, False)
+        asset_importer.import_asset()
+
         asset_importer = cache_importer.CacheImporter(self.version_dir, fbx_path)
         asset_importer.import_static_mesh()
 
         object_paths = asset_importer.imported_object_paths
         static_mesh_path = unreal_utils.get_objects_from_list(
             object_paths, unreal_constants.STATIC_MESH)
-        static_mesh = ue.load_asset(static_mesh_path)
-        ue.log_warning(f"Skeleton mesh path: {static_mesh}")
+        #static_mesh = ue.load_asset(static_mesh_path)
+        #ue.log_warning(f"Skeleton mesh path: {static_mesh}")
 
-        api_wrap.spawn_actor_from_object(static_mesh)
+        #api_wrap.spawn_actor_from_object(static_mesh)

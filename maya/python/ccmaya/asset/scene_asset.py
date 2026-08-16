@@ -26,6 +26,12 @@ class SceneAsset(object):
             return transform[0]
 
     @property
+    def is_skeleton_mesh(self):
+        # type: () -> bool
+        """ Is a static mesh """
+        return bool(self.jnt_grp)
+
+    @property
     def export_grp(self):
         if self.is_camera:
             return self.namespace
@@ -127,3 +133,13 @@ class SceneAsset(object):
             reference_path = cmds.referenceQuery(objects[0], filename=True)
         self._ref_path = reference_path.split("{")[0]
         return self._ref_path
+
+    @property
+    def asset_data_dict(self):
+        file_data = {
+            "is_camera": self.is_camera,
+            "is_skeleton_mesh": self.is_skeleton_mesh,
+            "namespace": self.namespace,
+            "asset_fbx_path": self.reference_path
+        }
+        return file_data

@@ -94,14 +94,7 @@ class MayaSceneAssetsPage(BasePublishPage):
         Returns:
             Whether the page is valid
         """
-        namespaces_to_rig = dict()
-        for index in range(self.lw_publish_assets.count()):
-            item = self.lw_publish_assets.item(index)
-            namespace = item.text()
-            scene_asset_inst = scene_asset.SceneAsset(namespace)
-            namespaces_to_rig[namespace] = scene_asset_inst.reference_path
-
-        self.data["namespaces_to_rig"] = namespaces_to_rig
+        self.data["namespaces"] = self.lw_publish_assets.items_text
         self.data["save_dir"] = self.wdg_save_dir.file_path
         return True
 

@@ -22,7 +22,7 @@ class ShotExporter(BaseExporter):
     def __init__(self):
         super().__init__()
         self.save_dir = str()
-        self.namespace_to_exported_files = dict()
+        self.exported_files_to_data = dict()
 
     @BaseExporter.add_to_percentage(10)
     def open_file(self):
@@ -47,12 +47,16 @@ class ShotExporter(BaseExporter):
         """
         self.logger.info("Caching assets...")
         self.save_dir = self.data["save_dir"]
-        namespaces_to_rig = self.data["namespaces_to_rig"]
-        all_namespaces = list(namespaces_to_rig.keys())
+        all_namespaces = self.data["namespaces"]
 
+        namespace_to_data = dict()
         for namespace in all_namespaces:
             abc_path = self.abc_export(namespace)
-            self.namespace_to_exported_files[namespace] = [abc_path]
+            scene_asset_inst = scene_asset.SceneAsset(namespace)
+            self.exported_files_to_data[abc_path] = scene_asset_inst.asset_data_dict
+
+            # store the namespace data to be reused for the fbx files
+            namespace_to_data[namespace] = scene_asset_inst.asset_data_dict
 
         # run the fbx export separately
         fbx_inst = fbx_anim_export.FbxAnimExport(all_namespaces, self.save_dir)
@@ -60,9 +64,7 @@ class ShotExporter(BaseExporter):
 
         # add the fbx paths to the exported files dictionary
         for namespace, fbx_path in fbx_inst.namespace_to_fbx_path.items():
-            exported_files = self.namespace_to_exported_files[namespace]
-            exported_files.append(fbx_path)
-            self.namespace_to_exported_files[namespace] = exported_files
+            self.exported_files_to_data[fbx_path] = namespace_to_data[namespace]
 
     @BaseExporter.add_to_percentage(5)
     def abc_export(self, namespace):
@@ -120,7 +122,7 @@ class ShotExporter(BaseExporter):
 
         # update and save all metadata
         data = {
-            "namespace_to_exported_files": self.namespace_to_exported_files,
+            "exported_files_to_data": self.exported_files_to_data,
             "start_frame": int(cmds.playbackOptions(q=True, min=True)),
             "end_frame": int(cmds.playbackOptions(q=True, max=True)),
             "master_scene": cmds.file(q=True, sn=True)

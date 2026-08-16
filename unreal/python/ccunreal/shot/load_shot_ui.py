@@ -50,12 +50,26 @@ class LoadShotUI(base_ui.WidgetBase):
         self.cmb_sequence.currentIndexChanged.connect(self.populate_sequence_shots)
 
     def enable_existing_level(self, enable):
+        # type: (bool) -> None
+        """
+        Enable the existing level widgets
+
+        Args:
+            enable: Whether to enable the widgets
+        """
         self.lbl_existing.setEnabled(enable)
         self.cmb_existing.setEnabled(enable)
         self.lbl_new.setEnabled(not enable)
         self.le_new.setEnabled(not enable)
 
     def enable_existing_shots(self, enable):
+        # type: (bool) -> None
+        """
+        Enable the existing shots widgets
+
+        Args:
+            enable: Whether to enable the widgets
+        """
         self.cmb_existing_shots.setEnabled(enable)
         self.lbl_existing_shots.setEnabled(enable)
         self.lbl_new_shot.setEnabled(not enable)
@@ -63,6 +77,10 @@ class LoadShotUI(base_ui.WidgetBase):
 
     @property
     def level_path(self):
+        # type: () -> str
+        """
+        Work out the level to create path
+        """
         if self.rbn_existing.isChecked():
             level_path = self.cmb_existing.currentText()
         else:
@@ -70,7 +88,23 @@ class LoadShotUI(base_ui.WidgetBase):
             level_path = f"/Game/Level/{map_name}"
         return level_path
 
+    @property
+    def shot_path(self):
+        # type: () -> str
+        """ The selected shot path """
+        if self.rbn_existing_shot.isChecked():
+            shot_name = self.cmb_existing_shots.currentText()
+        else:
+            shot_name = self.le_new_shot.text()
+        sequence_name = self.cmb_sequence.currentText()
+        shot_folders = [self.sequence_root, sequence_name, "Shots", shot_name]
+        shot_path = ue.Paths.combine(shot_folders)
+        return shot_path
+
     def enable_btn(self):
+        """
+        Enable the new shot button
+        """
         if self.rbn_new_shot.isChecked():
             new_name = self.le_new_shot.text()
             self.btn_import_files.setEnabled(bool(new_name))
@@ -87,8 +121,12 @@ class LoadShotUI(base_ui.WidgetBase):
             return
         self.data = file_utils.read_file(import_json)
 
-        exported_files = self.data["exported_files"]
-        for file_path in exported_files:
+        # TODO: temp file for new format
+        exported_files_to_data = self.data.get("exported_files_to_data")
+        if not exported_files_to_data:
+            return
+
+        for file_path, file_data in exported_files_to_data.items():
             if not file_path.endswith(".fbx"):
                 continue
             item = QtWidgets.QListWidgetItem(os.path.basename(file_path))
@@ -127,6 +165,9 @@ class LoadShotUI(base_ui.WidgetBase):
         self.cmb_existing.addItems(level_paths)
 
     def populate_sequences(self):
+        """
+        Populate the sequences combo box
+        """
         folder_names = unreal_utils.list_subfolders(self.sequence_root, recursive=False)
         self.cmb_sequence.addItems(folder_names)
 
@@ -148,16 +189,7 @@ class LoadShotUI(base_ui.WidgetBase):
         Import cameras into unreal
         """
         ue.log_warning("Building shot...")
-        if self.rbn_existing_shot.isChecked():
-            shot_name = self.cmb_existing_shots.currentText()
-        else:
-            shot_name = self.le_new_shot.text()
-
-        sequence_name = self.cmb_sequence.currentText()
-        shot_folders = [self.sequence_root, sequence_name, "Shots", "shot_name"]
-        shot_path = ue.Paths.combine(shot_folders)
-        ue.log_warning(f"shot_path: {shot_path}")
-        ue_load_shot.UELoadShot(self.import_files_list, self.data, self.level_path, shot_name, shot_path)
+        ue_load_shot.UELoadShot(self.import_files_list, self.data, self.level_path, self.shot_path)
 
 
 def launch():

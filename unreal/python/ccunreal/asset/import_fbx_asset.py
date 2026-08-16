@@ -1,33 +1,29 @@
 """ Import fbx asset from asset version """
 import os
 import unreal as ue
-import ccftrack.asset_version as ft_version
 import ccunreal.unreal_constants as unreal_constants
 import ccunreal.utils.unreal_utils as unreal_utils
-import ccunreal.cache_importer as cache_importer
-import ccunreal.asset.create_turntable as cc_turntable
-import ccunreal.asset.material_linker as material_linker
+import ccunreal.shot.cache_importer as cache_importer
 
 
 class ImportAsset(object):
     """
     Import a cache asset into the scene
     """
-    def __init__(self, ftver, asset_version_id, component_path=None):
-        # type: (ft_version.FtAssetVersion, str, str) -> None
+    asset_root = "/Game/ControlChaos/Asset"
+
+    def __init__(self, asset_fbx_path, namespace, is_skeleton_mesh):
+        # type: (str, str) -> None
         """
         Args:
             ftver: An instance of the ftrack asset version
             asset_version_id: The asset version id
             component_path: Path to import
         """
-        self.ftver = ftver
-        self.ftver.asset_version_id = asset_version_id
         self.asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
-        self.ctx = unreal_utils.context_from_ftver(self.ftver)
-        self.latest_version = self.ctx.latest_version
-        self.fbx_path = component_path or self.ftver.fbx_component_path
-        self.destination_dir = self.ctx.ue_asset_version_directory
+        self.asset_fbx_path = asset_fbx_path
+        self.is_skeleton_mesh = is_skeleton_mesh
+        self.destination_dir = ue.Paths.combine([self.asset_root, namespace])
 
         # initialize class variables
         self.error_msg = str()
@@ -43,19 +39,19 @@ class ImportAsset(object):
             ue.log_warning("Import invalid so skipping")
             return
 
-        asset_importer = cache_importer.CacheImporter(self.destination_dir, self.fbx_path)
-        if self.ftver.task_name == "rigging":
+        asset_importer = cache_importer.CacheImporter(self.destination_dir, self.asset_fbx_path)
+        if self.is_skeleton_mesh:
+            ue.log_warning(f"Importing skeleton mesh: {self.asset_fbx_path}")
             asset_importer.import_skeleton_mesh()
-        elif self.ftver.task_name in ["lookdev", "modeling"]:
-            asset_importer.import_static_mesh()
         else:
-            ue.log_error("Not supported type")
+            ue.log_warning(f"Importing static mesh: {self.asset_fbx_path}")
+            asset_importer.import_static_mesh()
 
         # run post import commands
         self.organize_asset()
         self.apply_metadata_tags()
-        self.create_arnold_texture()
-        self.apply_previous_materials()
+        #self.create_arnold_texture()
+        #self.apply_previous_materials()
         self.save_asset()
 
     @property
@@ -101,19 +97,9 @@ class ImportAsset(object):
         Also check the destination directory exists and
         if the task type is supporting
         """
-        # check there is a fbx path
-        if not self.fbx_path:
-            ue.log_warning(f"No FBX path found on asset version {self.ftver.asset_build_name}")
-            return False
-
         # check the fbx path exists on disk
-        if not os.path.exists(self.fbx_path):
-            ue.log_warning(f"Fbx path does not exist in {self.ftver.asset_build_name}")
-            return False
-
-        # if the asset exists let the artist know
-        if ue.EditorAssetLibrary.does_directory_exist(self.destination_dir):
-            ue.log_warning(f"Path exists: {self.destination_dir}")
+        if not os.path.exists(self.asset_fbx_path):
+            ue.log_warning(f"Fbx path does not exist for {self.asset_fbx_path}")
             return False
         return True
 
@@ -145,67 +131,8 @@ class ImportAsset(object):
         unreal_utils.add_cc_metadata_dict(self._skeleton_mesh, self.ftver.as_dict)
         unreal_utils.add_metadata_value(self._skeleton_mesh, "ftrack_id", self.ftver.asset_version_id)
 
-    def create_arnold_texture(self):
-        """
-        From the material description create
-        the missing textures
-        """
-        material_linker.link_materials(self.ftver.matdesc_component_path)
-
-    def apply_previous_materials(self):
-        """
-        If there is a previous version use its shaders
-        """
-        if not self.latest_version:
-            return
-
-        # in this case latest version is the last version
-        # of the skeleton before the new one was importer
-        self.ctx.use_version = self.latest_version
-        previous_skeleton_mesh_path = self.ctx.ue_skeleton_mesh_path
-        prev_skeleton_mesh = ue.load_asset(previous_skeleton_mesh_path)
-
-        # start the material array to assign
-        material_array = ue.Array(ue.SkeletalMaterial)
-        for index, material in enumerate(prev_skeleton_mesh.materials):
-            # check if there is an existing material on the new asset
-            try:
-                existing_material = self.skeleton_mesh.materials[index]
-            except IndexError:
-                ue.log_warning("Existing material does not exist!")
-                existing_material = None
-
-            if existing_material:
-                # remove the previous materials
-                ue.log(f"Deleting existing material {existing_material.material_slot_name}")
-                ue.EditorAssetLibrary.delete_loaded_assets([existing_material.material_interface])
-
-                # set the existing material slot to the previous one
-                existing_material.material_interface = material.material_interface
-                existing_material.material_slot_name = material.material_slot_name
-                material_array.append(material)
-            else:
-                # create a new material and assign it.
-                new_material = ue.SkeletalMaterial()
-                new_material.material_interface = material.material_interface
-                new_material.material_slot_name = material.material_slot_name
-                self.skeleton_mesh.materials.append(new_material)
-            self.skeleton_mesh.modify()
-
-        # set the materials which completes the assignments
-        self.skeleton_mesh.set_editor_property("materials", material_array)
-
     def save_asset(self):
         """
         Save the imported assets
         """
         ue.EditorAssetLibrary.save_directory(self.destination_dir)
-
-    def create_turntable(self):
-        """
-        Create the turntable setup for the asset
-        """
-        cc_turntable.main(
-            self.skeleton_mesh.get_full_name(),
-            asset=self.skeleton_mesh
-        )
