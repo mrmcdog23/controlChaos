@@ -101,11 +101,18 @@ def get_shot_assets():
     """
     shot_assets_list = list()
     for geo_grp in cmds.ls("*:GEO"):
+        is_referenced = cmds.referenceQuery(geo_grp, inr=True)
+        if not is_referenced:
+            continue
         namespace = geo_grp.split(":")[0]
         shot_assets_list.append(namespace)
-
-    cam_grp = cmds.ls(maya_constants.CAM_GRP)
-    if cam_grp:
-        shot_assets_list.extend(cam_grp)
+    shot_assets_list.extend(render_cameras())
     return shot_assets_list
 
+
+def render_cameras():
+    cameras = list()
+    for cam in cmds.listCameras():
+        if cam not in maya_constants.DEFAULT_CAMERAS:
+            cameras.append(cam)
+    return cameras

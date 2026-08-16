@@ -27,9 +27,10 @@ class SceneAsset(object):
 
     @property
     def export_grp(self):
-        for grp in [self.cam_grp, self.geo_grp]:
-            if grp:
-                return grp
+        if self.is_camera:
+            return self.namespace
+        if self.geo_grp:
+            return self.geo_grp
 
     @property
     def geo_grp(self):
@@ -63,9 +64,13 @@ class SceneAsset(object):
         """
         Get the root node to export the fullpath
         """
-        if not self._cam_grp:
-            self._cam_grp = self.find_group(maya_constants.CAM_GRP)
-        return self._cam_grp
+        camera_tran = cmds.ls(self.namespace, type="transform")
+        if not camera_tran:
+            return
+        camera_shape = cmds.listRelatives(camera_tran[0], type="camera")
+        if not camera_shape:
+            return
+        return camera_shape[0]
 
     @property
     def root_joint(self):
