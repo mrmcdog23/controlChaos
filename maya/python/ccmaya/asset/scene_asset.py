@@ -1,3 +1,5 @@
+import re
+import glob
 import maya.cmds as cmds
 import ccmaya.maya_constants as maya_constants
 
@@ -143,3 +145,29 @@ class SceneAsset(object):
             "asset_fbx_path": self.reference_path
         }
         return file_data
+
+    @property
+    def current_version(self):
+        """
+        Extract current version
+        """
+        match = re.search(r"(\d+)\.fbx$", self.reference_path)
+        if not match:
+            return
+        return match.group(1)
+
+    @property
+    def all_versions(self):
+        regex = self.reference_path.replace(f"{self.current_version}.fbx", "*.fbx")
+        all_files = glob.glob(regex)
+
+        all_versions = list()
+        for fbx_path in all_files:
+            match = re.search(r"(\d+)\.fbx$", fbx_path)
+            if not match:
+                continue
+            all_versions.append(match.group(1))
+
+        all_versions.sort()
+        all_versions.reverse()
+        return all_versions

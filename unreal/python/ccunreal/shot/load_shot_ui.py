@@ -139,6 +139,9 @@ class LoadShotUI(base_ui.WidgetBase):
         self.ui_settings.setValue("import_json", import_json)
 
     def populate_sequence_shots(self):
+        """
+        Populate the shot list
+        """
         selected_sequence = self.cmb_sequence.currentText()
         shots_path = f"{self.sequence_root}/{selected_sequence}/Shots"
         shot_names = unreal_utils.list_subfolders(shots_path, recursive=False)
