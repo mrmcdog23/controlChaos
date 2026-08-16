@@ -137,6 +137,17 @@ class UELoadShot(object):
                 self.import_static_mesh(file_data)
 
     def import_skeleton_asset(self, file_data):
+        # type: (dict) -> (ue.Skeleton, ue.SkeletonMesh)
+        """
+        Import the skeleton asset from the file data
+
+        Args:
+            file_data: THe information of the asset
+
+        Returns:
+            skeleton: The unreal skeleton asset
+            skeleton_mesh: The unreal skeleton mesh as an asset
+        """
         # import the actor and its fbx path
         asset_importer = import_fbx_asset.ImportAsset(
             file_data["asset_fbx_path"], file_data["namespace"], True)
