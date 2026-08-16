@@ -30,7 +30,7 @@ class ShotExporter(BaseExporter):
         Open the wip maya file
         """
         maya_utils.load_plugins(["AbcExport"])
-        cmds.file(self.data['wip_file_path'],  open=True, force=True)
+        #cmds.file(self.data['wip_file_path'],  open=True, force=True)
 
     def export(self):
         """
@@ -47,7 +47,8 @@ class ShotExporter(BaseExporter):
         """
         self.logger.info("Caching assets...")
         self.save_dir = self.data["save_dir"]
-        all_namespaces = self.data["namespaces"]
+        namespaces_to_fbx = self.data["namespaces_to_fbx"]
+        all_namespaces = list(namespaces_to_fbx.keys())
         for namespace in all_namespaces:
             abc_path = self.abc_export(namespace)
             self.exported_files.append(abc_path)

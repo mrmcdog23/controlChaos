@@ -2,10 +2,11 @@
 import maya.mel as mel
 import maya.cmds as cmds
 import ccmaya.utils.maya_utils as maya_utils
-from CCPySide import QtWidgets
+import ccmaya.asset.scene_asset as scene_asset
 from ccgeneral.widgets.dragdrop_listwidget import DragDropListWidget
 from ccgeneral.wizard.pages.base_page import BasePublishPage
 from ccgeneral.widgets.line_browser import LineBrowser
+from CCPySide import QtWidgets
 
 
 class MayaSceneAssetsPage(BasePublishPage):
@@ -93,12 +94,14 @@ class MayaSceneAssetsPage(BasePublishPage):
         Returns:
             Whether the page is valid
         """
-        namespaces = list()
+        namespaces_to_fbx = dict()
         for index in range(self.lw_publish_assets.count()):
             item = self.lw_publish_assets.item(index)
-            namespaces.append(item.text())
+            namespace = item.text()
+            scene_asset_inst = scene_asset.SceneAsset(namespace)
+            namespaces_to_fbx[namespace] = scene_asset_inst.reference_path
 
-        self.data["namespaces"] = namespaces
+        self.data["namespaces_to_fbx"] = namespaces_to_fbx
         self.data["save_dir"] = self.wdg_save_dir.file_path
         return True
 

@@ -64,8 +64,15 @@ class FbxAnimExport(object):
                 self.namespace_to_objects[namespace] = [scene_asset_inst.geo_grp]
                 continue
 
-            self.logger.info(f"Found root joint {root_joint} for {namespace}")
+            # import if referenced object
+            is_referenced = cmds.referenceQuery(root_joint, inr=True)
+            if not is_referenced:
+                continue
+            ref_path = cmds.referenceQuery(root_joint, filename=True)
+            cmds.file(ref_path, importReference=True)
+
             # update the root joint and get its descendants
+            self.logger.info(f"Found root joint {root_joint} for {namespace}")
             root_joint = cmds.parent(root_joint, world=True)[0]
 
             cmds.select(cl=True)
@@ -121,7 +128,7 @@ class FbxAnimExport(object):
         Args:
             namespace: The namespace of the asset to export
         """
-        self.logger.info(f"Namespaces.... {self.namespace_to_objects}")
+        self.logger.info(f"Exporting namespace.... {namespace}")
         objects_to_select = self.namespace_to_objects.get(namespace)
         if not objects_to_select:
             self.logger.info(f"No fbx elements for namespace {namespace}")

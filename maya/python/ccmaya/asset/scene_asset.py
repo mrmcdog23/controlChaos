@@ -21,13 +21,13 @@ class SceneAsset(object):
         """
         if self.namespace == find_group:
             return self.namespace
-        for transform in cmds.listRelatives(self.namespace, ad=True, f=True):
-            if transform.endswith(find_group):
-                return transform
+        transform = cmds.ls(f"{self.namespace}:{find_group}", type="transform")
+        if transform:
+            return transform[0]
 
     @property
     def export_grp(self):
-        for grp in [self.cam_grp, self.env_grp, self.geo_grp]:
+        for grp in [self.cam_grp, self.geo_grp]:
             if grp:
                 return grp
 
@@ -46,7 +46,6 @@ class SceneAsset(object):
         if not self._env_grp:
             self._env_grp = self.find_group(maya_constants.ENV_GRP)
         return self._env_grp
-
 
     @property
     def jnt_grp(self):
@@ -97,3 +96,29 @@ class SceneAsset(object):
         cameras = cmds.listRelatives(self.cam_grp, type="transform", f=True)
         if cameras:
             return cameras[0]
+
+    @property
+    def reference_node(self):
+        # type: () -> Optional[str]
+        """ From a namespace get the reference node """
+        for ref_node in cmds.ls(type="reference"):
+            try:
+                node_namespace = cmds.referenceQuery(ref_node, namespace=True)
+                if node_namespace.endswith(self.namespace):
+                    return ref_node
+            except RuntimeError:
+                pass
+
+    @property
+    def reference_path(self):
+        # type: () -> str
+        """ Path of the referenced file """
+        if self.reference_node:
+            reference_path = cmds.referenceQuery(self.reference_node, filename=True)
+        else:
+            objects = cmds.ls(f"{self.namespace}:*")
+            if not objects:
+                return
+            reference_path = cmds.referenceQuery(objects[0], filename=True)
+        self._ref_path = reference_path.split("{")[0]
+        return self._ref_path
