@@ -223,3 +223,72 @@ def list_subfolders(folder_path, recursive=False):
         base_name = ue.Paths.get_base_filename(folder_path)
         folder_names.append(base_name)  # "SubFolder"
     return folder_names
+
+
+def get_asset_from_path(file_path, folder_root=None):
+    """
+    From a file path find the asset in the project
+
+    Args:
+        file_path: Path to the file to find
+    """
+    asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
+    folder_root = folder_root or "/Game"
+    # Get all assets under /Game
+    filter = ue.ARFilter(
+        class_names=["StaticMesh", "SkeletalMesh"],
+        package_paths=[folder_root],
+        recursive_paths=True,
+        recursive_classes=True
+    )
+    assets = asset_registry.get_assets(filter)
+    for asset in assets:
+        loaded_asset = ue.EditorAssetLibrary.load_asset(asset.package_name)
+        asset_import_data = loaded_asset.get_editor_property('asset_import_data')
+        first_filename = asset_import_data.get_first_filename()
+        if file_path == first_filename:
+            return loaded_asset
+
+
+def find_all_assets_of_type(directory, find_asset_type):
+    # type: (str, str) -> list[ue.Object]
+    """
+    Get all assets of a specific type in a directory
+
+    Args:
+        directory: The folder to look for the asset
+        find_asset_type: Asset type to find
+
+    Returns:
+        all_assets_of_type: List of assets found
+    """
+    all_assets_of_type = list()
+    path_to_type = get_path_to_type_dict(directory)
+    for object_path, asset_type in path_to_type.items():
+        if asset_type == find_asset_type:
+            asset = ue.load_asset(object_path)
+            all_assets_of_type.append(asset)
+    return all_assets_of_type
+
+
+def find_asset_of_type(directory, find_asset_type, assets_before=None):
+    # type: (str, str, Optional[ue.Object]) -> Optional[ue.Object]
+    """
+    Get an asset of a specific type in a directory
+
+    Args:
+        directory: The folder to look for the asset
+        find_asset_type: Asset type to find
+        assets_before: List of already found assets
+
+    Returns:
+        asset: The loaded asset found
+    """
+    all_assets_of_type = find_all_assets_of_type(directory, find_asset_type)
+    if assets_before and all_assets_of_type:
+        for asset in all_assets_of_type:
+            if asset not in assets_before:
+                return asset
+
+    if all_assets_of_type:
+        return all_assets_of_type[0]

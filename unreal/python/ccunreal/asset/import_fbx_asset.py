@@ -35,6 +35,12 @@ class ImportAsset(object):
         """
         Function to import asset
         """
+        loaded_asset = unreal_utils.get_asset_from_path(
+            self.asset_fbx_path, folder_root=self.destination_dir)
+        if loaded_asset:
+            ue.log_warning(f"Loaded asset already found: {loaded_asset}")
+            return
+
         if not self.is_import_valid:
             ue.log_warning("Import invalid so skipping")
             return
@@ -49,9 +55,6 @@ class ImportAsset(object):
 
         # run post import commands
         self.organize_asset()
-        self.apply_metadata_tags()
-        #self.create_arnold_texture()
-        #self.apply_previous_materials()
         self.save_asset()
 
     @property
@@ -121,15 +124,6 @@ class ImportAsset(object):
             asset = self.asset_registry.get_asset_by_object_path(object_path)
             dest_path = f"{self.destination_dir}/{asset_type}/{asset.asset_name}"
             ue.EditorAssetLibrary.rename_asset(object_path, dest_path)
-
-    def apply_metadata_tags(self):
-        """
-        Apply the import data to the asset
-        """
-        if not self._skeleton_mesh:
-            return
-        unreal_utils.add_cc_metadata_dict(self._skeleton_mesh, self.ftver.as_dict)
-        unreal_utils.add_metadata_value(self._skeleton_mesh, "ftrack_id", self.ftver.asset_version_id)
 
     def save_asset(self):
         """
