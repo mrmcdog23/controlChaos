@@ -2,6 +2,7 @@
 import maya.cmds as cmds
 from ccgeneral.wizard.validators.base_validators import BaseValidator
 import ccmaya.maya_constants as maya_constants
+import ccmaya.utils.maya_utils as maya_utils
 
 
 class GroupsNamedCorrectlyValidator(BaseValidator):
@@ -26,25 +27,23 @@ class GroupsNamedCorrectlyValidator(BaseValidator):
             "joint": maya_constants.JNT_GRP
             }
         missing_groups = list()
-        for node in cmds.ls("*.export"):
-            asset_name = node.split(".export")[0]
+
+        for asset_name in maya_utils.get_shot_assets():
+            objects_found = cmds.ls(f"{asset_name}:*", type="transform")
+            if not objects_found:
+                continue
+
+            # check there is a group of that name
+            found_obj_group = False
             for node_type, group_name in type_to_prefix.items():
-
-                # check for objects of that type that are descendants
-                objects_found = cmds.listRelatives(asset_name, ad=True, type=node_type, f=True)
-                if not objects_found:
-                    continue
-                objects_found.append(asset_name)
-
-                # check there is a group of that name
-                found_obj_group = False
                 for obj in objects_found:
-                    if f"|{group_name}|" in obj:
+                    if obj.endswith(group_name):
                         found_obj_group = True
+                        break
 
-                # add to the list of missing groups
-                if not found_obj_group:
-                    missing_groups.append(f"{asset_name} is missing {group_name}")
+            # add to the list of missing groups
+            if not found_obj_group:
+                missing_groups.append(f"{asset_name} is missing {group_name}")
 
         if missing_groups:
             self.is_valid = False

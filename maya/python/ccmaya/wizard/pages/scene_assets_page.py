@@ -1,7 +1,7 @@
 """ Select which assets in the maya scene to publish """
 import maya.mel as mel
 import maya.cmds as cmds
-import ccmaya.maya_constants as maya_constants
+import ccmaya.utils.maya_utils as maya_utils
 from CCPySide import QtWidgets
 from ccgeneral.widgets.dragdrop_listwidget import DragDropListWidget
 from ccgeneral.wizard.pages.base_page import BasePublishPage
@@ -48,6 +48,9 @@ class MayaSceneAssetsPage(BasePublishPage):
         self.lyt_save_dir.addWidget(self.wdg_save_dir)
 
     def connect_signals(self):
+        """
+        Connect the signals to the widgets
+        """
         self.lw_publish_assets.model().rowsInserted.connect(self.check_complete)
         self.lw_publish_assets.model().rowsRemoved.connect(self.check_complete)
         self.wdg_save_dir.line_edit.textChanged.connect(self.check_complete)
@@ -56,10 +59,7 @@ class MayaSceneAssetsPage(BasePublishPage):
         """
         Load the scene assets that are published rigs
         """
-        for node in cmds.ls("*.export"):
-            asset_name = node.split(".export")[0]
-            item = QtWidgets.QListWidgetItem(asset_name)
-            self.lw_scene_assets.addItem(item)
+        self.lw_scene_assets.addItems(maya_utils.get_shot_assets())
 
     def check_complete(self):
         """

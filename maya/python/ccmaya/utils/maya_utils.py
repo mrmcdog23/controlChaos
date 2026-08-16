@@ -4,6 +4,7 @@ import maya.OpenMayaUI as OpenMayaUI
 from typing import Optional, Any
 from CCPySide import QtWidgets, shiboken
 import cccore.utils.cc_logging as cc_logging
+import ccmaya.maya_constants as maya_constants
 
 
 logger = cc_logging.cc_logger()
@@ -85,3 +86,26 @@ def add_export_attribute():
         cmds.addAttr(selected_node, longName="export", at='bool')
     else:
         cmds.warning("Export attribute already exists!")
+
+
+def get_shot_assets():
+    # type: (Any) -> dict
+    """
+    Get all shot assets that have a geometry group
+
+    Args:
+        session: Current ftrack session
+
+    Returns:
+        shot_assets_dict: Dict of published assets
+    """
+    shot_assets_list = list()
+    for geo_grp in cmds.ls("*:GEO"):
+        namespace = geo_grp.split(":")[0]
+        shot_assets_list.append(namespace)
+
+    cam_grp = cmds.ls(maya_constants.CAM_GRP)
+    if cam_grp:
+        shot_assets_list.extend(cam_grp)
+    return shot_assets_list
+
