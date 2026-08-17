@@ -90,14 +90,14 @@ class FbxAnimExport(object):
         """
         for namespace in self.namespaces:
             scene_asset_inst = scene_asset.SceneAsset(namespace)
-
-            # if there is no
-            cam = scene_asset_inst.cam
-            if not scene_asset_inst.cam:
-                self.logger.warning(f"No camera found on {namespace}")
+            if not scene_asset_inst.is_camera:
                 continue
 
             # need to set the camera to far focus distance for Unreal
+            cam = scene_asset_inst.export_grp
+            if not cmds.objExists(f"{cam}.focusDistance"):
+                continue
+
             cmds.setAttr(f"{cam}.focusDistance", 100000)
             self.objects_to_bake.append(cam)
             self.logger.info(f"Camera found for {namespace}")
