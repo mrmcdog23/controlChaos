@@ -111,8 +111,16 @@ def get_shot_assets():
 
 
 def render_cameras():
+    # type: () -> list[str]
+    """
+    Get a list of all cameras bar the defaults
+
+    Returns:
+        cameras: List of cameras
+    """
     cameras = list()
-    for cam in cmds.listCameras():
-        if cam not in maya_constants.DEFAULT_CAMERAS:
-            cameras.append(cam)
+    for cam in cmds.ls(type="camera"):
+        cam_transform = cmds.listRelatives(cam, p=True)[0]
+        if cam_transform not in maya_constants.DEFAULT_CAMERAS:
+            cameras.append(cam_transform)
     return cameras
