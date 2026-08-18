@@ -110,8 +110,8 @@ class CacheImporter(object):
         options.static_mesh_import_data = static_mesh_data
 
         # Transform offsets — leave zeroed unless intentionally compensating
-        #anim_data = options.anim_sequence_import_data
-        #anim_data.set_editor_property('import_rotation', ue.Rotator(-90, 0, 0))
+        anim_data = options.anim_sequence_import_data
+        anim_data.set_editor_property('import_rotation', ue.Rotator(-90, 0, 0))
         asset_import_task.options = options
 
         self.run_task(asset_import_task)
