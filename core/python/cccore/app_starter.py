@@ -300,6 +300,9 @@ class UnrealApp(BaseApp):
         """
         Launch the unreal project
         """
+        if not os.environ["USERNAME"] == "joele":
+            self.cmd_list = [self.exe_path]
+            return
         uproject_path = "C:/Users/joele/Documents/Unreal Projects/new_test/new_test.uproject"
         self.cmd_list = [self.exe_path, uproject_path]
 
