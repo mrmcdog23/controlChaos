@@ -252,7 +252,8 @@ class UELoadShot(object):
         else:
             # if no binding found spawn one
             binding, camera_actor = editor_subsys.create_camera(spawnable=False)
-            camera_actor.set_actor_label(f"{self.shot_name}_cam")
+            camera_name = file_utils.get_file_name(fbx_path)
+            camera_actor.set_actor_label(camera_name)
 
         # apply the sequence animation
         world = ue.EditorLevelLibrary.get_editor_world()

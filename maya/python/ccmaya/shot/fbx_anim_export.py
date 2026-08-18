@@ -95,10 +95,9 @@ class FbxAnimExport(object):
 
             # need to set the camera to far focus distance for Unreal
             cam = scene_asset_inst.export_grp
-            if not cmds.objExists(f"{cam}.focusDistance"):
-                continue
+            if cmds.objExists(f"{cam}.focusDistance"):
+                cmds.setAttr(f"{cam}.focusDistance", 100000)
 
-            cmds.setAttr(f"{cam}.focusDistance", 100000)
             self.objects_to_bake.append(cam)
             self.logger.info(f"Camera found for {namespace}")
 
