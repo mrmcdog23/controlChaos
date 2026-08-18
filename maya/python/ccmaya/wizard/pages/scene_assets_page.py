@@ -60,7 +60,7 @@ class MayaSceneAssetsPage(BasePublishPage):
         """
         Load the scene assets that are published rigs
         """
-        self.lw_scene_assets.addItems(maya_utils.get_shot_assets())
+        self.lw_scene_assets.addItems(maya_utils.get_shot_namespaces())
 
     def check_complete(self):
         """

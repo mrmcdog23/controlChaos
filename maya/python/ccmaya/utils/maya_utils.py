@@ -88,7 +88,7 @@ def add_export_attribute():
         cmds.warning("Export attribute already exists!")
 
 
-def get_shot_assets():
+def get_shot_namespaces():
     # type: (Any) -> dict
     """
     Get all shot assets that have a geometry group
