@@ -3,3 +3,4 @@ PySide6
 qtpy
 requests
 pyyaml
+ftrack-python-api

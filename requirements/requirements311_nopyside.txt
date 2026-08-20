@@ -2,3 +2,4 @@ pymel
 qtpy
 requests
 pyyaml
+ftrack-python-api

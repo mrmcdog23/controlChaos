@@ -345,7 +345,11 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         # launch subprocess
         subprocess.run(cmd_list, check=True)
 
-
+'''
 if __name__ == "__main__":
     base_ui.open_ui(ControlChaosLauncher)
 
+'''
+import ccftrack.base as base
+
+ftbase = base.FtBase()

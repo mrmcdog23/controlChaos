@@ -1,0 +1,6 @@
+apps:
+  maya:
+    version:
+      2023
+pipeline_version:
+  25052023
