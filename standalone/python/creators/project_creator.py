@@ -1,14 +1,9 @@
-""" Create a project on disk and on FTrack """
-import os
-import ccftrack.asset as asset
+""" Create a project on FTrack """
+from typing import Optional
 import ccftrack.shot as shot
 import cccore.base_ui as base_ui
 import cccore.utils.cc_logging as cc_logging
-import cccore.utils.file_utils as file_utils
 import cccore.utils.ui_utils as ui_utils
-import cccore.data.server_data as server_data
-import cccore.app_starter as app_starter
-import cccore.core_constants as core_constants
 from CCPySide import QtWidgets, QtCore, QtGui
 
 
@@ -29,10 +24,7 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.ftshot = shot.FtShot()
-        self.ftasset = asset.FtAsset(session=self.ftshot.session)
         self.logger = cc_logging.cc_logger()
-
-        self.project_data = server_data.ProjectData()
         self.app_name_cmb_dict = dict()
 
         # run setup functions
@@ -41,6 +33,9 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
         self.connect_signals()
 
     def populate_data(self):
+        """
+        Populate the dta of the ui
+        """
         self.cmb_schema.addItems(self.ftshot.all_schemas)
         self.set_combobox_index(self.cmb_schema, self.default_schema)
         self.cmb_frames_per_second.addItems(self.ftshot.all_fps)
@@ -68,11 +63,18 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
         for app_name, versions in self.ftshot.application_versions.items():
             combo_name = f"cmb_{app_name}"
             app_combobox = self.findChild(QtWidgets.QComboBox, combo_name)
-            if app_combobox is not None:
-                app_combobox.addItems(versions)
-                self.app_name_cmb_dict[app_name] = app_combobox
+            if app_combobox is None:
+                continue
+            app_combobox.addItems(versions)
+            default_value = self.ftshot.attribute_default_value(app_name)
+            self.set_combobox_index(app_combobox, default_value)
+            self.app_name_cmb_dict[app_name] = app_combobox
 
     def validate_info(self):
+        # type: () -> Optional[str]
+        """
+        Validate the info of the project
+        """
         # Check the name is valid
         project_name = self.le_name.text()
         if " " in project_name:
@@ -113,18 +115,20 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
             buttons=["Create", "Cancel"],
             parent=self
         )
-        if create == 1:
+        if create == "Cancel":
             return
 
-        self.logger.info(f"Creating on ftrack...{project_name}")
+        self.logger.info(f"Creating on FTrack... {project_name}")
         schema_name = self.cmb_schema.currentText()
         project_code = self.le_code.text()
         fps = self.cmb_frames_per_second.currentText()
 
+        # get information of the applications
         apps_dict = dict()
         for app_name, app_combobox in self.app_name_cmb_dict.items():
             apps_dict[app_name] = app_combobox.currentText()
 
+        # create the ftrack project
         self.ftshot.create_ftrack_project(
             project_name, project_code, apps_dict, fps, schema_name
         )

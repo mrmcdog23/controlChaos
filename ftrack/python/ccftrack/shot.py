@@ -446,12 +446,11 @@ class FtShot(FtBase):
         Create the ftrack project
 
         Args:
-            code: Project code (Should be 3 letter upper case word)
-            name: Project name to add
-            root: Directory root folder of the project
-            resolution: The project resolution
-            fps: The number of frames per second
+            project_name: Project name to add
+            project_code: Project code (Should be 3 letter upper case word)
             apps_dict: Application versions of the project
+            fps: The number of frames per second
+            schema_name: Name of the schema to use
         """
         # Get relevant schema
         schema = self.get_schema_by_name(schema_name)
@@ -465,13 +464,15 @@ class FtShot(FtBase):
                 "fps": fps
             },
         }
-        self.logger.info(f"Creating project {proj_dict}")
         project = self.session.create('Project', proj_dict)
         for app_name, version in apps_dict.items():
             self.logger.info(f"Setting {app_name} to version {version}")
             project['custom_attributes'][app_name] = version
-        self.session.commit()
 
+        # add the defualt folders
+        self.create_folder("asset", project)
+        self.create_folder("shot", project)
+        self.commit()
         self.logger.info(f"Created {project}")
 
     def create_sequence(self, sequence_name, episode_name=None):

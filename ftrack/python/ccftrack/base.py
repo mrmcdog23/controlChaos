@@ -300,6 +300,8 @@ class FtBase(object):
 
     @property
     def all_fps(self):
+        # type: () -> list[str]
+        """ Get all of the frames per second """
         custom_attr_configs = self.session.query(
             'select key, label, type.name, config, object_type.name,'
             ' entity_type from CustomAttributeConfiguration').all()
@@ -307,6 +309,22 @@ class FtBase(object):
             if cfg['key'] != "fps" or cfg['type']['name'] != 'enumerator':
                 continue
             return self.get_enumerator_values(cfg)
+
+    def attribute_default_value(self, attribute_name):
+        # type: (str) -> str
+        """
+        Get the custom attribute default value
+
+        Args:
+            attribute_name: name of the attribute
+
+        Returns:
+            Value of the attribute
+        """
+        attr_config = self.session.query(
+            f'CustomAttributeConfiguration where key is "{attribute_name}"'
+        ).first()
+        return attr_config["default"][0]
 
     @property
     def is_commercial(self):
