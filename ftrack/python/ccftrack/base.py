@@ -1,5 +1,6 @@
 """ Base ftrack wrapper for general functions """
 import os
+import json
 import operator
 import collections
 import ftrack_api
@@ -39,6 +40,7 @@ class FtBase(object):
         self._version_number = None
         self._status_name = None
         self._category = None
+        self._app_name_versions = dict()
         self.override_task = None
         self.version = None
         self.data = dict()
@@ -207,16 +209,6 @@ class FtBase(object):
         return project_code_to_name_dict
 
     @property
-    def projects_names_no_lib(self):
-        # type: () -> list[str]
-        """ List of ftrack project names no lib """
-        projects_names = self.projects_names
-        for lib_project in [core_constants.LIBRARY, core_constants.FX_LIBRARY]:
-            if lib_project in projects_names:
-                projects_names.remove(lib_project)
-        return projects_names
-
-    @property
     def session(self):
         # type: () -> ftrack_api.Session
         """ Session property """
@@ -270,6 +262,29 @@ class FtBase(object):
         Commit changes to ftrack
         """
         self.session.commit()
+
+    @property
+    def application_versions(self):
+        # type: () -> dict
+        """
+        Get a dictionary of applications to its versions
+        """
+        if self._app_name_versions:
+            return self._app_name_versions
+
+        custom_attr_configs = self.session.query(
+            'select key, label, type.name, config, object_type.name,'
+            ' entity_type from CustomAttributeConfiguration').all()
+
+        for cfg in custom_attr_configs:
+            if cfg['type']['name'] != 'enumerator':
+                continue
+
+            app_name = cfg['key']
+            outer = json.loads(cfg['config'])
+            options = json.loads(outer['data'])
+            self._app_name_versions[app_name] = [opt['value'] for opt in options]
+        return self._app_name_versions
 
     @property
     def is_commercial(self):
@@ -1006,7 +1021,7 @@ class FtBase(object):
         return asset_version
 
     @property
-    def app_versions(self):
+    def project_app_versions(self):
         # type: () -> dict
         """
         Application versions on the project
@@ -1015,14 +1030,16 @@ class FtBase(object):
             The current projects application versions
         """
         app_versions = dict()
-        attributes = self.project['custom_attributes']
-        for app in list(core_constants.APP_VERSION.keys()):
-            versions = attributes[app]
+        custom_attributes = self.project['custom_attributes']
+        for app_name, versions in custom_attributes.items():
+            if app_name not in self.application_versions:
+                continue
+            versions = custom_attributes[app_name]
             try:
                 use_version = versions[0]
             except IndexError:
                 use_version = None
-            app_versions[app] = use_version
+            app_versions[app_name] = use_version
         return app_versions
 
     @property
