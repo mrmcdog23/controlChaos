@@ -92,19 +92,6 @@ maya_third_party_dir:
 animbot_config_path:
   /no8/pipeline/applications/maya/plugins/config.json
 
-# slack hooks url and ids
-farmer_freds_url:
-  https://hooks.slack.com/services/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
-frameio_url:
-  https://hooks.slack.com/services/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
-frameio_token:
-  fio-u-4ROvA_-FvqvN9Pd6DbiwTHpOilZezcCN_8W8lSER8xArz_0pIBy-wtIxzZHyCk0-
-frameio_team_id:
-  e77d8f2c-b07d-4f94-93e0-2c516a3355be
-
-
-media_shuttle_dir:
-  /System/Volumes/Data/storage/jobs/.mediashuttle/
 third_party_houdini_dir:
   /no8/pipeline/applications/houdini
 houdini_template_dir:
