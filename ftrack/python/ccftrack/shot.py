@@ -4,7 +4,6 @@ import ftrack_api
 import collections
 from typing import Optional, Union, Any
 import cccore.core_constants as core_constants
-import cccore.context as context
 from ccftrack.base import FtBase
 
 
@@ -441,7 +440,7 @@ class FtShot(FtBase):
         )
         return num_to_version.get(version_num)
 
-    def create_ftrack_project(self, code, name, root, resolution, fps, apps_dict):
+    def create_ftrack_project(self, project_name, project_code, apps_dict, fps, schema_name):
         # type: (str, str, str, str, str, dict) -> None
         """
         Create the ftrack project
@@ -455,46 +454,24 @@ class FtShot(FtBase):
             apps_dict: Application versions of the project
         """
         # Get relevant schema
-        query = f'ProjectSchema where name is {core_constants.SCHEMA_NAME}'
-        schema = self.session.query(query).first()
-        root_dirname = os.path.basename(root)
-
-        # get project code
-        ceta_number = name.split("_")[0]
-        if ceta_number.isdigit():
-            long_code = f"{ceta_number}_{code}"
-        else:
-            long_code = f"{code}_{name}"
+        schema = self.get_schema_by_name(schema_name)
 
         # Create project
         proj_dict = {
-            "name": long_code,
-            "full_name": name,
+            "name": project_code,
+            "full_name": project_name,
             "project_schema": schema,
             "custom_attributes": {
-                "project_fps": fps,
-                "resolution": resolution,
-                "short_code": code,
-                "server_root": os.path.dirname(root)
+                "fps": fps
             },
-            'root': root_dirname
         }
-
         self.logger.info(f"Creating project {proj_dict}")
         project = self.session.create('Project', proj_dict)
         for app_name, version in apps_dict.items():
             self.logger.info(f"Setting {app_name} to version {version}")
             project['custom_attributes'][app_name] = version
-
         self.session.commit()
-        self.logger.info(f"Created project called {name}")
 
-        # set the project name and create episode and folders
-        self._project_names = None
-        self.project_name = name
-
-        # create folders under the project
-        self.create_folder("build", self.project)
         self.logger.info(f"Created {project}")
 
     def create_sequence(self, sequence_name, episode_name=None):

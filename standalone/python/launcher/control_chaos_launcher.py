@@ -97,20 +97,11 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.logger = cc_logging.cc_logger()
         self.ftbase = base.FtBase()
 
-        self.create_layout()
         self.populate_apps_and_tools()
         self.load_from_settings()
         self.populate_projects()
         self.update_project_data()
         self.connect_signals()
-
-    def create_layout(self):
-        """
-        Create the layout of the config
-        """
-        self.wdg_project_config = LineBrowser(
-            self, "file", "Select Project Config", "", "Project Config")
-        self.lyt_project_config.addWidget(self.wdg_project_config)
 
     def load_from_settings(self):
         """
@@ -126,20 +117,6 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.rbn_tools.setChecked(int(tools))
         app = self.ui_settings.value("app", 0)
         self.rbn_apps.setChecked(int(app))
-
-        saved_config_path = self.ui_settings.value("project_config", str())
-        default_config_path = data_utils.get_relative_path("core/config/default_config.json")
-
-        potential_configs = [
-            saved_config_path,
-            core_constants.SERVER_PROJECT_CONFIG,
-            core_constants.LOCAL_PROJECT_CONFIG,
-            default_config_path
-        ]
-        for config_path in potential_configs:
-            if os.path.exists(config_path):
-                self.wdg_project_config.set_file_path(config_path)
-                break
 
         # set the flame users name
         self.filter_app_or_tool_list()
@@ -165,7 +142,6 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.rbn_apps.clicked.connect(self.filter_app_or_tool_list)
         self.rbn_tools.clicked.connect(self.filter_app_or_tool_list)
         self.btn_launch.clicked.connect(self.launch_selected)
-        self.wdg_project_config.line_edit.textChanged.connect(self.populate_projects)
         self.cmb_project.currentIndexChanged.connect(self.update_project_data)
         self.cmb_application_version.currentIndexChanged.connect(self.set_launch_button_text)
 

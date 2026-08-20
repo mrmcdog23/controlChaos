@@ -166,7 +166,7 @@ class FtBase(object):
     def projects_code(self):
         # type: () -> list[str]
         """ Get a list of all project codes on ftrack """
-        return self.get_names(self.get_active_projects)
+        return self.get_names(self.active_projects)
 
     @property
     def project_code(self):
@@ -279,12 +279,34 @@ class FtBase(object):
         for cfg in custom_attr_configs:
             if cfg['type']['name'] != 'enumerator':
                 continue
-
             app_name = cfg['key']
-            outer = json.loads(cfg['config'])
-            options = json.loads(outer['data'])
-            self._app_name_versions[app_name] = [opt['value'] for opt in options]
+            self._app_name_versions[app_name] = self.get_enumerator_values(cfg)
         return self._app_name_versions
+
+    def get_enumerator_values(self, cfg):
+        # type: (Any) -> list[str]
+        """
+        From an enumerator get the ftrack values
+
+        Args:
+            cfg: ftrack cofiguation data
+
+        Returns:
+            list of enumerator values
+        """
+        outer = json.loads(cfg['config'])
+        options = json.loads(outer['data'])
+        return [opt['value'] for opt in options]
+
+    @property
+    def all_fps(self):
+        custom_attr_configs = self.session.query(
+            'select key, label, type.name, config, object_type.name,'
+            ' entity_type from CustomAttributeConfiguration').all()
+        for cfg in custom_attr_configs:
+            if cfg['key'] != "fps" or cfg['type']['name'] != 'enumerator':
+                continue
+            return self.get_enumerator_values(cfg)
 
     @property
     def is_commercial(self):
@@ -589,6 +611,16 @@ class FtBase(object):
         schema = self.session.query(query).first()
         asset_types = schema.get_types('AssetBuild')
         return self.get_names(asset_types)
+
+    def get_schema_by_name(self, schema_name):
+        query = f'ProjectSchema where name is "{schema_name}"'
+        return self.session.query(query).one()
+
+    @property
+    def all_schemas(self):
+        """ Get a list of project schemas available """
+        schemas = self.session.query('ProjectSchema').all()
+        return self.get_names(schemas)
 
     def get_folder(self, name):
         # type: (str) -> ftrack_api.entity.folder

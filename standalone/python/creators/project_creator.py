@@ -1,346 +1,136 @@
-""" The Control Chaos project creator tool """
+""" Create a project on disk and on FTrack """
 import os
-import cccore.utils.cc_logging as cc_logging
+import ccftrack.asset as asset
+import ccftrack.shot as shot
 import cccore.base_ui as base_ui
-import cccore.core_constants as core_constants
-import cccore.utils.data_utils as data_utils
+import cccore.utils.cc_logging as cc_logging
 import cccore.utils.file_utils as file_utils
+import cccore.utils.ui_utils as ui_utils
+import cccore.data.server_data as server_data
 import cccore.app_starter as app_starter
-from ccgeneral.widgets.line_browser import LineBrowser
+import cccore.core_constants as core_constants
 from CCPySide import QtWidgets, QtCore, QtGui
 
 
 class ProjectCreator(base_ui.StandaloneWindowBase):
     title = "Project Creator"
     window_icon = "project_creator"
-    icon_to_widget = {
-        "maya": "lbl_maya_icon",
-        "houdini": "lbl_houdini_icon",
-        "nuke": "lbl_nuke_icon",
-        "unreal": "lbl_unreal_icon",
-        "expand": "btn_expand",
-        "collapse": "btn_collapse",
+    widget_to_icon = {
+        "lbl_project_icon": "project",
+        "lbl_houdini_icon": "houdini",
+        "lbl_maya_icon": "maya",
+        "lbl_nuke_icon": "nuke",
+        "lbl_blender_icon": "blender",
+        "lbl_flame_icon": "flame"
     }
+    default_fps = "24"
+    default_schema = "Control Chaos Feature"
 
-    def __init__(self):
-        super().__init__()
-        self.wdg_browse_root = None
-        self.project_root = str()
-
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+        self.ftshot = shot.FtShot()
+        self.ftasset = asset.FtAsset(session=self.ftshot.session)
         self.logger = cc_logging.cc_logger()
-        self.ui_settings = QtCore.QSettings('controlChaos', 'project_creator')
 
-        self.create_layout()
-        self.load_settings()
-        self.populate_yamls()
-        self.populate_structure()
+        self.project_data = server_data.ProjectData()
+        self.app_name_cmb_dict = dict()
+
+        # run setup functions
+        self.populate_data()
         self.populate_app_versions()
-        self.enable_button()
         self.connect_signals()
 
-    def load_settings(self):
-        """
-        Load the previous settings to the widgets
-        """
-        project_name = self.ui_settings.value("project_name", str())
-        self.le_project_name.setText(project_name)
-        rbn_standard = self.ui_settings.value("rbn_standard", 1)
-        self.rbn_custom.setChecked(not rbn_standard)
-
-        self.wdg_custom_yaml.setHidden(rbn_standard)
-        project_structures_dir = self.ui_settings.value("project_structures_dir", str())
-        self.wdg_custom_yaml.set_file_path(project_structures_dir)
-
-        project_dir = self.ui_settings.value("project_dir", str())
-        self.wdg_browse_root.set_file_path(project_dir)
-
-    def create_layout(self):
-        """
-        Build the layout of the tool
-        """
-        project_dir = self.ui_settings.value("project_dir", str())
-        self.wdg_browse_root = LineBrowser(
-            self, "dir", "Select Project Directory", project_dir, "Project Directory")
-        self.lyt_project_root.addWidget(self.wdg_browse_root)
-
-        # add the custom yaml folder widget
-        project_structures_dir = self.ui_settings.value("project_structures_dir", str())
-        self.wdg_custom_yaml = LineBrowser(
-            self, "dir", "Select Custom Directory", project_structures_dir, "Custom Directory")
-        self.wdg_custom_yaml.setHidden(True)
-        self.lyt_custom_folder.addWidget(self.wdg_custom_yaml)
-
-        # hide the headers of the tree widget
-        self.tw_project_structure.setHeaderHidden(True)
-
-    def populate_yamls(self):
-        """
-        Populate the list of potential project structures
-        """
-        self.cmb_project_structure.blockSignals(True)
-        self.cmb_project_structure.clear()
-
-        if self.rbn_standard.isChecked():
-            project_structures_dir = data_utils.get_relative_path("core/config/project_structures")
-        else:
-            project_structures_dir = self.wdg_custom_yaml.file_path
-            self.ui_settings.setValue("project_structures_dir", project_structures_dir)
-
-        if not project_structures_dir or not os.path.exists(project_structures_dir):
-            return
-
-        project_structures_files = file_utils.get_files_recursively(
-            project_structures_dir, extensions=["yml"])
-
-        # add the files to the combo box
-        for project_structure_file in project_structures_files:
-            file_name = file_utils.get_file_name(project_structure_file)
-            self.cmb_project_structure.addItem(file_name, project_structure_file)
-
-        # store the settings
-        self.cmb_project_structure.blockSignals(False)
-        self.populate_structure()
-
-    def insert_nodes(self, parent_item, data):
-        # type: (QtWidgets.QTreeWidgetItem, dict) -> None
-        """
-        Recursively populate a QTreeWidgetItem from nested dict data.
-
-        Args:
-            parent_item: The parent tree widget item to add to
-            data: The dictionary to add to the item
-        """
-        if not isinstance(data, dict):
-            return
-
-        for key, value in data.items():
-            child = QtWidgets.QTreeWidgetItem([key])
-            parent_item.addChild(child)
-            if isinstance(value, dict) and value:
-                self.insert_nodes(child, value)
-
-    def populate_app_versions(self):
-        """
-        Populate the application versions and frames per second
-        """
-        self.cmb_fps.addItems(core_constants.FRAME_RATES)
-        self.set_combobox_index(self.cmb_fps, core_constants.DEFAULT_FPS)
-
-        # populate application versions
-        self.cmb_unreal.addItems(app_starter.UnrealApp.app_versions)
-        self.cmb_nuke.addItems(app_starter.NukeApp.app_versions)
-        self.cmb_maya.addItems(app_starter.MayaApp.app_versions)
-        self.cmb_houdini.addItems(app_starter.HoudiniApp.app_versions)
+    def populate_data(self):
+        self.cmb_schema.addItems(self.ftshot.all_schemas)
+        self.set_combobox_index(self.cmb_schema, self.default_schema)
+        self.cmb_frames_per_second.addItems(self.ftshot.all_fps)
+        self.set_combobox_index(self.cmb_frames_per_second, self.default_fps)
 
     def connect_signals(self):
         """
-        Connect the signals to the widgets
+        Connect the widgets to the signals
         """
-        self.btn_expand.clicked.connect(self.expand_all)
-        self.btn_collapse.clicked.connect(self.collapse_all)
-        self.le_project_name.textChanged.connect(self.enable_button)
-        self.wdg_browse_root.line_edit.textChanged.connect(self.enable_button)
-        self.wdg_custom_yaml.line_edit.textChanged.connect(self.populate_yamls)
-        self.btn_create_project.clicked.connect(self.create_new_project)
-        self.cmb_project_structure.currentIndexChanged.connect(self.populate_structure)
-        self.tw_project_structure.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.tw_project_structure.customContextMenuRequested.connect(self.action_menu)
-        self.rbn_standard.toggled.connect(self.show_custom)
+        self.le_name.textChanged.connect(self.update_code)
+        self.btn_create_project.clicked.connect(self.create_project)
 
-    def show_custom(self, show):
+    def update_code(self):
         """
-        Show the custom config directly
+        Work out the project code from the name
         """
-        self.wdg_custom_yaml.setHidden(show)
-        self.ui_settings.setValue("rbn_standard", int(show))
-        self.populate_yamls()
+        selected_project_name = self.le_name.text()
+        project_code = selected_project_name[0:3].upper()
+        self.le_code.setText(project_code)
 
-    def action_menu(self, event):
+    def populate_app_versions(self):
         """
-        Create action menu for removing items
+        Populate the application versions
         """
-        if not self.tw_project_structure.selectedItems():
+        for app_name, versions in self.ftshot.application_versions.items():
+            combo_name = f"cmb_{app_name}"
+            app_combobox = self.findChild(QtWidgets.QComboBox, combo_name)
+            if app_combobox is not None:
+                app_combobox.addItems(versions)
+                self.app_name_cmb_dict[app_name] = app_combobox
+
+    def validate_info(self):
+        # Check the name is valid
+        project_name = self.le_name.text()
+        if " " in project_name:
+            return "No spaces in project name only underescores"
+        if len(project_name) < 5:
+            return "Project name is too short"
+        if project_name in self.ftshot.projects_names:
+            return f"Project name {project_name} exists"
+
+        # Check the code is valid
+        project_code = self.le_code.text()
+        if len(project_code) != 3:
+            return "Project code is too short"
+        if not project_code.isupper():
+            return "Project code needs to be uppercase"
+        if project_code in self.ftshot.projects_code:
+            return f"Project code {project_code} exists"
+
+    def create_project(self):
+        """
+        Creating project on ftrack
+        """
+        is_valid_message = self.validate_info()
+        if is_valid_message:
+            ui_utils.messagebox(
+                "Info Invalid",
+                is_valid_message,
+                "critical",
+                parent=self
+            )
             return
-        action_save = QtGui.QAction(self)
-        action_save.setText("Add Folder")
-        action_save.triggered.connect(self.add_folder)
 
-        # show the menu
-        menu = QtWidgets.QMenu(self)
-        menu.addSeparator()
-        menu.addAction(action_save)
-        menu.popup(QtGui.QCursor.pos())
-
-    def add_folder(self):
-        """
-        Add folder to the tree widget item
-        """
-        text, ok = QtWidgets.QInputDialog.getText(self, "New Folder", "Enter folder name:")
-        if not ok:
+        project_name = self.le_name.text()
+        create = ui_utils.messagebox(
+            "Create",
+            f"Create Project {project_name}?",
+            "question",
+            buttons=["Create", "Cancel"],
+            parent=self
+        )
+        if create == 1:
             return
-        item = self.tw_project_structure.selectedItems()[0]
-        new_item = QtWidgets.QTreeWidgetItem([text])
-        item.addChild(new_item)
-        item.setExpanded(True)
 
-    def enable_button(self):
-        """
-        If the text is filled out enable the button
-        """
-        project_name = self.le_project_name.text()
-        project_dir = self.wdg_browse_root.file_path
+        self.logger.info(f"Creating on ftrack...{project_name}")
+        schema_name = self.cmb_schema.currentText()
+        project_code = self.le_code.text()
+        fps = self.cmb_frames_per_second.currentText()
 
-        enabled = bool(project_name and project_dir)
-        self.btn_create_project.setEnabled(enabled)
+        apps_dict = dict()
+        for app_name, app_combobox in self.app_name_cmb_dict.items():
+            apps_dict[app_name] = app_combobox.currentText()
 
-        self.ui_settings.setValue("project_dir", project_dir)
-        self.ui_settings.setValue("project_name", project_name)
-
-    def populate_structure(self):
-        """
-        Populate the structure of the project from the yaml file
-        """
-        # load the project structure from the yaml file
-        project_structure_file = self.cmb_project_structure.currentData()
-        project_structure = file_utils.read_file(project_structure_file)
-
-        # add the root node to add to
-        top_item = QtWidgets.QTreeWidgetItem(["PROJECT_ROOT"])
-        self.tw_project_structure.clear()
-        self.tw_project_structure.addTopLevelItem(top_item)
-
-        # build the tree recursively and expand on completion
-        self.insert_nodes(top_item, project_structure)
-        top_item.setExpanded(True)
-
-    def expand_all(self):
-        """
-        Expand all the items to show all
-        """
-        self.tw_project_structure.expandAll()
-
-    def collapse_all(self):
-        """
-        Collapse the items to only the roots are showing
-        """
-        self.tw_project_structure.collapseAll()
-        root = self.tw_project_structure.topLevelItem(0)
-        if root is not None:
-            root.setExpanded(True)
-
-    def item_to_dict(self, item):
-        # type: (QtWidgets.QTreeWidgetItem) -> dict
-        """
-        Build a dictionary from the item and its children
-
-        Args:
-            item: The item to get the dictionary for
-
-        Returns:
-            result: The dictionary of the project
-        """
-        result = dict()
-        for index in range(item.childCount()):
-            child = item.child(index)
-            result[child.text(0)] = self.item_to_dict(child) if child.childCount() > 0 else None
-        return result
-
-    def create_new_project(self):
-        """
-        Create new control chaos project
-        """
-        self.build_project_on_disk()
-        self.save_settings()
-        QtWidgets.QMessageBox.information(self, "Created", "Created project", QtWidgets.QMessageBox.Ok)
-
-    def build_project_on_disk(self):
-        root = self.tw_project_structure.topLevelItem(0)
-        if root is None:
-            return dict()
-
-        project_structure = self.item_to_dict(root)
-        project_dir = self.wdg_browse_root.file_path
-        project_name = self.le_project_name.text()
-
-        self.project_root = file_utils.join_file_names(project_dir, project_name)
-        self.create_folder_structure(self.project_root, project_structure)
-
-    def create_folder_structure(self, project_root, structure):
-        # type: (str, dict) -> None
-        """
-        Build the default folder structure
-
-        Args:
-            project_root: The project root folder
-            structure: Folder structure to build
-        """
-        for p, v in self.iteritems_recursive(structure):
-            sub_path = "/".join(list(p))
-            folder_path = os.path.join(project_root, sub_path)
-            file_utils.create_directories(folder_path)
-            
-    def iteritems_recursive(self, d):
-        # type: (dict) -> (set, str)
-        """
-        Recursively build folder path
-
-        Args:
-            d: Dictionary of folder structure
-
-        Returns:
-            Folder set
-            Folder name
-        """
-        for k, v in d.items():
-            if isinstance(v, dict):
-                for k1, v1 in self.iteritems_recursive(v):
-                    yield (k,) + k1, v1
-            else:
-                yield (k,), v
-
-    def save_settings(self):
-        """
-        Save the project settings to a json file
-        """
-        project_name = self.le_project_name.text()
-        general_settings = {
-            "project_name": project_name,
-            "project_code": self.le_project_code.text(),
-            "fps": self.cmb_fps.currentText(),
-        }
-
-        application_versions = {
-            "unreal": self.cmb_unreal.currentText(),
-            "maya": self.cmb_maya.currentText(),
-            "houdini": self.cmb_houdini.currentText(),
-            "nuke": self.cmb_nuke.currentText()
-        }
-
-        project_settings = {
-            "general_settings": general_settings,
-            "application_versions": application_versions,
-            "project_root": self.project_root
-        }
-
-        # loop through both potential config paths to write to
-        config_paths = [
-            core_constants.SERVER_PROJECT_CONFIG,
-            core_constants.LOCAL_PROJECT_CONFIG
-        ]
-        for config_path in config_paths:
-
-            # if the directory does not exist then continue
-            directory_path = os.path.dirname(config_path)
-            if not os.path.exists(directory_path):
-                continue
-
-            # read and update the data
-            data = dict()
-            if os.path.exists(config_path):
-                data = file_utils.read_file(config_path)
-            data[project_name] = project_settings
-            file_utils.write_file(config_path, data)
+        self.ftshot.create_ftrack_project(
+            project_name, project_code, apps_dict, fps, schema_name
+        )
+        ui_utils.messagebox(
+            "Complete", f"Project {project_name} created", "info", parent=self)
 
 
 if __name__ == "__main__":
-    base_ui.open_standalone_ui(ProjectCreator)
+    base_ui.open_ui(ProjectCreator)

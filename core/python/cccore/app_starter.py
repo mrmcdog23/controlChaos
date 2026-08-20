@@ -114,6 +114,10 @@ class BaseEntity(object):
         general_path = self.join_file_names(self.pipeline_root, "general", "python")
         self.python_paths.append(general_path)
 
+        # add ftrack root to python paths list
+        ftrack_path = self.join_file_names(self.pipeline_root, "ftrack", "python")
+        self.python_paths.append(ftrack_path)
+
     def set_python_paths(self):
         """
         Join the python paths to a string and
