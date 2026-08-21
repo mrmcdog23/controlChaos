@@ -27,17 +27,14 @@ class Ui(object):
 
     def __init__(self, parent=None, *args, **kwargs):
         super(Ui, self).__init__(parent)
-
         self._icon_directory = None
         self._cc_style_sheet = None
-
         self.load_ui_file_and_set_window()
         self.add_theme_directory()
         self.set_widget_icons()
         self.add_icons_to_tab()
         self.load_cc_style_sheet()
         self.apply_btn_style_sheet()
-
         self.load_previous_ui_settings()
         self.add_cc_header()
 

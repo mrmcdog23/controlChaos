@@ -33,7 +33,6 @@ class FtBase(object):
         self.input_project = input_project
         self._session = session
         self._project_name = None
-        self._project_names = list()
         self._project = None
         self._is_episodic = None
         self._asset_version = None
@@ -187,13 +186,10 @@ class FtBase(object):
         Get a list of all project names on ftrack.
         Filter names that start with digits
         """
-        if self._project_names:
-            return self._project_names
-
-        self._project_names = [a["full_name"] for a in self.active_projects]
-        self._project_names.sort()
-        self._project_names.reverse()
-        return self._project_names
+        project_names = [a["full_name"] for a in self.active_projects]
+        project_names.sort()
+        project_names.reverse()
+        return project_names
 
     @property
     def project_code_to_name(self):
@@ -226,15 +222,12 @@ class FtBase(object):
         if session:
             self._session = session
         else:
-            api_user = "contact@control-chaos.com"
-
-            self.logger.info(f"Connecting to ftrack as {api_user}")
-            API_KEY = "NTE0Y2JhYWQtNzZiNS00ODlkLTg3N2EtNDExZDZkODA1ZTAwOjphNGQ4ZTA0MS0yZDNlLTQ3NDgtYWNjMC04YjgxOTQwYWE0MTY"
-            SERVER_URL = "https://control-chaos.ftrackapp.com/"
-            self._session = ftrack_api.Session(server_url=SERVER_URL,
-                                               api_key=API_KEY,
-                                               api_user=api_user
-                                               )
+            self.logger.info(f"Connecting to ftrack as {self.server_data.api_user}")
+            self._session = ftrack_api.Session(
+                server_url=self.server_data.ftrack_url,
+                api_key=self.server_data.api_key,
+                api_user=self.server_data.api_user
+            )
 
     @property
     def project(self):

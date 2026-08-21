@@ -75,14 +75,12 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
     title = "Launcher"
     window_icon = "launcher"
     widget_to_icon = {
-        "btn_dev_folder": "folder",
-        "btn_refresh": "refresh"
+        "refresh": "btn_refresh"
     }
     add_cc_title_name = True
 
     def __init__(self):
         super().__init__()
-
         # define class variables
         self.project_data = None
         self.app_list = list()
@@ -97,6 +95,7 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.logger = cc_logging.cc_logger()
         self.ftbase = base.FtBase()
 
+        self.set_widget_icons(self.widget_to_icon)
         self.populate_apps_and_tools()
         self.load_from_settings()
         self.populate_projects()
@@ -144,6 +143,7 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.btn_launch.clicked.connect(self.launch_selected)
         self.cmb_project.currentIndexChanged.connect(self.update_project_data)
         self.cmb_application_version.currentIndexChanged.connect(self.set_launch_button_text)
+        self.btn_refresh.clicked.connect(self.populate_projects)
 
     def update_project_data(self):
         """
@@ -160,6 +160,7 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         """
         Populate the projects
         """
+        self.cmb_project.clear()
         project_names_list = self.ftbase.projects_names
         self.cmb_project.addItems(project_names_list)
         self.create_completer(self.cmb_project, items_list=project_names_list)

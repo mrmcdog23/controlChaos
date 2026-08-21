@@ -97,74 +97,10 @@ class ServerData(ReadData):
         """
         super(ServerData, self).__init__(read_path)
 
-        # add server prefix if on a mac
-        self.server_prefix = self.data["win_server_prefix"]
-        self.jobs_dir = self.data["win_jobs_dir"]
-        self.pitch_dir = self.data["win_pitch_dir"]
-        self.masters_dir = self.data["masters_dir"]
-
-
-        # pipeline variables
-        self.code_root = self.server_prefix + self.data["code_root"]
-        self.branch_root = self.server_prefix + self.data["branch_root"]
-        self.beta_root = self.server_prefix + self.data["beta_root"]
-        self.stable_root = self.server_prefix + self.data["stable_root"]
-        self.project_database_path = self.server_prefix + self.data["project_database_path"]
-
-        # temporary data paths
-        self.backup_dir = self.server_prefix + self.data["backup_dir"]
-        self.artist_scripts = self.data["artist_scripts"]
-        self.artist_data = self.server_prefix + self.data["artist_data"]
-        self.flame_data = self.data["flame_data"]
-        self.thumbnail_dir = self.data["thumbnail_dir"]
-
-        # git relative variables
-        self.git_source = self.data["git_source"]
-        self.git_url = self.data["git_url"]
-
         # ftrack variables
-        self.ftrack_server = self.data["ftrack_server"]
         self.api_key = self.data["api_key"]
-        self.server_url = self.data["server_url"]
-
-        # deadline variables
-        self.deadline_dir = self.data["deadline_dir"]
-        self.deadline_data = self.server_prefix + self.data["deadline_data"]
-        self.deadline_user_data_path = self.data["deadline_user_data_path"]
-        self.farmer_freds_url = self.data["farmer_freds_url"]
-
-        # frameio variables
-        self.frameio_url = self.data["frameio_url"]
-        self.frameio_token = self.data["frameio_token"]
-        self.frameio_team_id = self.data["frameio_team_id"]
-
-        # nuke variables
-        self.third_party_nuke_dir = self.data["third_party_nuke_dir"]
-        self.share_nodes_dir = self.data["share_nodes_dir"]
-        self.foundry_licence = self.data["foundry_licence"]
-        self.shared_gizmo_dir = self.server_prefix + self.data["shared_gizmo_dir"]
-        self.optical_flares_licence_path = self.data["optical_flares_licence_path"]
-        self.optical_flares_licence_preset = self.data["optical_flares_licence_preset"]
-
-        # houdini variables
-        self.third_party_houdini_dir = self.data["third_party_houdini_dir"]
-        self.houdini_template_dir = self.data["houdini_template_dir"]
-        self.shared_otls_dir = self.data["shared_otls_dir"]
-
-        # mayas paths
-        self.maya_third_party_dir = self.data["maya_third_party_dir"]
-
-        # media shuttle variables
-        self.media_shuttle_dir = self.data["media_shuttle_dir"]
-
-        # flame variables
-        self.default_flame_project_root = self.data["default_flame_project_root"]
-
-        # maya plugins
-        self.animbot_config_path = self.data["animbot_config_path"]
-
-        # mac jobs directory
-        self.mac_jobs_dir = self.data["mac_jobs_dir"]
+        self.ftrack_url = self.data["ftrack_url"]
+        self.api_user = self.data["api_user"]
 
 
 class ProjectData(ServerData):
@@ -190,61 +126,6 @@ class ProjectData(ServerData):
         self.display_name = os.environ.get("DISPLAY_NAME")
         self.project_root = os.environ.get("PROJECT_ROOT")
         self.project_type = os.environ.get("PROJECT_TYPE")
-
-        # work out the mount directory
-        if not self.is_job:
-            self.jobs_dir = self.pitch_dir
-
-        # check for a custom project root and if there is one override the default
-        custom_project_data = self.get_custom_project_data()
-        job_dir_key = "mac_jobs_dir" if sys.platform == "darwin" else "jobs_dir"
-        custom_jobs_dir = custom_project_data.get(job_dir_key)
-        if custom_jobs_dir:
-            self.jobs_dir = custom_jobs_dir
-
-        # set the mac directory
-        self.mac_jobs_dir = custom_project_data.get("mac_jobs_dir", self.mac_jobs_dir)
-
-        # set the project root
-        self.project_root = self.join_list(self.jobs_dir, self.project_name)
-        os.environ["PROJECT_ROOT"] = self.project_root
-
-        self.vfx_root = self.join_list(self.project_root, "vfx")
-        self.icon_dir = self.join_list(self.pipeline_root, "core", "icons")
-        self.appdata = self.join_list(self.vfx_root, "appdata")
-        self.is_development = self.pipeline_type == "Development"
-        self.is_longform = self.project_type == "longform"
-        self.is_commercial = self.project_type == "commercial"
-
-        # set the correct ocio file
-        if self.is_commercial:
-            self.ocio_path = self.data["commercials_ocio_path"]
-        else:
-            self.ocio_path = self.data["longform_ocio_path"]
-
-        # project appdata directories
-        self.ingested_tracking_dir = self.join_list(self.appdata, "ingested_tracking")
-
-        # houdini root directories
-        self.houdini_root = self.join_list(self.vfx_root, "tools", "houdini")
-        self.project_otls_dir = self.join_list(self.houdini_root, "otls")
-        self.project_shelves_dir = self.join_list(self.houdini_root, "shelves")
-
-        # default config path
-        defaults_path = CONFIG_FMT.format(self.pipeline_root, "defaults")
-        defaults_data = self.read_yaml(defaults_path)
-        self.data.update(defaults_data)
-
-        # project config path
-        custom_project_data = self.get_custom_project_data()
-        self.data.update(custom_project_data)
-
-        # set the correct ocio file
-        if self.is_commercial:
-            self.shot_extract_regex_list = self.data["commercials_shot_regex_list"]
-        else:
-            self.shot_extract_regex_list = self.data["longform_shot_regex_list"]
-        self.ingest_component_names = self.data["ingest_component_names"]
 
     def get_custom_project_data(self):
         # type: () -> dict
