@@ -1,0 +1,9 @@
+jobs_dir:
+  /mnt/nda/sky
+mac_jobs_dir:
+  /System/Volumes/Data/nda
+
+# ingester regex expression
+longform_shot_regex_list:
+  - ^([a-z|A-Z|0-9]{3}_[a-z|A-Z|0-9]{3})_(.*)_([0-9]{3})_(.*)_[v|V](.*)
+  - ^([a-z|A-Z|0-9]{3}_[a-z|A-Z|0-9]{3})_(.*)_([0-9]{3})

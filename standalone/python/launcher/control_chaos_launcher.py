@@ -6,9 +6,11 @@ import cccore.app_starter as app_starter
 import cccore.core_constants as core_constants
 import cccore.utils.cc_logging as cc_logging
 import cccore.utils.file_utils as file_utils
+import cccore.data.server_data as server_data
 import cccore.utils.data_utils as data_utils
 from ccgeneral.widgets.line_browser import LineBrowser
 from CCPySide import QtWidgets, QtCore, QtGui
+import ccftrack.base as base
 
 
 SELECTED_COLOUR = "rgb(0, 0, 255)"
@@ -73,14 +75,12 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
     title = "Launcher"
     window_icon = "launcher"
     widget_to_icon = {
-        "btn_dev_folder": "folder",
-        "btn_refresh": "refresh"
+        "refresh": "btn_refresh"
     }
     add_cc_title_name = True
 
     def __init__(self):
         super().__init__()
-
         # define class variables
         self.project_data = None
         self.app_list = list()
@@ -90,22 +90,17 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.all_projects_data = dict()
 
         # initialize data
+        self.server_data = server_data.ServerData()
         self.ui_settings = QtCore.QSettings('control_chaos', 'launcher')
         self.logger = cc_logging.cc_logger()
+        self.ftbase = base.FtBase()
 
-        self.create_layout()
+        self.set_widget_icons(self.widget_to_icon)
         self.populate_apps_and_tools()
         self.load_from_settings()
         self.populate_projects()
+        self.update_project_data()
         self.connect_signals()
-
-    def create_layout(self):
-        """
-        Create the layout of the config
-        """
-        self.wdg_project_config = LineBrowser(
-            self, "file", "Select Project Config", "", "Project Config")
-        self.lyt_project_config.addWidget(self.wdg_project_config)
 
     def load_from_settings(self):
         """
@@ -121,20 +116,6 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.rbn_tools.setChecked(int(tools))
         app = self.ui_settings.value("app", 0)
         self.rbn_apps.setChecked(int(app))
-
-        saved_config_path = self.ui_settings.value("project_config", str())
-        default_config_path = data_utils.get_relative_path("core/config/default_config.json")
-
-        potential_configs = [
-            saved_config_path,
-            core_constants.SERVER_PROJECT_CONFIG,
-            core_constants.LOCAL_PROJECT_CONFIG,
-            default_config_path
-        ]
-        for config_path in potential_configs:
-            if os.path.exists(config_path):
-                self.wdg_project_config.set_file_path(config_path)
-                break
 
         # set the flame users name
         self.filter_app_or_tool_list()
@@ -160,17 +141,27 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.rbn_apps.clicked.connect(self.filter_app_or_tool_list)
         self.rbn_tools.clicked.connect(self.filter_app_or_tool_list)
         self.btn_launch.clicked.connect(self.launch_selected)
-        self.wdg_project_config.line_edit.textChanged.connect(self.populate_projects)
-        self.cmb_project.currentIndexChanged.connect(self.update_selection)
-        self.cmb_application_version.currentIndexChanged.connect(self.update_button_text)
+        self.cmb_project.currentIndexChanged.connect(self.update_project_data)
+        self.cmb_application_version.currentIndexChanged.connect(self.set_launch_button_text)
+        self.btn_refresh.clicked.connect(self.populate_projects)
+
+    def update_project_data(self):
+        """
+        Update the project data based on the selected project
+        """
+        project_name = self.cmb_project.currentText()
+        self.ftbase.project_name = project_name
+        self.project_app_versions = self.ftbase.project_app_versions
+        self.project_data = server_data.ProjectData(project_name=project_name)
+        self.update_selection()
+        #self.set_project_type_icon()
 
     def populate_projects(self):
         """
         Populate the projects
         """
-        self.all_projects_data = file_utils.read_file(self.wdg_project_config.file_path)
-        project_names_list = list(self.all_projects_data.keys())
         self.cmb_project.clear()
+        project_names_list = self.ftbase.projects_names
         self.cmb_project.addItems(project_names_list)
         self.create_completer(self.cmb_project, items_list=project_names_list)
 
@@ -246,21 +237,18 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         if not selected_app:
             return
 
-        app_versions = selected_app.app_versions
-        if app_versions:
-            # if there are application versions
-            # populate the list and set the default
+        # update app versions
+        if self.rbn_apps.isChecked():
+            application_versions = self.ftbase.application_versions[selected_app.name]
+            project_version = self.project_app_versions[selected_app.name]
             self.cmb_application_version.clear()
-            self.cmb_application_version.addItems(app_versions)
+            self.cmb_application_version.addItems(application_versions)
+            self.set_combobox_index(self.cmb_application_version, project_version)
 
-            project_name = self.cmb_project.currentText()
-            project_data = self.all_projects_data[project_name]
-            app_version = project_data["application_versions"][selected_app.name]
-            self.set_combobox_index(self.cmb_application_version, app_version)
+        # find the application name
+        self.set_launch_button_text()
 
-        self.update_button_text()
-
-    def update_button_text(self):
+    def set_launch_button_text(self):
         """
         Update the launch button text
         """
@@ -348,4 +336,3 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
 
 if __name__ == "__main__":
     base_ui.open_ui(ControlChaosLauncher)
-

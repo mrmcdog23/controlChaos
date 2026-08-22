@@ -1,0 +1,6 @@
+context_panel:
+  button_width: 70
+
+# configurations for shot creator
+shot_creator:
+  custom_naming: true
