@@ -493,7 +493,8 @@ class FtShot(FtBase):
             return
 
         # get the parent object either the project or episode
-        parent_entity = self.episode if episode_name else self.project
+        shot_folder = self.get_folder("shot")
+        parent_entity = self.episode if episode_name else shot_folder
         self.logger.info(f"Creating sequence {sequence_name}")
         self.session.create('Sequence', {'name': sequence_name, 'parent': parent_entity})
         self.session.commit()
@@ -524,14 +525,16 @@ class FtShot(FtBase):
         start = start or core_constants.DEFAULT_START_FRAME
         end = end or core_constants.DEFAULT_END_FRAME
         self.logger.info(f"Frame range: {start}-{end}")
-        create_shot_dict = {'name': shot_name,
-                            'parent': self.sequence,
-                            "custom_attributes": {"fstart": start,
-                                                  "fend": end,
-                                                  "handles": core_constants.DEFAULT_HANDLES,
-                                                  "created_by": core_constants.USERNAME
-                                                  }
-                            }
+
+        create_shot_dict = {
+            "name": shot_name,
+            "parent": self.sequence,
+            "custom_attributes": {
+                "fstart": start,
+                "fend": end,
+                "handles": core_constants.DEFAULT_HANDLES
+            }
+        }
 
         new_shot = self.session.create('Shot', create_shot_dict)
         self.create_task_template_for_entity("Shot", new_shot)

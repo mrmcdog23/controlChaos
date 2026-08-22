@@ -17,7 +17,7 @@ FRAME_STYLE = "background-color: {0};"
 
 class ValidatorWidget(base_ui.WidgetBase):
     ui_name = "validator"
-    icon_to_widget = {"refresh_white": "btn_refresh",
+    widget_to_icon = {"refresh_white": "btn_refresh",
                       "information": "btn_details",
                       "fix": "btn_autofix"
                       }

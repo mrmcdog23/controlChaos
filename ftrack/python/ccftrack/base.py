@@ -188,7 +188,6 @@ class FtBase(object):
         """
         project_names = [a["full_name"] for a in self.active_projects]
         project_names.sort()
-        project_names.reverse()
         return project_names
 
     @property

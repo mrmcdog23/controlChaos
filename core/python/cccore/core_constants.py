@@ -1,6 +1,5 @@
 """ Core constants for the pipeline """
 import os
-from enum import Enum
 
 
 PYTHON_EXE = "C:/Python/python311/python.exe"
@@ -17,3 +16,8 @@ LOCAL_PROJECT_CONFIG = f"{os.environ['USERPROFILE']}/Documents/projects_config.j
 
 PROGRESS_TEXT = "PROGRESS:"
 MAXIMUM_VALUE_TEXT = "MAXIMUM VALUE:"
+
+DEFAULT_START_FRAME = 1001
+DEFAULT_END_FRAME = 1100
+DEFAULT_HANDLES = 10
+USERNAME = os.environ.get("USERNAME")

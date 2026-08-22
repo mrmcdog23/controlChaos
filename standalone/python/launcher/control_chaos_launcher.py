@@ -5,10 +5,7 @@ import cccore.base_ui as base_ui
 import cccore.app_starter as app_starter
 import cccore.core_constants as core_constants
 import cccore.utils.cc_logging as cc_logging
-import cccore.utils.file_utils as file_utils
 import cccore.data.server_data as server_data
-import cccore.utils.data_utils as data_utils
-from ccgeneral.widgets.line_browser import LineBrowser
 from CCPySide import QtWidgets, QtCore, QtGui
 import ccftrack.base as base
 
@@ -38,7 +35,7 @@ class AppToolWidget(base_ui.WidgetBase):
 
         # set the app label and icon
         self.lbl_display_name.setText(self.display_text)
-        self.apply_icon_to_widget(self.lbl_app_icon, self.appclass.icon)
+        self.apply_widget_to_icon(self.lbl_app_icon, self.appclass.icon)
 
     def set_selected(self):
         """
@@ -75,7 +72,7 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
     title = "Launcher"
     window_icon = "launcher"
     widget_to_icon = {
-        "refresh": "btn_refresh"
+        "btn_refresh": "refresh"
     }
     add_cc_title_name = True
 

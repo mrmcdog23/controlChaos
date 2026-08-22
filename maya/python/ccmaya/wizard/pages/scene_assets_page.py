@@ -2,7 +2,6 @@
 import maya.mel as mel
 import maya.cmds as cmds
 import ccmaya.utils.maya_utils as maya_utils
-import ccmaya.asset.scene_asset as scene_asset
 from ccgeneral.widgets.dragdrop_listwidget import DragDropListWidget
 from ccgeneral.wizard.pages.base_page import BasePublishPage
 from ccgeneral.widgets.line_browser import LineBrowser

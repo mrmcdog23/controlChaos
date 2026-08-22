@@ -13,7 +13,7 @@ from pathlib import Path
 class Ui(object):
     """ Base class for building uis """
     title = None
-    icon_to_widget = dict()
+    widget_to_icon = dict()
     ui_name = None
     window_icon = str()
     tab_to_icons = dict()
@@ -258,11 +258,11 @@ class Ui(object):
         Set the icons to the widgets based
         on the icon and widget names
         """
-        use_icon_to_widget = icon_dict if icon_dict else self.icon_to_widget
-        for icon_name, widget_name in use_icon_to_widget.items():
-            self.apply_icon_to_widget(widget_name, icon_name)
+        use_widget_to_icon = icon_dict if icon_dict else self.widget_to_icon
+        for widget_name, icon_name in use_widget_to_icon.items():
+            self.apply_widget_to_icon(widget_name, icon_name)
 
-    def apply_icon_to_widget(self, widget_name, icon_name):
+    def apply_widget_to_icon(self, widget_name, icon_name):
         # type: (QtWidgets.QWidget, str) -> None
         """
         From an icon name find its path and apply to the widget
@@ -293,7 +293,6 @@ class Ui(object):
         elif hasattr(widget, "setPixmap"):
             pixmap = QtGui.QPixmap(icon_path)
             widget.setPixmap(pixmap)
-
 
     def add_icons_to_combo(self, combobox, icons_list):
         # type: (QtWidgets.QComboBox, list[str]) -> None

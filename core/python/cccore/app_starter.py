@@ -355,11 +355,23 @@ class ProjectCreatorTool(BaseTool):
         self.launch_path = "{0}/standalone/python/creators/project_creator.py"
 
 
+class ShotCreatorTool(BaseTool):
+    name = "shot_creator_tool"
+
+    def __init__(self):
+        super(ShotCreatorTool, self).__init__()
+        self.display_text = "Shot Creator"
+        self.icon = "shot_creator.png"
+        self.launch_path = "{0}/standalone/python/creators/shot_creator.py"
+
+
+
 APPLICATIONS = [
     MayaApp,
     UnrealApp
 ]
 TOOLS = [
     SlateMakerTool,
-    ProjectCreatorTool
+    ProjectCreatorTool,
+    ShotCreatorTool
 ]
