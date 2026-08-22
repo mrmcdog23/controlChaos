@@ -37,15 +37,14 @@ class ShotCreator(base_ui.StandaloneWindowBase):
 
     def __init__(self):
         super().__init__()
-        print(self.widget_to_icon)
         self.project_data = server_data.ProjectData()
         self.ftshot = shot.FtShot()
         self.logger = cc_logging.cc_logger()
         self.folder_structure = dict()
         self.lbl_project_name.setText(self.project_data.project_name)
         self.set_option_hidden()
-        #self.populate_sequences()
-        #self.connect_signals()
+        self.populate_sequences()
+        self.connect_signals()
 
     def set_option_hidden(self):
         """ Set the option hidden on startup """
@@ -237,7 +236,7 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         self.lw_sequence.clear()
         self.lw_shot.clear()
 
-        sequence_names = self.ftshot.get_sequence_names()
+        sequence_names = self.ftshot.sequence_names
         for seq_name in sequence_names:
             item = ContextItem(seq_name, False)
             self.lw_sequence.addItem(item)

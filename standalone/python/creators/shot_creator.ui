@@ -110,9 +110,6 @@
         <property name="text">
          <string/>
         </property>
-        <property name="btn_ss" stdset="0">
-         <bool>true</bool>
-        </property>
        </widget>
       </item>
      </layout>
@@ -196,9 +193,6 @@
            </property>
            <property name="text">
             <string/>
-           </property>
-           <property name="btn_ss" stdset="0">
-            <bool>true</bool>
            </property>
           </widget>
          </item>
