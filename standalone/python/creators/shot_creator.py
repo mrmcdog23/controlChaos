@@ -25,10 +25,10 @@ class ContextItem(QtWidgets.QListWidgetItem):
 class ShotCreator(base_ui.StandaloneWindowBase):
     title = "Shot Creator"
     window_icon = "shot_creator"
-    icon_to_widget = {
-        "project": "lbl_project_icon",
-        "sequence": "lbl_icon_sequence",
-        "shot": "lbl_icon_shot",
+    widget_to_icon = {
+        "lbl_project_icon": "project",
+        "lbl_icon_sequence": "sequence",
+        "lbl_icon_shot": "shot",
         "btn_add_sequence": "add",
         "btn_add_specific_shot_number": "add",
         "btn_add_shot_range": "add",
@@ -37,7 +37,7 @@ class ShotCreator(base_ui.StandaloneWindowBase):
 
     def __init__(self):
         super().__init__()
-        print(self.icon_to_widget)
+        print(self.widget_to_icon)
         self.project_data = server_data.ProjectData()
         self.ftshot = shot.FtShot()
         self.logger = cc_logging.cc_logger()

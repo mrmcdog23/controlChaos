@@ -38,7 +38,7 @@ class AppToolWidget(base_ui.WidgetBase):
 
         # set the app label and icon
         self.lbl_display_name.setText(self.display_text)
-        self.apply_icon_to_widget(self.lbl_app_icon, self.appclass.icon)
+        self.apply_widget_to_icon(self.lbl_app_icon, self.appclass.icon)
 
     def set_selected(self):
         """
@@ -74,8 +74,8 @@ class AppToolWidget(base_ui.WidgetBase):
 class ControlChaosLauncher(base_ui.StandaloneWindowBase):
     title = "Launcher"
     window_icon = "launcher"
-    icon_to_widget = {
-        "refresh": "btn_refresh"
+    widget_to_icon = {
+        "btn_refresh": "refresh"
     }
     add_cc_title_name = True
 
@@ -95,7 +95,7 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.logger = cc_logging.cc_logger()
         self.ftbase = base.FtBase()
 
-        self.set_widget_icons(self.icon_to_widget)
+        self.set_widget_icons(self.widget_to_icon)
         self.populate_apps_and_tools()
         self.load_from_settings()
         self.populate_projects()

@@ -36,7 +36,7 @@ class PasteTableWidget(QtWidgets.QTableWidget):
 class SlateMakerUI(base_ui.StandaloneWindowBase):
     title = "Slate Maker"
     window_icon = "slate_maker"
-    icon_to_widget = {"refresh": "btn_refresh"}
+    widget_to_icon = {"refresh": "btn_refresh"}
 
     def __init__(self):
         super().__init__()
