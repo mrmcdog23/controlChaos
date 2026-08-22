@@ -167,10 +167,10 @@
          <item>
           <widget class="QLineEdit" name="le_new_sequence_name">
            <property name="maxLength">
-            <number>3</number>
+            <number>999999993</number>
            </property>
            <property name="placeholderText">
-            <string>TST</string>
+            <string>tattoonie</string>
            </property>
           </widget>
          </item>

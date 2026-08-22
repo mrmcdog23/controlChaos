@@ -64,7 +64,7 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         """
         sequence_name = self.le_new_sequence_name.text()
         size_of_sequence = len(sequence_name)
-        set_btn_on = size_of_sequence == 3 and sequence_name.isupper()
+        set_btn_on = size_of_sequence > 3
         self.btn_add_sequence.setEnabled(set_btn_on)
 
     def connect_signals(self):
@@ -129,7 +129,7 @@ class ShotCreator(base_ui.StandaloneWindowBase):
             Name of the padded shot with the sequence
         """
         shot_number_padded = str(shot_number).zfill(4)
-        return f"{self.sequence_name}_sh{shot_number_padded}"
+        return f"sh{shot_number_padded}"
 
     def add_shot_range(self):
         """
