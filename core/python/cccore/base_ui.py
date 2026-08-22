@@ -259,6 +259,8 @@ class Ui(object):
         on the icon and widget names
         """
         use_icon_to_widget = icon_dict if icon_dict else self.icon_to_widget
+        print (use_icon_to_widget)
+        print (self.icon_to_widget)
         for icon_name, widget_name in use_icon_to_widget.items():
             self.apply_icon_to_widget(widget_name, icon_name)
 

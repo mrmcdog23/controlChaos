@@ -10,7 +10,7 @@ from CCPySide import QtWidgets, QtCore, QtGui
 class ProjectCreator(base_ui.StandaloneWindowBase):
     title = "Project Creator"
     window_icon = "project_creator"
-    widget_to_icon = {
+    icon_to_widget = {
         "lbl_project_icon": "project",
         "lbl_houdini_icon": "houdini",
         "lbl_maya_icon": "maya",
