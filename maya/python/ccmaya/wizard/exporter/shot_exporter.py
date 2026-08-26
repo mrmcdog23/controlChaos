@@ -7,6 +7,8 @@ import cccore.utils.file_utils as file_utils
 import ccmaya.maya_constants as maya_constants
 import ccmaya.asset.scene_asset as scene_asset
 import ccmaya.utils.maya_utils as maya_utils
+import cccore.file_env.context as context
+import ccftrack.publish as publish
 import ccmaya.shot.fbx_anim_export as fbx_anim_export
 from ccgeneral.wizard.exporter.base_exporter import BaseExporter
 
@@ -23,6 +25,7 @@ class ShotExporter(BaseExporter):
         super().__init__()
         self.save_dir = str()
         self.exported_files_to_data = dict()
+        self.additional_components = dict()
 
     @BaseExporter.add_to_percentage(10)
     def open_file(self):
@@ -38,6 +41,7 @@ class ShotExporter(BaseExporter):
         """
         self.cache_assets()
         self.write_metadata()
+        self.publish_shot()
         self.log(f"Export Complete")
 
     @BaseExporter.add_to_percentage(15)
@@ -46,8 +50,15 @@ class ShotExporter(BaseExporter):
         Cache all the assets in the scene
         """
         self.logger.info("Caching assets...")
-        self.save_dir = self.data["save_dir"]
         all_namespaces = self.data["namespaces"]
+
+        # set the next version number
+        ctx = context.Context(self.data)
+        self.next_version = self.ftquery.next_version_from_ctx(ctx)
+        self.logger.info(f"Using next version number: {self.next_version}")
+
+        ctx.use_version = self.next_version
+        self.abc_version_dir = ctx.next_alembic_path
 
         namespace_to_data = dict()
         for namespace in all_namespaces:
@@ -78,7 +89,12 @@ class ShotExporter(BaseExporter):
         self.logger.info(f"Exporting alembic {namespace}")
         scene_asset_inst = scene_asset.SceneAsset(namespace)
 
-        abc_path = file_utils.join_file_names(self.save_dir, f"{namespace}.abc")
+        ctx = context.Context(self.data)
+        ctx.use_suffix = namespace
+        ctx.use_version = self.next_version
+        abc_path = ctx.next_alembic_path
+
+        file_utils.create_directories(os.path.dirname(abc_path))
         self.logger.info(f"Alembic path: {abc_path}")
 
         start = int(cmds.playbackOptions(q=True, min=True))
@@ -95,6 +111,9 @@ class ShotExporter(BaseExporter):
         )
         self.logger.info(f"Export args: {abc_args}")
         cmds.AbcExport(j=abc_args, verbose=True)
+
+        # add namespace to additional dictionary
+        self.additional_components[namespace] = abc_path
         return abc_path
 
     @BaseExporter.add_to_percentage(5)
@@ -129,6 +148,19 @@ class ShotExporter(BaseExporter):
         }
         data.update(self.data)
         file_utils.write_file(metadata_path, data)
+
+    @BaseExporter.add_to_percentage(10)
+    def publish_shot(self):
+        """
+        Publish the shot to ftrack
+        """
+        self.data["additional_components"] = self.additional_components
+        publish_inst = publish.FtrackPublish(self.data)
+        self.asset_version = publish_inst.asset_version
+        asset_version_id = self.asset_version["id"]
+        self.ftver.asset_version_id = asset_version_id
+        self.log(f"Asset Version: {asset_version_id}")
+
 
 
 if __name__ == "__main__":

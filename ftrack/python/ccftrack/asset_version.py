@@ -99,7 +99,7 @@ class FtAssetVersion(FtBase):
         Returns:
             url_template: The ftrack url of the asset version
         """
-        version_data = {'server_url': self.server_data.ftrack_server,
+        version_data = {'server_url': self.server_data.ftrack_url,
                         'version_id': asset_version['id'],
                         'project_id': asset_version['link'][0]['id']
                         }

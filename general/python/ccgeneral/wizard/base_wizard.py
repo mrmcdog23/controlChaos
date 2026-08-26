@@ -3,7 +3,12 @@ from typing import Any
 from CCPySide import QtWidgets, QtCore, QtGui
 import cccore.base_ui as base_ui
 import cccore.utils.ui_utils as ui_utils
-import cccore.utils.cc_logging as cc_logging
+import ccftrack.asset_version as ft_version
+import ccftrack.asset as asset
+import ccftrack.shot as shot
+import ccftrack.query as query
+import cccore.data.server_data as server_data
+import cccore.file_env.context as context
 
 
 class BaseWizard(base_ui.WizardBase):
@@ -35,7 +40,12 @@ class BaseWizard(base_ui.WizardBase):
         self.pool = None
         self.output_subfolder = None
 
-        self.logger = cc_logging.cc_logger()
+        self.project_data = server_data.ProjectData()
+        self.ftver = ft_version.FtAssetVersion()
+        self.ftasset = asset.FtAsset(session=self.ftver.session)
+        self.ftshot = shot.FtShot(session=self.ftver.session)
+        self.ftquery = query.FtQuery(session=self.ftver.session)
+        self.ctx = context.Context()
 
         # set the wizard banner
         banner_path = self.get_icon_path(self.banner_name)
@@ -171,6 +181,10 @@ class BaseWizard(base_ui.WizardBase):
         message = None
         if not cls.wip_file_path():
             message = "File not saved"
+
+        if not context.Context().task:
+            message = "Environment not set"
+
         return message
 
     @classmethod

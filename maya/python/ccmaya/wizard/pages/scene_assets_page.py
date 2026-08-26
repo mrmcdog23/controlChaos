@@ -36,16 +36,12 @@ class MayaSceneAssetsPage(BasePublishPage):
         """
         Add the list widgets to the page of the assets to publish
         """
+        if self.built_layout:
+            return
         self.lw_scene_assets = DragDropListWidget()
         self.lw_layout.addWidget(self.lw_scene_assets, 1, 0)
-
         self.lw_publish_assets = DragDropListWidget()
         self.lw_layout.addWidget(self.lw_publish_assets, 1, 1)
-
-        # add save to directory
-        self.wdg_save_dir = LineBrowser(
-            self, "dir", "Select Output Directory", "", "Output Directory")
-        self.lyt_save_dir.addWidget(self.wdg_save_dir)
 
     def connect_signals(self):
         """
@@ -53,7 +49,6 @@ class MayaSceneAssetsPage(BasePublishPage):
         """
         self.lw_publish_assets.model().rowsInserted.connect(self.check_complete)
         self.lw_publish_assets.model().rowsRemoved.connect(self.check_complete)
-        self.wdg_save_dir.line_edit.textChanged.connect(self.check_complete)
 
     def load_scene_assets(self):
         """
@@ -75,15 +70,10 @@ class MayaSceneAssetsPage(BasePublishPage):
         Returns:
             Whether there is assets to publish
         """
-        if not self.wdg_save_dir or not self.lw_publish_assets:
+        if not self.lw_publish_assets:
             return
-
         has_assets = bool(self.lw_publish_assets.count())
-        save_dir = self.wdg_save_dir.file_path
-
-        if save_dir and has_assets:
-            return True
-        return False
+        return has_assets
 
     def validatePage(self):
         # type: () -> bool
@@ -94,6 +84,5 @@ class MayaSceneAssetsPage(BasePublishPage):
             Whether the page is valid
         """
         self.data["namespaces"] = self.lw_publish_assets.items_text
-        self.data["save_dir"] = self.wdg_save_dir.file_path
         return True
 

@@ -8,7 +8,7 @@ FFMPEG_EXE = "C:/ffmpeg/bin/ffmpeg.exe"
 PROJECTS_DIR = "C:/Users/joele/Downloads/projects"
 
 DEFAULT_FPS = "24"
-FRAME_RATES = ["23.976", "24", "25", "29.97", "30"]
+FRAME_RATES = ["23.976", "24", "25", "29.97", "30", "60"]
 
 # project configurations
 SERVER_PROJECT_CONFIG = "X:/Config_CC/projects_config.json"
@@ -26,3 +26,11 @@ USERNAME = os.environ.get("USERNAME")
 ASSET_STRUCTURE = "core/config/folder/asset_structure.yml"
 SHOT_STRUCTURE = "core/config/folder/shot_structure.yml"
 TASK_STRUCTURE = "core/config/folder/task_structure.yml"
+
+
+IMAGE_TYPES = ["png", "exr", "tif", "jpg", "jpeg"]
+SEQUENCE_TYPES = ["png", "exr", "tif", "jpg", "jpeg", "fbx", "mov",
+                  "ass", "bgeo.sc", "vdb", "abc", "dpx", "obj", "tx"
+                  ]
+SINGLE_FRAME_SEQUENCE = ["abc", "fbx", "obj", "usd", "json", "mov", "cpio"]
+CACHE_TYPES = ["bgeo.sc", "vdb", "abc", "fbx"]

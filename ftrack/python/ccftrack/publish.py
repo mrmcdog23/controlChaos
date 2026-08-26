@@ -4,8 +4,8 @@ import sys
 import ccftrack.asset_version as asset_version
 import ccftrack.shot as shot
 import ccftrack.asset as asset
-import cccore.utils.ffmpeg_args as ffmpeg_args
-import cccore.utils.apply_hud as apply_hud
+import cccore.utils.ffmpeg_utils as ffmpeg_utils
+#import cccore.utils.apply_hud as apply_hud
 import cccore.utils.file_utils as file_utils
 import cccore.utils.cc_logging as cc_logging
 import cccore.utils.sequence_utils as sequence_utils
@@ -111,7 +111,7 @@ class FtrackPublish(object):
         first_frame_path = seq_data.frame_paths[0]
 
         # run ffmpeg conversion to png
-        ffmpeg_args.convert_image_type(first_frame_path, output_path)
+        ffmpeg_utils.convert_image_type(first_frame_path, output_path)
         self.logger.info(f"Generated...{output_path}")
         self.data["thumbnail_path"] = output_path
 
@@ -204,6 +204,7 @@ class FtrackPublish(object):
             self.ftver.create_component_for_path(
                 source_path, self.ftver.version_int, component_name)
 
+    '''
     def apply_nuke_hud(self):
         """
         Apply the heads up display in Nuke
@@ -213,6 +214,7 @@ class FtrackPublish(object):
         self.data["mov_path"] = temp_mov_path
         apply_hud.create_cc_hud_mov(self.data)
         self.ftver.add_playable_component(temp_mov_path)
+    '''
 
     def create_ftrack_movie(self):
         """
@@ -227,10 +229,10 @@ class FtrackPublish(object):
 
         # if a movie file component was found use it
         if self.movie_component_path:
-            if self.data.get("apply_hud", False):
-                self.apply_nuke_hud()
-            else:
-                self.ftver.add_playable_component(self.movie_component_path)
+            #if self.data.get("apply_hud", False):
+            #    self.apply_nuke_hud()
+            #else:
+            self.ftver.add_playable_component(self.movie_component_path)
             return
 
         if not self.image_sequence:
@@ -260,14 +262,14 @@ class FtrackPublish(object):
 
         if self.data.get("use_ffmpeg", False):
             self.logger.info("Using FFMpeg to create movie file")
-            created = ffmpeg_args.run_ffmpeg_hud_command(
+            created = ffmpeg_utils.run_ffmpeg_hud_command(
                 seq_data.start,
                 seq_data.nuke_path,
                 temp_mov_path
                 )
-        else:
-            self.logger.info("Applying cc HUD via Nuke")
-            created = apply_hud.create_cc_hud_mov(self.data)
+        #else:
+        #    self.logger.info("Applying cc HUD via Nuke")
+        #    created = apply_hud.create_cc_hud_mov(self.data)
 
         if not created:
             self.logger.critical(f"Failed to create movie file")

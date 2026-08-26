@@ -656,7 +656,7 @@ class FtShot(FtBase):
 
         # get next file publish path
         asset_version = self.publish_asset()
-        self.copy_and_publish_wip_file(asset_version)
+        #self.copy_and_publish_wip_file(asset_version)
         return asset_version
 
     def publish_asset(self):

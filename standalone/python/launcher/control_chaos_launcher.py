@@ -344,7 +344,7 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         """
         Create the project on disk
         """
-        self.logger.info(f"Creating project: {project_root}")
+        self.logger.info(f"Creating disk project: {project_root}")
         folder_creator_inst = folder_creator.CreateFolders()
         folder_creator_inst.create_project_structure(project_root)
 
@@ -352,7 +352,7 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.ftshot.project_name = project_name
         for sequence_name in self.ftshot.sequence_names:
             self.ftshot.sequence_name = sequence_name
-            create_dict = {sequence_name: self.ftshot.shot_names}
+            create_dict[sequence_name] = self.ftshot.shot_names
 
         folder_creator_inst.create_dict = create_dict
         folder_creator_inst.create_all_shot_folders()

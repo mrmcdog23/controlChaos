@@ -3,10 +3,10 @@ import maya.OpenMaya as OpenMaya
 import maya.cmds as cmds
 import no8maya.startup.context_buttons as context_buttons
 import no8maya.maya_constants as maya_constants
-import no8core.utils.context_utils as context_utils
-import no8core.core_constants as core_constants
-import no8core.context as context
-import no8core.utils.backup_file as backup_file
+import cccore.utils.context_utils as context_utils
+import cccore.core_constants as core_constants
+import cccore.context as context
+import cccore.utils.backup_file as backup_file
 
 
 START = core_constants.DEFAULT_START_FRAME

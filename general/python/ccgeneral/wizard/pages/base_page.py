@@ -34,17 +34,13 @@ class BasePublishPage(base_ui.WizardPageBase):
     @property
     def data(self):
         # type: () -> dict
-        """
-        Gathered wizard data
-        """
+        """ Gathered wizard data """
         return self.wizard().data
 
     @property
     def project_data(self):
         # type: () -> Any
-        """
-        Project data
-        """
+        """ Project data """
         return self.wizard().project_data
 
     def cleanupPage(self):
@@ -100,28 +96,20 @@ class BasePublishPage(base_ui.WizardPageBase):
         self.pw.setButtonLayout(btn_list)
 
     def set_first_page(self):
-        """
-        Set the first page button layout
-        """
+        """ Set the first page button layout """
         self.set_buttons(PagePosition.FIRST)
 
     def set_middle_page(self):
-        """
-        Set the middle page of the wizard button layout
-        """
+        """ Set the middle page of the wizard button layout """
         self.set_buttons(PagePosition.MIDDLE)
 
     def set_last_page(self):
-        """
-        Set the last page layout
-        """
+        """ Set the last page layout """
         self.set_buttons(PagePosition.LAST)
 
     def set_next_button_text(self, button_text):
         # type: (str) -> None
-        """
-        Set the next button text
-        """
+        """ Set the next button text """
         self.setButtonText(QtWidgets.QWizard.NextButton, button_text)
 
     def isComplete(self):
@@ -153,15 +141,11 @@ class BasePublishPage(base_ui.WizardPageBase):
 
     def skipPage(self):
         # type: () -> bool
-        """
-        Decides whether a page should be skipped.
-        """
+        """ Decides whether a page should be skipped. """
         return False
 
     @property
     def exporter(self):
         # type: () -> Any
-        """
-        The class to be used to export
-        """
+        """ The class to be used to export """
         return self.wizard().exporter

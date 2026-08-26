@@ -1,3 +1,4 @@
+import collections
 from CCPySide import QtWidgets, QtCore, QtGui
 import cccore.file_env.context as context
 
@@ -64,3 +65,52 @@ def cc_save_with_suffix(ext):
         if ctx:
             return ctx.next_save_path
 
+
+def get_status_stylesheet(status):
+    # type: (Any) -> str
+    """
+    From a ftrack status get the style sheet text
+
+    Args:
+        status: The status dictionary
+
+    Returns:
+        style_sheet: Text of the style sheet to assign
+    """
+    if not status:
+        return str()
+    status_colour = status['color']
+    style_sheet = f"color: black; background-color: {status_colour}"
+    return style_sheet
+
+
+def context_layout_form_context(ctx):
+    # type: (context.Context) -> QtWidgets.QFormLayout
+    """
+    Build a form layout from a context class
+
+    Args:
+        ctx: Current context class
+
+    Returns:
+        form_layout: The context layout
+    """
+    context_dict = collections.OrderedDict()
+    if ctx.is_build:
+        context_dict["Type:"] = ctx.build_type
+        context_dict["Name:"] = ctx.asset_build
+        context_dict["Task:"] = ctx.task
+    else:
+        if ctx.episode:
+            context_dict["Episode:"] = ctx.episode
+        context_dict["Sequence:"] = ctx.sequence
+        context_dict["Shot:"] = ctx.shot
+        context_dict["Task:"] = ctx.task
+
+    form_layout = QtWidgets.QFormLayout()
+    for context_key, context_value in context_dict.items():
+        lbl_context_key = QtWidgets.QLabel(context_key)
+        lbl_context_value = QtWidgets.QLabel(context_value)
+        lbl_context_value.setFont(QtGui.QFont("Ariel", weight=QtGui.QFont.Bold))
+        form_layout.addRow(lbl_context_key, lbl_context_value)
+    return form_layout

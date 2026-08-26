@@ -102,7 +102,7 @@ def context_dict_from_path(path):
     return context_dict
 
 
-def context_from_path(path):
+def get_context_from_path(path):
     # type: (str) -> context.Context
     """
     From a file path build a context class instance

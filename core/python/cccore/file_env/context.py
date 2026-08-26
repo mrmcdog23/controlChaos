@@ -6,6 +6,7 @@ import cccore.data.server_data as server_data
 import cccore.utils.file_utils as file_utils
 import cccore.utils.cc_logging as cc_logging
 from cccore.file_env import ctx_constants
+import cccore.core_constants as core_constants
 
 
 class Context(object):
@@ -34,6 +35,12 @@ class Context(object):
         self.use_ingest_subfolder = None
         self.project_data = server_data.ProjectData()
         self.logger = cc_logging.cc_logger()
+
+    @property
+    def is_build(self):
+        # type: () -> bool
+        """ Is it an asset build """
+        return bool(self.entity == "asset")
 
     def get_value(self, key_name):
         # type: (str) -> str
@@ -64,6 +71,10 @@ class Context(object):
         # type: () -> str
         """ Path of the root folder """
         return self.get_value("project_root")
+
+    @property
+    def episode(self):
+        return None
 
     @property
     def sequence(self):
@@ -138,6 +149,12 @@ class Context(object):
         return file_utils.join_file_names(self.app_dir, self.file_subfolder)
 
     @property
+    def abc_dir(self):
+        # type: () -> str
+        """ The project shots directory """
+        return file_utils.join_file_names(self.app_dir, "abc", self.task)
+
+    @property
     def task_dir(self):
         # type: () -> str
         """ The project shots directory """
@@ -162,6 +179,30 @@ class Context(object):
         # type: () -> str
         """ Build the file name without the extension"""
         return f"{self.project_code}_{self.sequence}_{self.shot}_{self.task}{self.suffix_str}"
+
+    @property
+    def is_image(self):
+        # type: () -> bool
+        """ It is an image sequence in the current extension """
+        return self.ext in core_constants.IMAGE_TYPES
+
+    @property
+    def is_sequence(self):
+        # type: () -> bool
+        """
+        It is an image sequence in the current extension
+        """
+        return self.ext in core_constants.SEQUENCE_TYPES
+
+    @property
+    def is_single_frame_sequence(self):
+        # type: () -> bool
+        """
+        Is the sequence a single frame
+        """
+        if self.use_is_single_frame_sequence is not None:
+            return self.use_is_single_frame_sequence
+        return self.ext in core_constants.SINGLE_FRAME_SEQUENCE
 
     @property
     def next_save_path(self):
@@ -219,7 +260,7 @@ class Context(object):
         if version_padded:
             return version_padded
         if self.use_version:
-            return str(self.version).zfill(3)
+            return str(self.use_version).zfill(3)
 
     @property
     def version_int(self):
@@ -229,6 +270,14 @@ class Context(object):
             return self.use_version
         if self.version_padded:
             return int(self.version_padded)
+
+    @property
+    def next_alembic_path(self):
+        self.use_ext = "abc"
+        version = f"v{self.version_padded}"
+        alembic_path = file_utils.join_file_names(
+            self.abc_dir, version, self.new_filename)
+        return alembic_path
 
     @property
     def as_dict(self):

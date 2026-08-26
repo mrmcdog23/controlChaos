@@ -3,6 +3,7 @@ import sys
 import logging
 import datetime
 import cccore.utils.read_write as read_write
+import cccore.core_constants as core_constants
 
 
 def reload_cc_modules():
@@ -180,3 +181,57 @@ def get_file_date_text(file_path):
         minute=date_value(dt.minute)
     )
     return date_text
+
+
+def get_extension(file_path):
+    # type: (str) -> str
+    """
+    Get the file extension
+
+    Args:
+        file_path: Path of the file
+
+    Returns:
+        ext: The file extension type
+    """
+    if file_path.endswith("bgeo.sc"):
+        return "bgeo.sc"
+    _, extension = os.path.splitext(file_path)
+    ext = extension.strip(".")
+    return ext
+
+
+def get_category(ext):
+    # type: (str) -> str
+    """
+    From the file path get publish category
+
+    Args:
+        ext: File type extension
+
+    Returns:
+        category: Category to publish under
+    """
+    if ext in core_constants.CACHE_TYPES:
+        category = "Cache"
+    elif ext in core_constants.SEQUENCE_TYPES:
+        category = "Image Sequence"
+    else:
+        category = "Scene"
+    return category
+
+
+def update_metadata_file(data):
+    # type: (dict) -> None
+    """
+    Update the metadata file if in the data
+
+    Args:
+        data: Dictionary of the information to update
+    """
+    metadata_file_path = data.get("metadata_file_path")
+    if not metadata_file_path:
+        logging.critical("Key metadata_file_path not found in data")
+        return
+    logging.info(f"Updating metadata file path: {metadata_file_path}")
+    write_file(metadata_file_path, data)

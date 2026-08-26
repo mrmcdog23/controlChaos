@@ -2,6 +2,10 @@
 import logging
 import cccore.core_constants as core_constants
 import cccore.utils.file_utils as file_utils
+import ccftrack.asset_version as ft_version
+import ccftrack.asset as asset
+import ccftrack.shot as shot
+import ccftrack.query as query
 
 
 class BaseExporter(object):
@@ -14,6 +18,10 @@ class BaseExporter(object):
         self.ui = None
         self.data = None
         self.asset_version = None
+        self.ftver = ft_version.FtAssetVersion()
+        self.ftasset = asset.FtAsset(session=self.ftver.session)
+        self.ftshot = shot.FtShot(session=self.ftver.session)
+        self.ftquery = query.FtQuery(session=self.ftver.session)
 
     def add_to_percentage(percentage):
         """

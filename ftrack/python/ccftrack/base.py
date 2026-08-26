@@ -10,6 +10,7 @@ import cccore.utils.file_utils as file_utils
 import cccore.utils.cc_logging as cc_logging
 import cccore.core_constants as core_constants
 import cccore.data.server_data as server_data
+import cccore.file_env.context_utils as context_utils
 
 
 class ResultsError(ftrack_api.exception.NoResultFoundError):

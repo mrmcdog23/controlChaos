@@ -8,6 +8,7 @@ from ccmaya.wizard.pages.maya_progress_page import AnimProgressPage
 from ccmaya.wizard.pages.maya_validator_page import MayaValidatePage
 from ccmaya.wizard.pages.scene_assets_page import MayaSceneAssetsPage
 from ccgeneral.wizard.pages.complete_page import CompletePage
+from ccgeneral.wizard.pages.context_page import ShotContextPage
 
 
 class ShotExportWizard(base_wizard.BaseWizard):
@@ -23,6 +24,7 @@ class ShotExportWizard(base_wizard.BaseWizard):
         # type: () -> list[Any]
         """ List of wizard pages to add """
         pages = [MayaValidatePage,
+                 ShotContextPage,
                  MayaSceneAssetsPage,
                  AnimProgressPage,
                  CompletePage
