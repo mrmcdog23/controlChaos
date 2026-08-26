@@ -1,4 +1,5 @@
 from CCPySide import QtWidgets, QtCore, QtGui
+import cccore.file_env.context as context
 
 
 def messagebox(title, message, msg_type, buttons=None, parent=None, launch=True):
@@ -44,3 +45,22 @@ def messagebox(title, message, msg_type, buttons=None, parent=None, launch=True)
     msg.exec()
     button_text = msg.clickedButton().text()
     return button_text
+
+
+def cc_save_with_suffix(ext):
+    # type: (str) -> Optional[str]
+    """
+    Save the file with a suffix
+    """
+    suffix, ok_pressed = QtWidgets.QInputDialog.getText(
+        None, "Suffix", "Control Chaos Suffix Save", QtWidgets.QLineEdit.Normal)
+
+    if "_" in suffix:
+        messagebox("No Underscores", "No underscores allowed", "critical")
+        return
+
+    if ok_pressed and suffix != '':
+        ctx = context.Context(overrides={"suffix": suffix, "ext": ext})
+        if ctx:
+            return ctx.next_save_path
+

@@ -1,12 +1,11 @@
 """ Class for specifically querying ftrack """
-import collections
 
 import ftrack_api
 from typing import Optional
 from ccftrack.shot import FtShot
 from ccftrack.asset import FtAsset
-import cccore.context as context
-import cccore.utils.context_utils as context_utils
+import cccore.file_env.context as context
+import cccore.file_env.context_utils as context_utils
 
 
 class FtQuery(FtShot, FtAsset):

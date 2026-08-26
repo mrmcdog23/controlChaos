@@ -33,6 +33,11 @@ def join_file_names(*folder_list):
         folder_path = "/".join(folder_list[0])
     else:
         folder_path = os.path.join(*folder_list)
+
+    # check all are valid string value
+    if not all(isinstance(x, str) for x in folder_list):
+        raise TypeError(f"Path join folders are invalid: {folder_list}")
+
     folder_path_clean = folder_path.replace("\\", "/")
     return folder_path_clean
 
@@ -145,3 +150,33 @@ def temp_file_path(prefix, extension, directory=None):
     file_name = f"{prefix}_{unique_name}.{extension}"
     temp_path = join_file_names(directory, file_name)
     return temp_path
+
+
+def get_file_date_text(file_path):
+    # type: (str) -> str
+    """
+    Get a file date and time
+
+    Args:
+        file_path: Path of the file
+
+    Returns:
+        date_text: The data and time format
+    """
+    def date_value(value):
+        # type: (int) -> str
+        """ Convert a value to a padded number """
+        return str(value).zfill(2)
+
+    # Get the creation and modification datetime of the file
+    creation_time = os.path.getctime(file_path)
+    dt = datetime.datetime.fromtimestamp(creation_time)
+    date_text_fnt = "{year}-{month}-{day}  {hour}:{minute}"
+    date_text = date_text_fnt.format(
+        year=date_value(dt.year),
+        month=date_value(dt.month),
+        day=date_value(dt.day),
+        hour=date_value(dt.hour),
+        minute=date_value(dt.minute)
+    )
+    return date_text

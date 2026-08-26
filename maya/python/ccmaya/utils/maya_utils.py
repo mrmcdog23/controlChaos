@@ -5,6 +5,8 @@ from typing import Optional, Any
 from CCPySide import QtWidgets, shiboken
 import cccore.utils.cc_logging as cc_logging
 import ccmaya.maya_constants as maya_constants
+import cccore.utils.ui_utils as ui_utils
+import cccore.file_env.ctx_constants as ctx_constants
 
 
 logger = cc_logging.cc_logger()
@@ -124,3 +126,29 @@ def render_cameras():
         if cam_transform not in maya_constants.DEFAULT_CAMERAS:
             cameras.append(cam_transform)
     return cameras
+
+
+def cc_save():
+    # type: () -> str
+    """
+    Save the file path next file
+
+    Returns:
+        save_path: Path of the file to save
+    """
+    overrides = {"ext": "ma"}
+    save_path = ui_utils.cc_save_path(
+        get_maya_main_window(), overrides=overrides)
+    if not save_path:
+        return str()
+    cmds.file(rename=save_path)
+    cmds.file(save=True, type='mayaAscii')
+    return save_path
+
+
+def cc_save_panel_refresh():
+    """ Save and refresh maya panel """
+    cc_save()
+    maya_window = get_maya_main_window()
+    ctx_panel = maya_window.findChild(QtWidgets.QWidget, ctx_constants.CONTEXT_PANEL)
+    ctx_panel.populate_wip_versions()

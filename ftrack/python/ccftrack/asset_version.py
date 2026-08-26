@@ -6,7 +6,7 @@ import ftrack_api
 from typing import Optional
 from ccftrack.base import FtBase
 import cccore.core_constants as core_constants
-import cccore.utils.context_utils as context_utils
+import cccore.file_env.context_utils as context_utils
 import cccore.utils.file_utils as file_utils
 
 

@@ -1,7 +1,7 @@
 """ Core constants for the pipeline """
 import os
 
-
+USERNAME = os.environ["USERNAME"]
 PYTHON_EXE = "C:/Python/python311/python.exe"
 FFMPEG_EXE = "C:/ffmpeg/bin/ffmpeg.exe"
 
@@ -21,3 +21,8 @@ DEFAULT_START_FRAME = 1001
 DEFAULT_END_FRAME = 1100
 DEFAULT_HANDLES = 10
 USERNAME = os.environ.get("USERNAME")
+
+
+ASSET_STRUCTURE = "core/config/folder/asset_structure.yml"
+SHOT_STRUCTURE = "core/config/folder/shot_structure.yml"
+TASK_STRUCTURE = "core/config/folder/task_structure.yml"

@@ -89,23 +89,28 @@ QTreeWidget::item:selected {
     background-color: rgb(0, 0, 185);
     color: rgb(255, 255, 255);
 }
-
+QToolButton,
 QPushButton {
     color: rgb(255, 255, 255);
     background-color: rgb(60, 60, 60);
 }
-
+QToolButton:hover,
 QPushButton:hover {
     background-color: rgb(160, 160, 160);
 }
-
+QToolButton:pressed,
 QPushButton:pressed {
     background-color: rgb(0, 0, 255);
 }
-
+QToolButton:disabled,
 QPushButton:disabled {
     background-color: rgb(20, 20, 20);
 }
+
+QToolButton:checked {
+    background-color: rgb(200, 200, 200);
+}
+
 QComboBox {
     color: rgb(255, 255, 255);
     background-color: rgb(60, 60, 60);

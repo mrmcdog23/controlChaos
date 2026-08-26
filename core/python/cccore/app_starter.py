@@ -19,7 +19,10 @@ class BaseEntity(object):
         self.cmd_list = list()
         self.python_paths = list()
         self.project_data = None
+        self.project_root = None
+        self.project_code = None
         self.display_name = None
+        self.use_version = None
         self.is_app = None
 
     @property
@@ -101,6 +104,10 @@ class BaseEntity(object):
         Set the base environment variables
         """
         logging.info("Setting core variables...")
+        os.environ["PROJECT_CODE"] = self.project_code
+        os.environ["PROJECT_ROOT"] = self.project_root
+        os.environ["APP_VERSION"] = self.use_version
+        os.environ["APP_NAME"] = self.name
 
         # add core root to python paths list
         core_path = self.join_file_names(self.pipeline_root, "core", "python")
@@ -173,6 +180,8 @@ class BaseApp(BaseEntity):
         """
         The version of the application to use
         """
+        if self.use_version:
+            return self.use_version
         app_version = os.environ.get("APP_VERSION")
         if not app_version:
             raise Exception("Application version not set")
@@ -226,7 +235,7 @@ class MayaApp(BaseApp):
         self.python_paths.append(maya_python_path)
 
         # add startup script
-        startup_path = self.join_file_names(maya_python_path, "ddvmaya", "startup")
+        startup_path = self.join_file_names(maya_python_path, "ccmaya", "startup")
         self.python_paths.append(startup_path)
 
         # add shelf paths

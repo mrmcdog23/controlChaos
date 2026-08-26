@@ -6,8 +6,11 @@ import cccore.app_starter as app_starter
 import cccore.core_constants as core_constants
 import cccore.utils.cc_logging as cc_logging
 import cccore.data.server_data as server_data
-from CCPySide import QtWidgets, QtCore, QtGui
+import cccore.folder_creator as folder_creator
 import ccftrack.base as base
+import ccftrack.shot as shot
+from CCPySide import QtWidgets, QtCore, QtGui
+from ccgeneral.widgets.line_browser import LineBrowser
 
 
 SELECTED_COLOUR = "rgb(0, 0, 255)"
@@ -72,7 +75,9 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
     title = "Launcher"
     window_icon = "launcher"
     widget_to_icon = {
-        "btn_refresh": "refresh"
+        "lbl_project_icon": "project",
+        "btn_refresh": "refresh",
+        "btn_project_root": "roots"
     }
     add_cc_title_name = True
 
@@ -91,11 +96,12 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.ui_settings = QtCore.QSettings('control_chaos', 'launcher')
         self.logger = cc_logging.cc_logger()
         self.ftbase = base.FtBase()
+        self.ftshot = shot.FtShot(session=self.ftbase.session)
 
-        self.set_widget_icons(self.widget_to_icon)
+        self.create_layout()
         self.populate_apps_and_tools()
-        self.load_from_settings()
         self.populate_projects()
+        self.load_from_settings()
         self.update_project_data()
         self.connect_signals()
 
@@ -116,6 +122,10 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
 
         # set the flame users name
         self.filter_app_or_tool_list()
+        self.roots_dict = self.ui_settings.value("project_roots", dict())
+
+        project_name = self.ui_settings.value("project_name")
+        self.set_combobox_index(self.cmb_project, project_name)
 
     def closeEvent(self, event):
         """
@@ -131,6 +141,9 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         app = int(self.rbn_apps.isChecked())
         self.ui_settings.setValue("app", app)
 
+        project_name = self.cmb_project.currentText()
+        self.ui_settings.setValue("project_name", project_name)
+
     def connect_signals(self):
         """
         Connect the signals to the widgets
@@ -141,6 +154,22 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.cmb_project.currentIndexChanged.connect(self.update_project_data)
         self.cmb_application_version.currentIndexChanged.connect(self.set_launch_button_text)
         self.btn_refresh.clicked.connect(self.populate_projects)
+        self.btn_project_root.clicked.connect(self.show_project_root)
+
+    def show_project_root(self, show):
+        """
+        Hide or show the project root widget
+        """
+        self.wgt_project_root.setHidden(not show)
+
+    def create_layout(self):
+        """
+        Create the layout for the ui
+        """
+        self.wgt_project_root = LineBrowser(
+            self, "dir", "Select Project Root", "", "Project Root")
+        self.lyt_project_root.addWidget(self.wgt_project_root)
+        self.wgt_project_root.setHidden(True)
 
     def update_project_data(self):
         """
@@ -150,16 +179,25 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.ftbase.project_name = project_name
         self.project_app_versions = self.ftbase.project_app_versions
         self.project_data = server_data.ProjectData(project_name=project_name)
+
+        # set the project root
+        roots_dict = self.ui_settings.value("project_roots", dict())
+        project_name = self.cmb_project.currentText()
+        project_root = roots_dict.get(project_name, str())
+        self.wgt_project_root.set_file_path(project_root)
+
         self.update_selection()
-        #self.set_project_type_icon()
 
     def populate_projects(self):
         """
         Populate the projects
         """
         self.cmb_project.clear()
-        project_names_list = self.ftbase.projects_names
-        self.cmb_project.addItems(project_names_list)
+
+        project_names_list = list()
+        for project_code, project_name in self.ftbase.project_code_to_name.items():
+            self.cmb_project.addItem(project_name, project_code)
+            project_names_list.append(project_name)
         self.create_completer(self.cmb_project, items_list=project_names_list)
 
     def create_app_tool_list(self, app_tool_list):
@@ -269,7 +307,12 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
             False if it is not installed
         """
         selected_app = self.get_selected_app()
+        use_version = self.cmb_application_version.currentText()
+
+        # build the exe path
+        selected_app.appclass.use_version = use_version
         exe_path = selected_app.appclass.exe_path
+
         if exe_path and not os.path.exists(exe_path):
             message = f"{exe_path} is not installed"
             QtWidgets.QMessageBox.critical(self, "No Exe", message)
@@ -297,6 +340,38 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         QtWidgets.QMessageBox.critical(self, "No ffmpeg", message)
         return False
 
+    def create_project_on_disk(self, project_root, project_name):
+        """
+        Create the project on disk
+        """
+        self.logger.info(f"Creating project: {project_root}")
+        folder_creator_inst = folder_creator.CreateFolders()
+        folder_creator_inst.create_project_structure(project_root)
+
+        create_dict = dict()
+        self.ftshot.project_name = project_name
+        for sequence_name in self.ftshot.sequence_names:
+            self.ftshot.sequence_name = sequence_name
+            create_dict = {sequence_name: self.ftshot.shot_names}
+
+        folder_creator_inst.create_dict = create_dict
+        folder_creator_inst.create_all_shot_folders()
+
+    def get_and_save_project_root(self):
+        """
+        Set the project root
+        """
+        project_root = self.wgt_project_root.file_path
+        if not self.wgt_project_root.file_path:
+            QtWidgets.QMessageBox.critical(self, "No Root", "Set Project Root")
+            return
+
+        roots_dict = self.ui_settings.value("project_roots", dict())
+        project_name = self.cmb_project.currentText()
+        roots_dict[project_name] = project_root
+        self.ui_settings.setValue("project_roots", roots_dict)
+        return project_root
+
     def launch_selected(self):
         """
         Launch the selected application or tool
@@ -305,14 +380,21 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         if not self.is_slate_ffmpeg_installed:
             return
 
-        # store the launch version
-        app_version = self.cmb_application_version.currentText()
-        os.environ["APP_VERSION"] = app_version
-
         # if there is not exe path error
         exe_path_exists = self.does_exe_path_exist_on_disk()
         if not exe_path_exists:
             return
+
+        # create the project on disk
+        project_root = self.get_and_save_project_root()
+        if not project_root:
+            return
+
+        # store the launch version
+        use_version = self.cmb_application_version.currentText()
+        project_code = self.cmb_project.currentData()
+        project_name = self.cmb_project.currentText()
+        self.create_project_on_disk(project_root, project_name)
 
         selected_app = self.get_selected_app()
         directory = os.path.dirname(__file__)
@@ -323,7 +405,9 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
             core_constants.PYTHON_EXE,
             launch_wrapper,
             selected_app.class_name,
-            selected_app.display_text
+            project_code,
+            project_root,
+            use_version
         ]
         self.logger.info(f"Executing: {cmd_list}")
 
