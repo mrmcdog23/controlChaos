@@ -201,8 +201,9 @@ class FtrackPublish(object):
         # add additional components
         for component_name, source_path in additional_components.items():
             self.logger.info(f"Publishing {component_name}: {source_path}")
-            self.ftver.create_component_for_path(
-                source_path, self.ftver.version_int, component_name)
+            self.ftver.add_component_dict({component_name: source_path})
+            #self.ftver.create_component_for_path(
+            #    source_path, self.ftver.version_int, component_name)
 
     '''
     def apply_nuke_hud(self):

@@ -77,6 +77,9 @@ class ShotExporter(BaseExporter):
         for namespace, fbx_path in fbx_inst.namespace_to_fbx_path.items():
             self.exported_files_to_data[fbx_path] = namespace_to_data[namespace]
 
+            # add fbx namespace to additional dictionary
+            self.additional_components[f"fbx_{namespace}"] = fbx_path
+
     @BaseExporter.add_to_percentage(5)
     def abc_export(self, namespace):
         # type: (str) -> None
@@ -113,7 +116,7 @@ class ShotExporter(BaseExporter):
         cmds.AbcExport(j=abc_args, verbose=True)
 
         # add namespace to additional dictionary
-        self.additional_components[namespace] = abc_path
+        self.additional_components[f"abc_{namespace}"] = abc_path
         return abc_path
 
     @BaseExporter.add_to_percentage(5)
