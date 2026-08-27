@@ -70,7 +70,7 @@ class ShotExporter(BaseExporter):
             namespace_to_data[namespace] = scene_asset_inst.asset_data_dict
 
         # run the fbx export separately
-        fbx_inst = fbx_anim_export.FbxAnimExport(all_namespaces, self.save_dir)
+        fbx_inst = fbx_anim_export.FbxAnimExport(all_namespaces, ctx)
         fbx_inst.run_fbx_exports()
 
         # add the fbx paths to the exported files dictionary
@@ -94,7 +94,6 @@ class ShotExporter(BaseExporter):
 
         ctx = context.Context(self.data)
         ctx.use_suffix = namespace
-        ctx.use_version = self.next_version
         abc_path = ctx.next_alembic_path
 
         file_utils.create_directories(os.path.dirname(abc_path))

@@ -1,4 +1,5 @@
 """ Fbx animation exporter from Maya """
+import os
 import maya.cmds as cmds
 import pymel.core as pm
 import cccore.utils.file_utils as file_utils
@@ -10,7 +11,7 @@ class FbxAnimExport(object):
     """
     Export fbx files from a given list of namespaces to the cache directory
     """
-    def __init__(self, namespaces, save_dir):
+    def __init__(self, namespaces, ctx):
         # type: (str, str) -> None
         """
         Args:
@@ -20,7 +21,7 @@ class FbxAnimExport(object):
         self.start = int(cmds.playbackOptions(q=True, ast=True))
         self.end = int(cmds.playbackOptions(q=True, aet=True))
         self.namespaces = namespaces
-        self.save_dir = save_dir
+        self.ctx = ctx
         self.logger = cc_logging.cc_logger()
 
         # initialize the class variables
@@ -136,7 +137,9 @@ class FbxAnimExport(object):
         self.logger.info(f"FBX frame range: {self.start}-{self.end} - {namespace}")
 
         # get export path and directory
-        fbx_path = file_utils.join_file_names(self.save_dir, f"{namespace}.fbx")
+        self.ctx.use_suffix = namespace
+        fbx_path = self.ctx.next_fbx_path
+        file_utils.create_directories(os.path.dirname(fbx_path))
 
         # add the fbx path to the dictionary
         self.namespace_to_fbx_path[namespace] = fbx_path

@@ -155,6 +155,12 @@ class Context(object):
         return file_utils.join_file_names(self.app_dir, "abc", self.task)
 
     @property
+    def cache_dir(self):
+        # type: () -> str
+        """ The project shots directory """
+        return file_utils.join_file_names(self.app_dir, "cache", self.task)
+
+    @property
     def task_dir(self):
         # type: () -> str
         """ The project shots directory """
@@ -273,11 +279,21 @@ class Context(object):
 
     @property
     def next_alembic_path(self):
+        # type: () -> str
+        """ Work out the next abc save path """
         self.use_ext = "abc"
-        version = f"v{self.version_padded}"
         alembic_path = file_utils.join_file_names(
-            self.abc_dir, version, self.new_filename)
+            self.abc_dir, f"v{self.version_padded}", self.new_filename)
         return alembic_path
+
+    @property
+    def next_fbx_path(self):
+        # type: () -> str
+        """ Work out the next fbx save path """
+        self.use_ext = "fbx"
+        fbx_path = file_utils.join_file_names(
+            self.cache_dir, f"v{self.version_padded}", self.new_filename)
+        return fbx_path
 
     @property
     def as_dict(self):

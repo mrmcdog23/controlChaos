@@ -81,7 +81,6 @@ class CompletePage(BasePublishPage):
 
         # get access to the asset version and get the data
         ftver = self.wizard().ftver
-        print (f"ggrgre{asset_version_id}regvrrgg")
         ftver.asset_version_id = asset_version_id
         self.txt_ftrack_link.setText(ftver.html_link_format)
         self.txt_ftrack_link.setOpenExternalLinks(True)
@@ -117,7 +116,5 @@ class CompletePage(BasePublishPage):
         self.txt_file_path.setToolTip(wip_file_path)
 
     def isComplete(self):
-        """
-        As it's the final page its complete
-        """
+        """ As it's the final page its complete """
         return True
