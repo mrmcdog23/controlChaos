@@ -5,6 +5,7 @@ import cccore.base_ui as base_ui
 import cccore.utils.file_utils as file_utils
 import ccunreal.utils.unreal_utils as unreal_utils
 import ccunreal.shot.ue_load_shot as ue_load_shot
+import cccore.file_env.context as context
 import ccftrack.shot as shot
 import ccftrack.asset_version as ft_version
 from CCPySide import QtWidgets, QtCore
@@ -22,19 +23,31 @@ class LoadShotUI(base_ui.WidgetBase):
         self.ui_settings = QtCore.QSettings('controlChaos', 'ue_load_shot')
         self.ftshot = shot.FtShot()
         self.ftver = ft_version.FtAssetVersion(session=self.ftshot.session)
-
+        self.ctx = None
         self.data = dict()
+
+        self.load_settings()
         self.create_layout()
         self.populate_levels()
         self.populate_sequences()
         self.populate_sequence_shots()
+        self.populate_files()
         self.connect_signals()
+
+    def load_settings(self):
+        """
+        Load the settings to create the context
+        """
+        overrides = dict()
+        for key in ["sequence_name", "shot_name", "task_name"]:
+            overrides[key] = self.ui_settings.value(key)
+        self.ctx = context.Context(overrides=overrides)
 
     def create_layout(self):
         """
         Create the layout for the ui
         """
-        self.cmb_shot = ShotComboBox(self.ftshot)
+        self.cmb_shot = ShotComboBox(self.ftshot, ctx=self.ctx)
         self.lyt_shot_combo.addWidget(self.cmb_shot)
 
     def connect_signals(self):
@@ -46,7 +59,7 @@ class LoadShotUI(base_ui.WidgetBase):
         self.rbn_existing_shot.toggled.connect(self.enable_existing_shots)
         self.btn_import_files.clicked.connect(self.import_files)
         self.cmb_sequence.currentIndexChanged.connect(self.populate_sequence_shots)
-        self.cmb_shot.cmb_version.currentIndexChanged.connect(self.update_versions)
+        self.cmb_shot.cmb_version.currentIndexChanged.connect(self.populate_files)
 
     def enable_existing_level(self, enable):
         # type: (bool) -> None
@@ -110,7 +123,7 @@ class LoadShotUI(base_ui.WidgetBase):
         else:
             self.btn_import_files.setEnabled(True)
 
-    def update_versions(self):
+    def populate_files(self):
         """
         Update the version list based on the asset selection
         """
@@ -190,11 +203,16 @@ class LoadShotUI(base_ui.WidgetBase):
             import_files.append(file_path)
         return import_files
 
+    def closeEvent(self, event):
+        event.accept()
+        # set values in the settings
+        for key, value in self.cmb_shot.get_data().items():
+            self.ui_settings.setValue(key, value)
+
     def import_files(self):
         """
         Import cameras into unreal
         """
-        ue.log_warning("Building shot...")
         ue_load_shot.UELoadShot(
             self.import_files_list, self.data, self.level_path, self.shot_path)
 
