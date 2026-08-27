@@ -235,3 +235,20 @@ def update_metadata_file(data):
         return
     logging.info(f"Updating metadata file path: {metadata_file_path}")
     write_file(metadata_file_path, data)
+
+
+def get_component_path(component):
+    # type: (Any) -> str
+    """
+    From a ftrack component get its clean path
+
+    Args:
+        component: Component to get path for
+
+    Returns:
+        The clean path of the component
+    """
+    if not component['component_locations']:
+        return str()
+    path = component['component_locations'][0]['resource_identifier'].replace("\\", "/")
+    return path

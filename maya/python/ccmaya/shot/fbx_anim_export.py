@@ -5,6 +5,7 @@ import pymel.core as pm
 import cccore.utils.file_utils as file_utils
 import cccore.utils.cc_logging as cc_logging
 import ccmaya.asset.scene_asset as scene_asset
+import cccore.file_env.context as context
 
 
 class FbxAnimExport(object):
@@ -12,11 +13,11 @@ class FbxAnimExport(object):
     Export fbx files from a given list of namespaces to the cache directory
     """
     def __init__(self, namespaces, ctx):
-        # type: (str, str) -> None
+        # type: (str, context.Context) -> None
         """
         Args:
             namespaces: Namespaces to export
-            save_dir: Directory to export the fbx file to
+            ctx: Instance of Context class
         """
         self.start = int(cmds.playbackOptions(q=True, ast=True))
         self.end = int(cmds.playbackOptions(q=True, aet=True))
@@ -138,7 +139,7 @@ class FbxAnimExport(object):
 
         # get export path and directory
         self.ctx.use_suffix = namespace
-        fbx_path = self.ctx.next_fbx_path
+        fbx_path = self.ctx.fbx_file_path
         file_utils.create_directories(os.path.dirname(fbx_path))
 
         # add the fbx path to the dictionary

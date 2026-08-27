@@ -7,6 +7,9 @@ import ccunreal.utils.unreal_utils as unreal_utils
 import ccunreal.shot.ue_load_shot as ue_load_shot
 from ccgeneral.widgets.line_browser import LineBrowser
 from CCPySide import QtWidgets, QtCore
+from ccgeneral.widgets.shot_combobox import ShotComboBox
+import ccftrack.shot as shot
+import ccftrack.asset_version as ft_version
 
 
 class LoadShotUI(base_ui.WidgetBase):
@@ -18,6 +21,9 @@ class LoadShotUI(base_ui.WidgetBase):
     def __init__(self, parent):
         super().__init__(parent=parent)
         self.ui_settings = QtCore.QSettings('controlChaos', 'ue_load_shot')
+        self.ftshot = shot.FtShot()
+        self.ftver = ft_version.FtAssetVersion(session=self.ftshot.session)
+
         self.data = dict()
         self.create_layout()
         self.populate_levels()
@@ -29,25 +35,34 @@ class LoadShotUI(base_ui.WidgetBase):
         """
         Create the layout for the ui
         """
-        default_text = self.ui_settings.value("import_json")
-        self.wdg_import_dir = LineBrowser(
-            self, "file", "Select Import file", "",
-            "Import File", file_filter="*.json", default_text=default_text
-        )
-        self.lyt_import_dir.addWidget(self.wdg_import_dir)
-        if default_text:
-            self.populate_values()
+        self.cmb_shot = ShotComboBox(self.ftshot)
+        self.lyt_shot_combo.addWidget(self.cmb_shot)
 
     def connect_signals(self):
         """
         Connect the signals to the widgets
         """
-        self.wdg_import_dir.line_edit.textChanged.connect(self.populate_values)
         self.le_new_shot.textChanged.connect(self.enable_btn)
         self.rbn_existing.toggled.connect(self.enable_existing_level)
         self.rbn_existing_shot.toggled.connect(self.enable_existing_shots)
         self.btn_import_files.clicked.connect(self.import_files)
         self.cmb_sequence.currentIndexChanged.connect(self.populate_sequence_shots)
+        self.cmb_shot.cmb_version.currentIndexChanged.connect(self.update_versions)
+
+    def update_versions(self):
+        """
+        Update the version list based on the asset selection
+        """
+        #self.tw_versions.clear()
+        self.cmb_shot.set_ftshot()
+        version_num = self.cmb_shot.cmb_version.currentText()
+        # get the versions from the combo boxes
+        asset_version = self.ftshot.get_asset_version_from_number(version_num)
+        self.ftver.asset_version_id = asset_version["id"]
+        for k, v in self.ftver.component_to_path.items():
+            print (k, v)
+        #self.populate_version_tree(num_to_version_dict, self.ftasset)
+        #self.reset_ui()
 
     def enable_existing_level(self, enable):
         # type: (bool) -> None
@@ -116,10 +131,7 @@ class LoadShotUI(base_ui.WidgetBase):
         Populate the list widget with the fbx files
         """
         self.lw_import_files.clear()
-        import_json = self.wdg_import_dir.file_path
-        if not os.path.exists(import_json):
-            return
-        self.data = file_utils.read_file(import_json)
+        '''
 
         # TODO: temp file for new format
         exported_files_to_data = self.data.get("exported_files_to_data")
@@ -137,6 +149,7 @@ class LoadShotUI(base_ui.WidgetBase):
         self.sb_start_frame.setValue(self.data["start_frame"])
         self.sb_end_frame.setValue(self.data["end_frame"])
         self.ui_settings.setValue("import_json", import_json)
+        '''
 
     def populate_sequence_shots(self):
         selected_sequence = self.cmb_sequence.currentText()

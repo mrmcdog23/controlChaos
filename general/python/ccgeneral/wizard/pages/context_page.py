@@ -6,7 +6,7 @@ import cccore.utils.ui_utils as ui_utils
 from ccgeneral.wizard.pages.base_page import BasePublishPage
 import ccgeneral.widgets.status_cmb as status_cmb
 import ccgeneral.widgets.asset_cmb as asset_cmb
-import ccgeneral.widgets.shot_cmb as shot_cmb
+import ccgeneral.widgets.shot_combobox as shot_cmb
 
 
 class ContextPage(BasePublishPage):
@@ -157,7 +157,7 @@ class AssetCmbContextPage(ContextPage):
         return True
 
 
-class ShotCmbContextPage(ContextPage):
+class ShotComboBoxContextPage(ContextPage):
     title = "Select Shot Context Page"
     subtitle = "Select the shot to publish to"
 
@@ -172,7 +172,7 @@ class ShotCmbContextPage(ContextPage):
         """
         if self.cmb_shot:
             return
-        self.cmb_shot = shot_cmb.ShotCmb(
+        self.cmb_shot = shot_cmb.ShotComboBox(
             ftshot=self.wizard().ftshot)
         self.set_combobox_index(self.cmb_shot.cmb_task, "tracking")
         self.context_layout.addWidget(self.cmb_shot)

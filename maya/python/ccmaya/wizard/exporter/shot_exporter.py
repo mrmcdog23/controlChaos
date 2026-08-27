@@ -23,7 +23,7 @@ except (TypeError, RuntimeError):
 class ShotExporter(BaseExporter):
     def __init__(self):
         super().__init__()
-        self.save_dir = str()
+        self.ctx = None
         self.exported_files_to_data = dict()
         self.additional_components = dict()
 
@@ -53,12 +53,12 @@ class ShotExporter(BaseExporter):
         all_namespaces = self.data["namespaces"]
 
         # set the next version number
-        ctx = context.Context(self.data)
-        self.next_version = self.ftquery.next_version_from_ctx(ctx)
+        self.ctx = context.Context(self.data)
+        self.next_version = self.ftquery.next_version_from_ctx(self.ctx)
         self.logger.info(f"Using next version number: {self.next_version}")
 
-        ctx.use_version = self.next_version
-        self.abc_version_dir = ctx.next_alembic_path
+        self.ctx.use_version = self.next_version
+        self.abc_version_dir = self.ctx.alembic_file_path
 
         namespace_to_data = dict()
         for namespace in all_namespaces:
@@ -70,7 +70,7 @@ class ShotExporter(BaseExporter):
             namespace_to_data[namespace] = scene_asset_inst.asset_data_dict
 
         # run the fbx export separately
-        fbx_inst = fbx_anim_export.FbxAnimExport(all_namespaces, ctx)
+        fbx_inst = fbx_anim_export.FbxAnimExport(all_namespaces, self.ctx)
         fbx_inst.run_fbx_exports()
 
         # add the fbx paths to the exported files dictionary
@@ -92,9 +92,8 @@ class ShotExporter(BaseExporter):
         self.logger.info(f"Exporting alembic {namespace}")
         scene_asset_inst = scene_asset.SceneAsset(namespace)
 
-        ctx = context.Context(self.data)
-        ctx.use_suffix = namespace
-        abc_path = ctx.next_alembic_path
+        self.ctx.use_suffix = namespace
+        abc_path = self.ctx.alembic_file_path
 
         file_utils.create_directories(os.path.dirname(abc_path))
         self.logger.info(f"Alembic path: {abc_path}")
@@ -137,10 +136,6 @@ class ShotExporter(BaseExporter):
         """
         Write the metadata json file
         """
-        file_name = file_utils.get_file_name(self.data['wip_file_path'])
-        metadata_path = file_utils.join_file_names(
-            self.save_dir, f"{file_name}_metadata.json")
-
         # update and save all metadata
         data = {
             "exported_files_to_data": self.exported_files_to_data,
@@ -149,7 +144,15 @@ class ShotExporter(BaseExporter):
             "master_scene": cmds.file(q=True, sn=True)
         }
         data.update(self.data)
-        file_utils.write_file(metadata_path, data)
+
+        self.ctx.use_suffix = "metadata"
+        data_file_path = self.ctx.data_file_path
+        self.logger.info(f"Writing metadata: {data_file_path}")
+        file_utils.create_directories(os.path.dirname(data_file_path))
+        file_utils.write_file(data_file_path, data)
+
+        # add the data to the dictionary
+        self.additional_components["metadata"] = data_file_path
 
     @BaseExporter.add_to_percentage(10)
     def publish_shot(self):

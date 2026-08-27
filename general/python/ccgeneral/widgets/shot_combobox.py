@@ -6,14 +6,14 @@ import cccore.file_env.context as context
 import ccftrack.shot as shot
 
 
-class ShotCmb(base_ui.WidgetBase):
+class ShotComboBox(base_ui.WidgetBase):
     """
     The Ftrack combo boxes for loading shots and versions
     """
     def __init__(self,
                  ftshot=None,  # type: Optional[shot.FtShot]
                  ctx=None,  # type: Optional[context.Context]
-                 ver=False,  # type: Optional[bool]
+                 hide_versions=True,  # type: Optional[bool]
                  sel_tasks=False,  # type: Optional[bool]
                  hide_tasks=False  # type: Optional[bool]
                  ):
@@ -25,13 +25,15 @@ class ShotCmb(base_ui.WidgetBase):
             sel_tasks: Add an option to select the task
             hide_tasks: Hide the task combobox
         """
-        super(ShotCmb, self).__init__(ftshot=ftshot, ctx=ctx, ver=ver, sel_tasks=sel_tasks, hide_tasks=hide_tasks)
+        super(ShotComboBox, self).__init__(
+            ftshot=ftshot, ctx=ctx, hide_versions=hide_versions,
+            sel_tasks=sel_tasks, hide_tasks=hide_tasks)
         self.ftshot = ftshot
         self.ctx = ctx
-        self.ver = ver
+        self.hide_versions = hide_versions
         self.sel_tasks = sel_tasks
         self.hide_tasks = hide_tasks
-        self.is_commercial = self.ftshot.is_commercial
+        self.is_commercial = True
 
         # run the setup functions
         self.populate_episodes()
@@ -46,7 +48,7 @@ class ShotCmb(base_ui.WidgetBase):
         Set the version combobox hidden if not specified.
         If not connect the task combobox to the signal
         """
-        if not self.ver:
+        if not self.hide_versions:
             self.lbl_version.setHidden(True)
             self.cmb_version.setHidden(True)
         else:
@@ -214,11 +216,11 @@ class ShotCmb(base_ui.WidgetBase):
         return context_dict
 
 
-class ShotCmbHorizontal(ShotCmb):
+class ShotComboBoxHorizontal(ShotComboBox):
     """
     Shot combo boxes horizontal
     """
-    ui_name = "shot_cmb_horz"
+    ui_name = "shot_combobox_horz"
 
     def __init__(self, ftshot=None, ctx=None, ver=False, hide_tasks=False):
         super().__init__(ftshot=ftshot, ctx=ctx, ver=ver, hide_tasks=hide_tasks)

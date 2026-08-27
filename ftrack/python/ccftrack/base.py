@@ -1142,6 +1142,6 @@ class FtBase(object):
         Returns:
             File path of the component
         """
-        return file_utils.path_from_component(component)
+        return file_utils.get_component_path(component)
 
 
