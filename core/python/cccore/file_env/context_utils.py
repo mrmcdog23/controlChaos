@@ -116,3 +116,21 @@ def get_context_from_path(path):
     context_dict = context_dict_from_path(path)
     ctx = context.Context(overrides=context_dict)
     return ctx
+
+
+def is_file_correct_for_project(path):
+    # type: (str) -> bool
+    """
+    Does the given file path of that current project
+    environments project.
+
+    Args:
+        path: Path of the file to check
+
+    Returns:
+        True if it is of the correct environment
+    """
+    context_dict = context_dict_from_path(path)
+    if not context_dict or not context_dict.get("project_code"):
+        return True
+    return os.environ["PROJECT_CODE"] == context_dict["project_code"]

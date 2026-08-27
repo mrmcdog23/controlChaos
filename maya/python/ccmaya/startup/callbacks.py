@@ -1,82 +1,23 @@
 """ initialize the maya callbacks """
 import maya.OpenMaya as OpenMaya
 import maya.cmds as cmds
-import no8maya.startup.context_buttons as context_buttons
-import no8maya.maya_constants as maya_constants
-import cccore.utils.context_utils as context_utils
+import ccmaya.startup.context_buttons as context_buttons
+import ccmaya.maya_constants as maya_constants
+import cccore.file_env.context_utils as context_utils
 import cccore.core_constants as core_constants
-import cccore.context as context
-import cccore.utils.backup_file as backup_file
+import cccore.file_env.context as context
 
 
 START = core_constants.DEFAULT_START_FRAME
 END = core_constants.DEFAULT_END_FRAME
 
 
-def convert_camera_callback(node_name):
-    # type: (str) -> None
-    """
-    Create item for a standard maya camera to a
-    no8 camera triggered from the outliner.
-
-    Args:
-        node_name: Selected node name
-    """
-    object_type = cmds.objectType(node_name)
-
-    # it will most likely be a transform selected
-    # and if so check the shape is a camera
-    if object_type == "transform":
-        try:
-            shape = cmds.listRelatives(node_name, s=True)[0]
-        except IndexError:
-            return
-        # if the shape is not a camera then return
-        if cmds.objectType(shape) != "camera":
-            return
-
-    # if the object is not a camera or transform then return
-    elif object_type != "camera":
-        return
-
-    # if it is already a no8 camera return
-    if cmds.objExists(f"{node_name}.ftrackId"):
-        return
-
-    # build the menu item in the outliner
-    command = f"import no8maya.camera.camera_convert as cc;" \
-              f"cc.CameraConversion('{node_name}').convert_cam_to_no8_cam()"
-    cmds.menuItem(divider=True, insertAfter="")
-    cmds.menuItem(
-        "convert_no8_camera",
-        enableCommandRepeat=False,
-        label="Convert To No8Camera",
-        command=command
-    )
-
-
 def initialize_callbacks():
     """
     Create the open and new maya callbacks
     """
-    OpenMaya.MSceneMessage.addCallback(OpenMaya.MSceneMessage.kAfterSave, save_backup_file)
     OpenMaya.MSceneMessage.addCallback(OpenMaya.MSceneMessage.kAfterOpen, set_context_buttons)
     OpenMaya.MSceneMessage.addCallback(OpenMaya.MSceneMessage.kAfterNew, set_scene_fps)
-
-    # add camera convert callback
-    cmds.callbacks(
-        addCallback=convert_camera_callback,
-        hook='addItemsToOutlinerNodePopupMenu',
-        owner="camera_con"
-    )
-
-
-def save_backup_file(*args, **kwargs):
-    """
-    Save a backup of the file path
-    """
-    maya_file_path = cmds.file(q=True, sn=True)
-    backup_file.create_backup_file(maya_file_path)
 
 
 def set_scene_fps(*args, **kwargs):

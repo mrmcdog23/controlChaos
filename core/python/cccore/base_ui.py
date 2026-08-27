@@ -248,7 +248,7 @@ class Ui(object):
 
         # set the image
         elif not image_path or not os.path.exists(image_path):
-            self.set_widget_icons({"no_thumbnail.png": self.thumbnail})
+            self.set_widget_icons({self.thumbnail: "no_thumbnail.png"})
         else:
             self.set_widget_icons({image_path: self.thumbnail})
 

@@ -173,7 +173,11 @@ class ProgressPage(BasePublishPage):
         Args:
             message: Additional text to display
         """
-        pass
+        if core_constants.VERSION_TEXT in message:
+            regex_txt = "{0} (.*)".format(core_constants.VERSION_TEXT)
+            asset_version_id = re.search(regex_txt, message).group(1)
+            asset_version_id_cleaned = re.sub(r'[^a-zA-Z0-9-]', '', asset_version_id)
+            self.wizard().asset_version_id = asset_version_id_cleaned
 
     def local_progress(self, progress_num):
         # type: (int) -> None

@@ -51,10 +51,14 @@ class FtAssetVersion(FtBase):
     @property
     def asset_version_id(self):
         # type: () -> str
-        """
-        The current ftrack asset version id
-        """
+        """ The current ftrack asset version id """
         return self._asset_version_id
+
+    @property
+    def wip_file_path(self):
+        # type: () -> str
+        """ Get the wip file path if it exists """
+        return self.asset_version["custom_attributes"]["wip_file_path"]
 
     @asset_version_id.setter
     def asset_version_id(self, asset_version_id):
@@ -67,9 +71,10 @@ class FtAssetVersion(FtBase):
         """
         asset_version = self.get_asset_version_from_id(asset_version_id)
         if not asset_version:
-            self.logger.error("Asset version not found!")
+            self.logger.error(f"Asset version not found with id: {asset_version_id}")
             return
         self._asset_version_id = asset_version_id
+        self.logger.info(f"Asset version found with id: {asset_version_id}")
         self.asset_version = asset_version
 
     @property

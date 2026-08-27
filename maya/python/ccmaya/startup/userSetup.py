@@ -79,7 +79,7 @@ def create_callbacks():
     """
     Create the maya callbacks
     """
-    import no8maya.startup.callbacks as callbacks
+    import ccmaya.startup.callbacks as callbacks
     callbacks.initialize_callbacks()
 
 
@@ -102,9 +102,9 @@ def main():
 
     maya_menu.build_cc_menu()
     #maya_menu.build_no8_playblast_menu()
-    #create_callbacks()
+    create_callbacks()
     create_context_buttons()
-    #set_frames_per_second()
+    set_frames_per_second()
 
 
 mutils.executeDeferred(main)

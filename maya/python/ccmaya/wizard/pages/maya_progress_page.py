@@ -41,6 +41,7 @@ class MayaProgressPage(ProgressPage):
         Args:
             message: Additional text to display
         """
+        super().add_parent_message(message)
         # if the standard error is found no need for error checking as its last
         if "Exception ignored in: <function MCallbackIdWrapper.__del__ at " in message:
             self.found_standard_error = True

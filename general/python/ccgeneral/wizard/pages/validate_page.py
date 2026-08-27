@@ -17,10 +17,11 @@ FRAME_STYLE = "background-color: {0};"
 
 class ValidatorWidget(base_ui.WidgetBase):
     ui_name = "validator"
-    widget_to_icon = {"refresh_white": "btn_refresh",
-                      "information": "btn_details",
-                      "fix": "btn_autofix"
-                      }
+    widget_to_icon = {
+        "btn_refresh": "refresh_white",
+        "btn_details": "information",
+        "btn_autofix": "fix"
+    }
 
     def __init__(self, parent, valid_cls, data):
         super(ValidatorWidget, self).__init__(parent, valid_cls, data)

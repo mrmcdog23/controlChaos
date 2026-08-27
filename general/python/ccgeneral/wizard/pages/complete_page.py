@@ -81,6 +81,7 @@ class CompletePage(BasePublishPage):
 
         # get access to the asset version and get the data
         ftver = self.wizard().ftver
+        print (f"ggrgre{asset_version_id}regvrrgg")
         ftver.asset_version_id = asset_version_id
         self.txt_ftrack_link.setText(ftver.html_link_format)
         self.txt_ftrack_link.setOpenExternalLinks(True)
@@ -106,11 +107,14 @@ class CompletePage(BasePublishPage):
         elif gif_path and os.path.exists(gif_path):
             self.set_gif_on_label(self, gif_path, self.thumbnail, 250, 150)
 
-        # get file path
-        if ftver.master_component_path:
-            file_name = os.path.basename(ftver.master_component_path)
-            self.txt_file_path.setText(file_name)
-            self.txt_file_path.setToolTip(ftver.master_component_path)
+        # get the wip file path and add to the display
+        wip_file_path = ftver.wip_file_path
+        if wip_file_path:
+            wip_file_name = os.path.basename(wip_file_path)
+        else:
+            wip_file_name = "-"
+        self.txt_file_path.setText(wip_file_name)
+        self.txt_file_path.setToolTip(wip_file_path)
 
     def isComplete(self):
         """
