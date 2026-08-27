@@ -5,11 +5,10 @@ import cccore.base_ui as base_ui
 import cccore.utils.file_utils as file_utils
 import ccunreal.utils.unreal_utils as unreal_utils
 import ccunreal.shot.ue_load_shot as ue_load_shot
-from ccgeneral.widgets.line_browser import LineBrowser
-from CCPySide import QtWidgets, QtCore
-from ccgeneral.widgets.shot_combobox import ShotComboBox
 import ccftrack.shot as shot
 import ccftrack.asset_version as ft_version
+from CCPySide import QtWidgets, QtCore
+from ccgeneral.widgets.shot_combobox import ShotComboBox
 
 
 class LoadShotUI(base_ui.WidgetBase):
@@ -48,21 +47,6 @@ class LoadShotUI(base_ui.WidgetBase):
         self.btn_import_files.clicked.connect(self.import_files)
         self.cmb_sequence.currentIndexChanged.connect(self.populate_sequence_shots)
         self.cmb_shot.cmb_version.currentIndexChanged.connect(self.update_versions)
-
-    def update_versions(self):
-        """
-        Update the version list based on the asset selection
-        """
-        #self.tw_versions.clear()
-        self.cmb_shot.set_ftshot()
-        version_num = self.cmb_shot.cmb_version.currentText()
-        # get the versions from the combo boxes
-        asset_version = self.ftshot.get_asset_version_from_number(version_num)
-        self.ftver.asset_version_id = asset_version["id"]
-        for k, v in self.ftver.component_to_path.items():
-            print (k, v)
-        #self.populate_version_tree(num_to_version_dict, self.ftasset)
-        #self.reset_ui()
 
     def enable_existing_level(self, enable):
         # type: (bool) -> None
@@ -126,32 +110,38 @@ class LoadShotUI(base_ui.WidgetBase):
         else:
             self.btn_import_files.setEnabled(True)
 
-    def populate_values(self):
+    def update_versions(self):
         """
-        Populate the list widget with the fbx files
+        Update the version list based on the asset selection
         """
         self.lw_import_files.clear()
-        '''
+        self.cmb_shot.set_ftshot()
 
-        # TODO: temp file for new format
-        exported_files_to_data = self.data.get("exported_files_to_data")
-        if not exported_files_to_data:
-            return
+        # get the versions from the combo boxes
+        version_num = self.cmb_shot.cmb_version.currentText()
+        asset_version = self.ftshot.get_asset_version_from_number(version_num)
 
-        for file_path, file_data in exported_files_to_data.items():
-            if not file_path.endswith(".fbx"):
+        self.ftver.asset_version_id = asset_version["id"]
+        for component_name, component_path in self.ftver.component_to_path.items():
+            if component_name == "metadata":
+                self.data = file_utils.read_file(component_path)
+
+            if not component_path.endswith(".fbx"):
                 continue
-            item = QtWidgets.QListWidgetItem(os.path.basename(file_path))
+
+            item = QtWidgets.QListWidgetItem(os.path.basename(component_path))
             item.setCheckState(QtCore.Qt.Checked)
-            item.setData(QtCore.Qt.UserRole, file_path)
+            item.setData(QtCore.Qt.UserRole, component_path)
             self.lw_import_files.addItem(item)
 
+        # set the frame range from the data
         self.sb_start_frame.setValue(self.data["start_frame"])
         self.sb_end_frame.setValue(self.data["end_frame"])
-        self.ui_settings.setValue("import_json", import_json)
-        '''
 
     def populate_sequence_shots(self):
+        """
+        Populate the existing shot names combo box
+        """
         selected_sequence = self.cmb_sequence.currentText()
         shots_path = f"{self.sequence_root}/{selected_sequence}/Shots"
         shot_names = unreal_utils.list_subfolders(shots_path, recursive=False)
@@ -159,6 +149,9 @@ class LoadShotUI(base_ui.WidgetBase):
         self.cmb_existing_shots.addItems(shot_names)
 
     def populate_levels(self):
+        """
+        Populate the level sequences combobox
+        """
         asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
 
         # Filter for World assets (levels/maps)
@@ -202,7 +195,8 @@ class LoadShotUI(base_ui.WidgetBase):
         Import cameras into unreal
         """
         ue.log_warning("Building shot...")
-        ue_load_shot.UELoadShot(self.import_files_list, self.data, self.level_path, self.shot_path)
+        ue_load_shot.UELoadShot(
+            self.import_files_list, self.data, self.level_path, self.shot_path)
 
 
 def launch():

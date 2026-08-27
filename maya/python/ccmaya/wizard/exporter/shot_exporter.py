@@ -167,7 +167,6 @@ class ShotExporter(BaseExporter):
         self.log(f"Asset Version: {asset_version_id}")
 
 
-
 if __name__ == "__main__":
     exporter = ShotExporter()
     exporter.batch_process(sys.argv[1])
