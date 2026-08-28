@@ -167,6 +167,12 @@ class Context(object):
         return file_utils.join_file_names(self.app_dir, "data", self.task)
 
     @property
+    def movie_dir(self):
+        # type: () -> str
+        """ The project shots directory """
+        return file_utils.join_file_names(self.app_dir, "movie", self.task)
+
+    @property
     def task_dir(self):
         # type: () -> str
         """ The project shots directory """
@@ -309,6 +315,19 @@ class Context(object):
         fbx_path = file_utils.join_file_names(
             self.data_dir, f"v{self.version_padded}", self.new_filename)
         return fbx_path
+
+    @property
+    def playblast_movie_path(self):
+        # type: () -> str
+        """
+        Path of the sequence cache file
+        """
+        self.use_ext = "mov"
+        if os.path.exists(self.movie_dir):
+            self.use_version = len(os.listdir(self.movie_dir)) + 1
+        else:
+            self.use_version = 1
+        return file_utils.join_file_names(self.data_dir, self.new_filename)
 
     @property
     def as_dict(self):

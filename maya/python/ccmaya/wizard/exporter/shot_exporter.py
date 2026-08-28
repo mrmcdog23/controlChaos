@@ -50,7 +50,7 @@ class ShotExporter(BaseExporter):
         Cache all the assets in the scene
         """
         self.logger.info("Caching assets...")
-        all_namespaces = self.data["namespaces"]
+        all_namespaces = self.data.get("namespaces", list())
 
         # set the next version number
         self.ctx = context.Context(self.data)

@@ -101,7 +101,7 @@ def main():
     create_save_menu_item()
 
     maya_menu.build_cc_menu()
-    #maya_menu.build_no8_playblast_menu()
+    maya_menu.build_cc_playblast_menu()
     create_callbacks()
     create_context_buttons()
     set_frames_per_second()

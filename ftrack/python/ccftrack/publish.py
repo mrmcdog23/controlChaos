@@ -44,6 +44,15 @@ class FtrackPublish(object):
         self.publish_additional_components()
         self.create_ftrack_movie()
 
+    @property
+    def playable_component(self):
+        playable_component = self.data.get("playable_component")
+        if playable_component:
+            return playable_component
+        file_sequences = self.data.get("file_sequences")
+        if file_sequences:
+            return file_sequences[0]
+
     def get_category(self, ext):
         # type: (str) -> str
         """
@@ -115,9 +124,9 @@ class FtrackPublish(object):
         self.data["thumbnail_path"] = output_path
 
         # if not image sequence then use the first one
-        if not self.image_sequence:
-            self.logger.info(f"Using output path: {image_sequence_path}")
-            self.image_sequence = image_sequence_path
+        if not self.playable_component:
+            self.logger.info(f"Using output path: {self.playable_component}")
+            self.playable_component = self.playable_component
 
     def create_asset_version(self):
         """
@@ -181,11 +190,7 @@ class FtrackPublish(object):
             ctx = context_utils.get_context_from_path(sequence_path)
 
             # get the aov name from the context or index
-            aov_name = ctx.aov if ctx else f"main{(index + 1)}"
-            if aov_name in component_names:
-                self.logger.warning(f"{aov_name} already exists")
-                continue
-
+            aov_name = "main"
             name_to_path = {aov_name: seq_data.padded_path}
             self.ftver.add_component_dict(name_to_path)
 
@@ -218,7 +223,7 @@ class FtrackPublish(object):
             self.ftver.add_playable_component(self.movie_component_path)
             return
 
-        if not self.image_sequence:
+        if not self.playable_component:
             self.logger.info("No playable component")
             self.logger.info("Completed publish!")
             return
@@ -228,7 +233,7 @@ class FtrackPublish(object):
             self.logger.info("Skipping movie generation")
             return
 
-        seq_data = sequence_utils.get_sequence_data(self.image_sequence)
+        seq_data = sequence_utils.get_sequence_data(self.playable_component)
         if seq_data.is_cache:
             self.logger.info("Cache sequence")
             self.logger.info("Completed publish!")

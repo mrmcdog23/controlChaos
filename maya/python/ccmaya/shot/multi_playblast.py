@@ -15,6 +15,8 @@ FFMPEG_EXE = "C:/ffmpeg/bin/ffmpeg.exe"
 
 class MultiPlayblast(base_ui.WindowBase):
     title = "CC Multi Playblast"
+    use_cc_ss = False
+
     def __init__(self, parent):
         super().__init__(parent=parent)
         self.ui_settings = QtCore.QSettings('controlChaos', 'multiplay')

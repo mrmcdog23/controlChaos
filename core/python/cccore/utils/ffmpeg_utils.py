@@ -56,8 +56,13 @@ def run_ffmpeg_command(ffmpeg_command, output_path):
         Has the mov been run successfully
     """
     logger.info(f"Command: {ffmpeg_command}")
-    os.system(ffmpeg_command)
-
+    process = subprocess.Popen(
+        ffmpeg_command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=True
+    )
+    process.communicate()
     if os.path.exists(output_path):
         logger.info("Generated ffmpeg file")
         return True
@@ -109,14 +114,10 @@ def convert_image_type(input_path, output_path, low_res=False):
         resize_cmd=resize_cmd,
         output_path=output_path,
     )
+    success = run_ffmpeg_command(ffmpeg_convert_command, output_path)
     logger.info(f"Command: {ffmpeg_convert_command}")
-    process = subprocess.Popen(
-        ffmpeg_convert_command,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        shell=True
-    )
+    return success
 
-    stdout, stderr = process.communicate()
-    logger.info(stdout)
+
+def convert_sequence_to_movie(input_path, movie_path, start):
+    command = "ffmpeg -y  -start_number {start} -i {sequence_padded_path} -c:v libx264 -pix_fmt yuv420p {movie_path}"

@@ -60,7 +60,7 @@ class SequenceInfo(object):
         """
         # initialize class variables
         self.images_dir = str()
-        self.logger = cc_logging.no8_logger()
+        self.logger = cc_logging.cc_logger()
         self.source_image_path = self.get_source_image_path(source_image_path)
 
         # initialize sequence data

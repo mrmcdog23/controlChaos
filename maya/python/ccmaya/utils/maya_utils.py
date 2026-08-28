@@ -152,3 +152,14 @@ def cc_save_panel_refresh():
     maya_window = get_maya_main_window()
     ctx_panel = maya_window.findChild(QtWidgets.QWidget, ctx_constants.CONTEXT_PANEL)
     ctx_panel.populate_wip_versions()
+
+
+def get_model_panels():
+    # type: () -> list[cmds.modelPanel]
+    """ All model panels """
+    all_model_panels = list()
+    model_panels = cmds.getPanel(type="modelPanel")
+    for model_panel in cmds.getPanel(visiblePanels=True):
+        if model_panel in model_panels:
+            all_model_panels.append(model_panel)
+    return all_model_panels

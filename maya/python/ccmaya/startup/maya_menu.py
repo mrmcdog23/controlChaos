@@ -69,18 +69,18 @@ def build_cc_menu():
 
 def build_cc_playblast_menu():
     """
-    Added the no8playblast command to the Timeline popup menu.
+    Added the ccplayblast command to the Timeline popup menu.
     """
     mel.eval("""updateTimeSliderMenu TimeSliderMenu""")
-    if cmds.menuItem("no8_playblast_item", exists=True):
-        cmds.deleteUI("no8_playblast_item")
+    if cmds.menuItem("cc_playblast_item", exists=True):
+        cmds.deleteUI("cc_playblast_item")
 
-    if cmds.menuItem("no8_playblast_item_option", exists=True):
-        cmds.deleteUI("no8_playblast_item_option")
+    if cmds.menuItem("cc_playblast_item_option", exists=True):
+        cmds.deleteUI("cc_playblast_item_option")
 
-    cmds.menuItem("no8_playblast_item",
-                  label="No8 Playblast...",
-                  command="import no8maya.shot.playblaster.playblast_wizard as pbwz;pbwz.main()",
+    cmds.menuItem("cc_playblast_item",
+                  label="Control Chaos Playblast...",
+                  command="import ccmaya.shot.playblaster.playblast_wizard as pbwz;pbwz.main()",
                   ia="timeSliderPlayblastOptionItem",
                   p="TimeSliderMenu"
                   )
