@@ -61,7 +61,7 @@ def main():
     create_command(shot_menu, "Load FBX Cameras", command)
     
     command = "import ccunreal.shot.load_shot_ui as load_shot_ui;load_shot_ui.launch()"
-    create_command(shot_menu, "Shot Loader", command)
+    create_command(shot_menu, "Import Unreal Shot", command)
 
     # lighting menu
     lighting_menu = create_submenu(control_chaos_menu, "Lighting")

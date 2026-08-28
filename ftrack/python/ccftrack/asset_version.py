@@ -460,6 +460,12 @@ class FtAssetVersion(FtBase):
         return self.asset_version['comment']
 
     @property
+    def created_by(self):
+        # type: () -> str
+        """ Who created the asset version """
+        return self.asset_version["custom_attributes"]["created_by"]
+
+    @property
     def username(self):
         # type: () -> str
         """ Get the asset version username it was published under """
@@ -750,3 +756,4 @@ class FtAssetVersion(FtBase):
                         "version_num": self.version_num
                         }
         return ctx_dict
+

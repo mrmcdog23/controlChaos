@@ -151,6 +151,10 @@ class LoadShotUI(base_ui.WidgetBase):
         self.sb_start_frame.setValue(self.data["start_frame"])
         self.sb_end_frame.setValue(self.data["end_frame"])
 
+        # set the ftrack widgets
+        self.txt_created_by.setText(self.ftver.created_by)
+        self.txt_comments_by.setText(self.ftver.comment)
+
     def populate_sequence_shots(self):
         """
         Populate the existing shot names combo box
@@ -204,8 +208,10 @@ class LoadShotUI(base_ui.WidgetBase):
         return import_files
 
     def closeEvent(self, event):
+        """
+        Save the values on ui close
+        """
         event.accept()
-        # set values in the settings
         for key, value in self.cmb_shot.get_data().items():
             self.ui_settings.setValue(key, value)
 
