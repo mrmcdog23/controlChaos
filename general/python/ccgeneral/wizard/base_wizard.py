@@ -51,9 +51,7 @@ class BaseWizard(base_ui.WizardBase):
         banner_path = self.get_icon_path(self.banner_name)
         pixmap = QtGui.QPixmap(banner_path)
         self.setPixmap(QtWidgets.QWizard.BannerPixmap, pixmap)
-
         self.add_wizard_pages()
-        self.set_publish_data()
 
     @property
     def wizard_pages(self):
@@ -162,12 +160,6 @@ class BaseWizard(base_ui.WizardBase):
         # type: () -> str
         """ Either a shot or asset """
         return str()
-
-    def set_publish_data(self):
-        """
-        Set the core publish data to save
-        """
-        self.data["wip_file_path"] = self.wip_file_path()
 
     @classmethod
     def run_checks(cls):

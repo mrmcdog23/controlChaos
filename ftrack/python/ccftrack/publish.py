@@ -27,7 +27,6 @@ class FtrackPublish(object):
         self.sequence_only = True
         self.asset_version = None
         self.movie_name = str()
-        self.movie_component_path = str()
 
         # movie component found
         self.logger = cc_logging.cc_logger()
@@ -180,11 +179,6 @@ class FtrackPublish(object):
 
         for index, sequence_path in enumerate(self.data["file_sequences"]):
             self.logger.info(f"Sequence: {sequence_path}")
-            if sequence_path.endswith(".mov"):
-                self.logger.warning(f"Skipping file: {sequence_path}")
-                self.movie_component_path = sequence_path
-                continue
-
             seq_data = sequence_utils.get_sequence_data(sequence_path)
             sequence_utils.make_sequence_read_only(sequence_path)
             ctx = context_utils.get_context_from_path(sequence_path)
@@ -219,8 +213,10 @@ class FtrackPublish(object):
         self.logger.info("Creating FTrack movie...")
 
         # if a movie file component was found use it
-        if self.movie_component_path:
-            self.ftver.add_playable_component(self.movie_component_path)
+        movie_component_path = self.data["movie_component_path"]
+        if movie_component_path:
+            self.logger.info(f"Uploading movie path: {movie_component_path}")
+            self.ftver.add_playable_component(movie_component_path)
             return
 
         if not self.playable_component:
@@ -264,7 +260,7 @@ class FtrackPublish(object):
         self.ftver.add_playable_component(temp_mov_path)
 
         # either keep and add as a component or delete from disk
-        if self.data.get("keep_mov", False):
+        if self.data.get("keep_mov", True):
             self.ftver.add_component("movieFile", temp_mov_path)
         else:
             os.remove(temp_mov_path)

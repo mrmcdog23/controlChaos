@@ -7,24 +7,17 @@ from ccmaya.shot.playblaster.preview_page import PreviewPage
 from ccmaya.wizard.pages.maya_progress_page import AnimProgressPage
 from ccgeneral.wizard.pages.complete_page import CompletePage
 from ccgeneral.wizard.pages.context_page import ShotContextPage
-import ccgeneral.wizard.base_wizard as base_wizard
 import ccmaya.wizard.exporter.shot_exporter as shot_exporter
+from ccmaya.wizard.maya_base_wizard import MayaBaseWizard
 
 
-class PlayblastWizard(base_wizard.BaseWizard):
+class PlayblastWizard(MayaBaseWizard):
     title = "Playblast Wizard"
     use_cc_ss = False
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.exporter = shot_exporter.ShotExporter()
-        self.dl_settings = {
-            "use_pool": "python",
-            "one_frame_per_task": True,
-            "priority": 50,
-            "local_default": True
-        }
-        self.set_publish_data()
 
     @property
     def wizard_pages(self):

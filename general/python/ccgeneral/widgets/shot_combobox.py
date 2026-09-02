@@ -48,7 +48,7 @@ class ShotComboBox(base_ui.WidgetBase):
         Set the version combobox hidden if not specified.
         If not connect the task combobox to the signal
         """
-        if not self.hide_versions:
+        if self.hide_versions:
             self.lbl_version.setHidden(True)
             self.cmb_version.setHidden(True)
         else:

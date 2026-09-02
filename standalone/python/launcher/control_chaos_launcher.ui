@@ -217,7 +217,7 @@
     <item row="2" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QLabel" name="lbl_show_project_icon">
+       <widget class="QLabel" name="lbl_project_icon">
         <property name="minimumSize">
          <size>
           <width>20</width>
@@ -232,13 +232,6 @@
         </property>
         <property name="text">
          <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lbl_project">
-        <property name="text">
-         <string>Project </string>
         </property>
        </widget>
       </item>

@@ -110,6 +110,8 @@ class CompletePage(BasePublishPage):
         wip_file_path = ftver.wip_file_path
         if wip_file_path:
             wip_file_name = os.path.basename(wip_file_path)
+        elif self.data.get("display_name"):
+            wip_file_name = self.data.get("display_name")
         else:
             wip_file_name = "-"
         self.txt_file_path.setText(wip_file_name)

@@ -374,6 +374,15 @@ class ShotCreatorTool(BaseTool):
         self.launch_path = "{0}/standalone/python/creators/shot_creator.py"
 
 
+class VideoUploaderTool(BaseTool):
+    name = "video_uploader_tool"
+
+    def __init__(self):
+        super(VideoUploaderTool, self).__init__()
+        self.display_text = "Video Uploader"
+        self.icon = "video_uploader.png"
+        self.launch_path = "{0}/standalone/python/uploader/video_uploader_wizard.py"
+
 
 APPLICATIONS = [
     MayaApp,
@@ -382,5 +391,6 @@ APPLICATIONS = [
 TOOLS = [
     SlateMakerTool,
     ProjectCreatorTool,
-    ShotCreatorTool
+    ShotCreatorTool,
+    VideoUploaderTool
 ]

@@ -173,8 +173,7 @@ class ShotComboBoxContextPage(ContextPage):
         if self.cmb_shot:
             return
         self.cmb_shot = shot_cmb.ShotComboBox(
-            ftshot=self.wizard().ftshot)
-        self.set_combobox_index(self.cmb_shot.cmb_task, "tracking")
+            ftshot=self.wizard().ftshot, hide_versions=True)
         self.context_layout.addWidget(self.cmb_shot)
 
     def validatePage(self):

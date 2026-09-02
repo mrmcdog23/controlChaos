@@ -229,13 +229,11 @@ class ProgressPage(BasePublishPage):
         file_utils.create_directory(output_dir)
 
         # get the file name either from the wip file or the project name
-        file_name = file_utils.get_file_name(self.data["wip_file_path"])
-        if not file_name:
-            file_name = self.project_data.project_name
+        log_prefix = file_utils.get_file_name(self.data["log_prefix"])
 
         # set the temp file paths
         self.metadata_file_path = file_utils.temp_file_path(
-            file_name, "json", directory=output_dir)
+            log_prefix, "json", directory=output_dir)
         self.output_file_path = self.metadata_file_path.replace("json", "txt")
 
 

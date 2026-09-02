@@ -117,7 +117,3 @@ def convert_image_type(input_path, output_path, low_res=False):
     success = run_ffmpeg_command(ffmpeg_convert_command, output_path)
     logger.info(f"Command: {ffmpeg_convert_command}")
     return success
-
-
-def convert_sequence_to_movie(input_path, movie_path, start):
-    command = "ffmpeg -y  -start_number {start} -i {sequence_padded_path} -c:v libx264 -pix_fmt yuv420p {movie_path}"
