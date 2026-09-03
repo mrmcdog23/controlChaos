@@ -400,42 +400,17 @@ class FtAsset(FtBase):
         self.logger.info(f"Creating {asset_build_type_name} {asset_name} on ftrack")
         self.asset_build_type_name = asset_build_type_name
 
-        parent_folder = self.get_folder("build")
+        parent_folder = self.get_folder("asset")
         custom = {"created_by": core_constants.USERNAME}
-        new_asset_build = self.session.create('AssetBuild', {'name': asset_name,
-                                                             'type': self.asset_build_type,
-                                                             'parent': parent_folder,
-                                                             "custom_attributes": custom
-                                                             }
-                                              )
+        new_asset_build = self.session.create(
+            "AssetBuild", {"name": asset_name,
+                           "type": self.asset_build_type,
+                           "parent": parent_folder,
+                           "custom_attributes": custom
+                           }
+        )
         self.create_task_template_for_entity(asset_build_type_name, new_asset_build)
         self.session.commit()
-
-    def create_library_ftrack_asset(self, asset_build_type_name, asset_name):
-        # type: (str, str) -> None
-        """
-        Create a shot under a sequence
-
-        Args:
-            asset_build_type_name: Name of the asset build type
-            asset_name: Name of the asset to create
-        """
-        if asset_name in self.get_asset_build_names():
-            self.logger.info(f"Asset {asset_name} already exists on ftrack")
-            return
-
-        # find the parent folder on ftrack by the asset build type
-        folder_dict = {"hda": "otls", "gizmo": "gizmo"}
-        self.logger.info(f"Creating asset {asset_name} on ftrack")
-        folder_name = folder_dict[asset_build_type_name]
-        parent_folder = self.get_folder(folder_name)
-        self.asset_build_type_name = asset_build_type_name
-        new_asset_build = self.session.create('AssetBuild', {'name': asset_name,
-                                                             'type': self.asset_build_type,
-                                                             'parent': parent_folder,
-                                                             }
-                                              )
-        self.create_task_template_for_entity(asset_build_type_name, new_asset_build)
 
     def set_ftrack_data(self, data):
         # type: (dict) -> ftrack_api.entity.asset_version
