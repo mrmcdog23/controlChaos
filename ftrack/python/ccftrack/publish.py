@@ -213,7 +213,7 @@ class FtrackPublish(object):
         self.logger.info("Creating FTrack movie...")
 
         # if a movie file component was found use it
-        movie_component_path = self.data["movie_component_path"]
+        movie_component_path = self.data.get("movie_component_path")
         if movie_component_path:
             self.logger.info(f"Uploading movie path: {movie_component_path}")
             self.ftver.add_playable_component(movie_component_path)
