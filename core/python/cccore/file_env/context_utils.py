@@ -23,6 +23,8 @@ def get_display_text(envvar, selected_text):
         display_text = selected_text.replace("sh", "")
     elif envvar == ctx_constants.TASK_NAME:
         display_text = selected_text[:4]
+    elif envvar == ctx_constants.ASSET_BUILD_TYPE_NAME:
+        display_text = selected_text[:4]
     else:
         display_text = selected_text[:]
     return display_text[:5]

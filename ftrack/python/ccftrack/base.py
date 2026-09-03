@@ -633,7 +633,7 @@ class FtBase(object):
         schemas = self.session.query('ProjectSchema').all()
         return self.get_names(schemas)
 
-    def get_folder(self, name):
+    def get_folder(self, name, parent_id):
         # type: (str) -> ftrack_api.entity.folder
         """
         The project folder from the name
@@ -644,12 +644,13 @@ class FtBase(object):
         Returns:
             The ftrack folder of the name
         """
-        query = f'Folder where name is "{name}" and parent.id is {self.project_id}'
+        query = f'Folder where name is "{name}" and parent.id is {parent_id}'
         try:
             child_tasks = self.session.query(query)
             folder = child_tasks.one()
         except ftrack_api.exception.NoResultFoundError:
-            raise ResultsError(f"Folder {name} not found")
+            self.logger.warning(f"Folder {name} not found")
+            return
         return folder
 
     @property
@@ -658,7 +659,7 @@ class FtBase(object):
         """
         The project asset folder
         """
-        return self.get_folder("build")
+        return self.get_folder("asset", self.project_id)
 
     @property
     def task(self):

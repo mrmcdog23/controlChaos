@@ -121,18 +121,6 @@ class FtAsset(FtBase):
         self._task_name = task_name
         self.logger.info(f"Task name {task_name} found on asset build")
 
-    @property
-    def asset_build_types_names(self):
-        # type: () -> list[str]
-        """
-        Get project asset types names from the project schema
-
-        Returns:
-            List of project asset type names
-        """
-        asset_types = self.get_asset_build_types()
-        return self.get_names(asset_types)
-
     def get_asset_build_names(self, asset_type=None):
         # type: (str) -> list[str]
         """
@@ -400,12 +388,16 @@ class FtAsset(FtBase):
         self.logger.info(f"Creating {asset_build_type_name} {asset_name} on ftrack")
         self.asset_build_type_name = asset_build_type_name
 
-        parent_folder = self.get_folder("asset")
+        asset_type_folder = self.get_folder(asset_build_type_name, self.asset_folder["id"])
+        if not asset_type_folder:
+            self.logger.info(f"Folder {asset_build_type_name} not found. Creating...")
+            asset_type_folder = self.create_folder(asset_build_type_name, self.asset_folder)
+
         custom = {"created_by": core_constants.USERNAME}
         new_asset_build = self.session.create(
             "AssetBuild", {"name": asset_name,
                            "type": self.asset_build_type,
-                           "parent": parent_folder,
+                           "parent": asset_type_folder,
                            "custom_attributes": custom
                            }
         )

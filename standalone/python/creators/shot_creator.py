@@ -186,7 +186,12 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         """
         shot_number = self.sb_specific_shot_number.value()
         specific_shot_name = self.get_shot_name(shot_number)
-        self.specific_shot_name(specific_shot_name)
+
+        # check and warn the shot already exists
+        if not self.does_existing_shot_in_list(specific_shot_name):
+            item = ContextItem(specific_shot_name, True)
+            self.lw_shot.addItem(item)
+        self.enabled_create_button()
 
     def add_shot_to_list(self, specific_shot_name):
         # type: (str) -> None
@@ -210,13 +215,13 @@ class ShotCreator(base_ui.StandaloneWindowBase):
             set_hidden: Set the widget hidden
         """
         if set_hidden == self.rbn_shots_in_range:
-            self.wdg_shot_number.setHidden(False)
-            self.wdg_shots_in_range.setHidden(True)
+            self.wdg_shot_number.setHidden(True)
+            self.wdg_shots_in_range.setHidden(False)
             self.wdg_custom_name.setHidden(True)
 
         elif set_hidden == self.rbn_specific_shot_number:
-            self.wdg_shot_number.setHidden(True)
-            self.wdg_shots_in_range.setHidden(False)
+            self.wdg_shot_number.setHidden(False)
+            self.wdg_shots_in_range.setHidden(True)
             self.wdg_custom_name.setHidden(True)
         else:
             self.wdg_shot_number.setHidden(True)
