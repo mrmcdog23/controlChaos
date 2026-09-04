@@ -1,6 +1,5 @@
 """ Class to create folder structure on a project """
 import os
-from dataclasses import field
 from typing import Optional
 import cccore.utils.file_utils as file_utils
 import cccore.data.server_data as server_data
@@ -170,26 +169,24 @@ class CreateFolders(object):
         """
         Create the asset on disk and on ftrack
         """
-        root_dir = file_utils.join_file_names(self.project_root, "vfx", "build")
-        file_utils.create_directory(root_dir)
+        assets_dir = file_utils.join_file_names(self.project_root, "assets")
+        file_utils.create_directory(assets_dir)
 
-        # create the folder name of the asset
-        asset_build_type_name = self.create_dict["asset_build_type_name"]
-        asset_build_name = self.create_dict["asset_build_name"]
+        for asset_build_type_name, asset_build_names in self.create_dict.items():
+            # create the folder name of the asset
+            asset_type_folder_dir = file_utils.join_file_names(assets_dir, asset_build_type_name)
+            file_utils.create_directory(asset_type_folder_dir)
 
-        # create the folder directory
-        suffix = core_constants.BUILD_MAPPINGS[asset_build_type_name]
-        build_name = f"{suffix}{asset_build_name}"
-        asset_folder_dir = file_utils.join_file_names(root_dir, build_name)
-        file_utils.create_directory(asset_folder_dir)
+            for asset_build_name in asset_build_names:
+                asset_build_name_dir = file_utils.join_file_names(asset_type_folder_dir, asset_build_name)
+                file_utils.create_directory(asset_build_name_dir)
 
-        # create asset app folder with default sub folders
-        # e.g.houdini/hip, houdini/otls....
-        asset_structure = self.load_structure(core_constants.ASSET_STRUCTURE)
-        self.create_folder_structure(asset_folder_dir, asset_structure)
+                # create asset app folder with default sub folders
+                # e.g.houdini/hip, houdini/otls....
+                asset_structure = self.load_structure(core_constants.ASSET_STRUCTURE)
+                self.create_folder_structure(asset_build_name_dir, asset_structure)
 
-        # create tasks in the subfolders of a app
-        # e.g. houdini/hip/modeling, houdini/hip/lighting
-        self.create_app_task_folders(asset_folder_dir, "asset")
-
+                # create tasks in the subfolders of a app
+                # e.g. houdini/hip/modeling, houdini/hip/lighting
+                self.create_app_task_folders(asset_build_name_dir, "asset")
 

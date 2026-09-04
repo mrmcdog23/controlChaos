@@ -47,7 +47,7 @@ class ContextButtons(object):
 
         os.environ["entity"] = entity_name
         if entity_name == "asset":
-            self.asset_names_btn()
+            self.asset_types_btn()
         else:
             self.sequence_list_btn()
         try:
@@ -147,12 +147,25 @@ class ContextButtons(object):
                                      cmd_format
                                      )
 
-    def asset_names_btn(self):
+    def asset_types_btn(self):
+        """
+        Create the asset names button
+        """
+        global asset_types_btn
+        asset_build_types_names = FTRACK_ASSET.asset_build_types_names
+        cmd_format = '{0};ctx.asset_names_btn("{1}")'
+        asset_types_btn = self.create_btn(ctx_constants.ASSET_BUILD_TYPE_NAME,
+                                          asset_build_types_names,
+                                          cmd_format
+                                          )
+
+    def asset_names_btn(self, asset_type):
         """
         Create the asset names button
         """
         global asset_names_btn
-        asset_names = FTRACK_ASSET.get_asset_build_names()
+        self.set_btn_text(ctx_constants.ASSET_BUILD_TYPE_NAME, asset_types_btn, asset_type)
+        asset_names = FTRACK_ASSET.get_asset_build_names(asset_type=asset_type)
         cmd_format = '{0};ctx.asset_task_btn("{1}")'
         asset_names_btn = self.create_btn(ctx_constants.ASSET_BUILD_NAME,
                                           asset_names,

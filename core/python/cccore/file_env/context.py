@@ -37,7 +37,7 @@ class Context(object):
         self.logger = cc_logging.cc_logger()
 
     @property
-    def is_build(self):
+    def is_asset(self):
         # type: () -> bool
         """ Is it an asset build """
         return bool(self.entity == "asset")
@@ -89,6 +89,18 @@ class Context(object):
         return self.get_value("shot_name")
 
     @property
+    def asset_type(self):
+        # type: () -> str
+        """ Name of the asset type """
+        return self.get_value("asset_type")
+
+    @property
+    def asset_name(self):
+        # type: () -> str
+        """ Get the current asset name """
+        return self.get_value("asset_name")
+
+    @property
     def app_name(self):
         # type: () -> str
         """ Get the current application name """
@@ -105,6 +117,12 @@ class Context(object):
         # type: () -> str
         """ The project shots directory """
         return file_utils.join_file_names(self.project_root, "shots")
+
+    @property
+    def project_assets_dir(self):
+        # type: () -> str
+        """ The project assets directory """
+        return file_utils.join_file_names(self.project_root, "assets")
 
     @property
     def task(self):
@@ -140,7 +158,10 @@ class Context(object):
     def app_dir(self):
         # type: () -> str
         """ The project shots directory """
-        return file_utils.join_file_names(self.shot_dir, self.app_name)
+        if self.is_asset:
+            return file_utils.join_file_names(self.asset_name_dir, self.app_name)
+        else:
+            return file_utils.join_file_names(self.shot_dir, self.app_name)
 
     @property
     def subfolder_dir(self):
@@ -184,7 +205,17 @@ class Context(object):
         """ The project shots directory """
         return file_utils.join_file_names(self.task_dir, self.username)
 
-    #C:/Users/joele/Documents/PAU/shots/seq010/shot010/maya/scenes/layout/jleveson/PAU_seq010_shot0100_layout_v001.ma
+    @property
+    def asset_type_dir(self):
+        # type: () -> str
+        """ The project asset type directory """
+        return file_utils.join_file_names(self.project_assets_dir, self.asset_type)
+
+    @property
+    def asset_name_dir(self):
+        # type: () -> str
+        """ The project asset name directory """
+        return file_utils.join_file_names(self.asset_type_dir, self.asset_name)
 
     @property
     def file_subfolder(self):
@@ -195,8 +226,11 @@ class Context(object):
     @property
     def file_name(self):
         # type: () -> str
-        """ Build the file name without the extension"""
-        return f"{self.project_code}_{self.sequence}_{self.shot}_{self.task}{self.suffix_str}"
+        """ Build the file name without the extension """
+        if self.is_asset:
+            return f"{self.project_code}_{self.asset_type}_{self.asset_name}_{self.task}{self.suffix_str}"
+        else:
+            return f"{self.project_code}_{self.sequence}_{self.shot}_{self.task}{self.suffix_str}"
 
     @property
     def is_image(self):

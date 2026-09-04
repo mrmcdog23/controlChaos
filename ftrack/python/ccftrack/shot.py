@@ -469,8 +469,11 @@ class FtShot(FtBase):
             self.logger.info(f"Setting {app_name} to version {version}")
             project['custom_attributes'][app_name] = version
 
-        # add the defualt folders
-        self.create_folder("asset", project)
+        # add the default folders including the assets
+        asset_folder = self.create_folder("asset", project)
+        for asset_name in self.asset_build_types_names:
+            self.create_folder(asset_name, asset_folder)
+
         self.create_folder("shot", project)
         self.commit()
         self.logger.info(f"Created {project}")
@@ -493,7 +496,7 @@ class FtShot(FtBase):
             return
 
         # get the parent object either the project or episode
-        shot_folder = self.get_folder("shot")
+        shot_folder = self.get_folder("shot", self.project_id)
         parent_entity = self.episode if episode_name else shot_folder
         self.logger.info(f"Creating sequence {sequence_name}")
         self.session.create('Sequence', {'name': sequence_name, 'parent': parent_entity})

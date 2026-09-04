@@ -374,6 +374,16 @@ class ShotCreatorTool(BaseTool):
         self.launch_path = "{0}/standalone/python/creators/shot_creator.py"
 
 
+class AssetCreatorTool(BaseTool):
+    name = "asset_creator_tool"
+
+    def __init__(self):
+        super(AssetCreatorTool, self).__init__()
+        self.display_text = "Asset Creator"
+        self.icon = "asset.png"
+        self.launch_path = "{0}/standalone/python/creators/asset_creator.py"
+
+
 class VideoUploaderTool(BaseTool):
     name = "video_uploader_tool"
 
@@ -392,5 +402,6 @@ TOOLS = [
     SlateMakerTool,
     ProjectCreatorTool,
     ShotCreatorTool,
+    AssetCreatorTool,
     VideoUploaderTool
 ]
