@@ -13,24 +13,6 @@ maya:
   scripts:
   sounds:
   sourceimages:
-houdini:
-  abc:
-  archive:
-  audio:
-  backup:
-  cache:
-  comp:
-  desk:
-  flip:
-  geo:
-  hda:
-  hip:
-  otls:
-  render:
-  scripts:
-  sim:
-  tex:
-  video:
 nuke:
   render:
   scripts:
@@ -38,15 +20,6 @@ nuke:
 unreal:
   render:
   cache:
-mari:
-  photoshop:
-  published:
-  substance:
-  texturesDownloaded:
-  texturesToPublish:
 blender:
   scenes:
-zbrush:
-  paint:
-  sculpt:
-  texturesToPublish:
+

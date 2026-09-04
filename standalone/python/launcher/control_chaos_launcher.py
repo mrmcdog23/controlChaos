@@ -9,6 +9,7 @@ import cccore.data.server_data as server_data
 import cccore.folder_creator as folder_creator
 import ccftrack.base as base
 import ccftrack.shot as shot
+import ccftrack.asset as asset
 from CCPySide import QtWidgets, QtCore, QtGui
 from ccgeneral.widgets.line_browser import LineBrowser
 
@@ -97,6 +98,7 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.logger = cc_logging.cc_logger()
         self.ftbase = base.FtBase()
         self.ftshot = shot.FtShot(session=self.ftbase.session)
+        self.ftasset = shot.FtAsset(session=self.ftbase.session)
 
         self.create_layout()
         self.populate_apps_and_tools()
@@ -348,13 +350,26 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         folder_creator_inst = folder_creator.CreateFolders()
         folder_creator_inst.create_project_structure(project_root)
 
-        create_dict = dict()
+        # create the shot folders by gathering the sequences
+        # and shot names then running the folder creator
+        create_shots_dict = dict()
         self.ftshot.project_name = project_name
         for sequence_name in self.ftshot.sequence_names:
             self.ftshot.sequence_name = sequence_name
-            create_dict[sequence_name] = self.ftshot.shot_names
+            create_shots_dict[sequence_name] = self.ftshot.shot_names
 
-        folder_creator_inst.create_dict = create_dict
+        # create the shot folders
+        folder_creator_inst.create_dict = create_shots_dict
+        folder_creator_inst.create_all_shot_folders()
+
+        # gather asset build names and create a dictionary
+        create_assets_dict = dict()
+        for asset_build_type_name in self.ftasset.asset_build_types_names:
+            asset_build_names = self.ftasset.get_asset_build_names(asset_type=asset_build_type_name)
+            create_assets_dict[asset_build_type_name] = asset_build_names
+
+        # create the asset folders
+        folder_creator_inst.create_dict = create_assets_dict
         folder_creator_inst.create_all_shot_folders()
 
     def get_and_save_project_root(self):
