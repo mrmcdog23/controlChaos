@@ -98,7 +98,7 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.logger = cc_logging.cc_logger()
         self.ftbase = base.FtBase()
         self.ftshot = shot.FtShot(session=self.ftbase.session)
-        self.ftasset = shot.FtAsset(session=self.ftbase.session)
+        self.ftasset = asset.FtAsset(session=self.ftbase.session)
 
         self.create_layout()
         self.populate_apps_and_tools()
@@ -359,6 +359,7 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
             create_shots_dict[sequence_name] = self.ftshot.shot_names
 
         # create the shot folders
+        self.ftasset.project_name = project_name
         folder_creator_inst.create_dict = create_shots_dict
         folder_creator_inst.create_all_shot_folders()
 
@@ -370,7 +371,7 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
 
         # create the asset folders
         folder_creator_inst.create_dict = create_assets_dict
-        folder_creator_inst.create_all_shot_folders()
+        folder_creator_inst.create_asset_folders()
 
     def get_and_save_project_root(self):
         """
