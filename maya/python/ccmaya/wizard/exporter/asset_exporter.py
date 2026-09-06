@@ -1,0 +1,292 @@
+""" Asset publisher in maya """
+import os
+import sys
+import maya.cmds as cmds
+import cccore.utils.file_utils as file_utils
+import cccore.core_constants as core_constants
+import ccmaya.utils.maya_utils as maya_utils
+import ccmaya.maya_constants as maya_constants
+import cccore.file_env.context as context
+import cccore.file_env.context_utils as context_utils
+#import ccmaya.asset.fbx_asset_export as fbx_asset_export
+from ccgeneral.wizard.exporter.base_exporter import BaseExporter
+
+
+# initialize maya standalone
+try:
+    import maya.standalone
+    maya.standalone.initialize()
+except (TypeError, RuntimeError):
+    pass
+
+
+class AssetExporter(BaseExporter):
+    def __init__(self):
+        super(AssetExporter, self).__init__()
+        self.asset_data = dict()
+        self.asset_version_id = None
+
+    def export(self):
+        """
+        Export the asset and publish it to ftrack
+        """
+        self.export_clean_asset()
+        self.pre_export()
+        self.create_asset_version()
+        self.add_progress(10)
+
+        self.tag_and_copy_asset_version()
+        self.add_progress(10)
+
+        # write the data out
+        self.create_alembic_component()
+        self.add_progress(10)
+
+        self.create_usd_component()
+        self.add_progress(10)
+
+        self.create_asset_metadata()
+        self.add_progress(10)
+
+        self.create_materialx_file()
+        self.add_progress(10)
+
+        self.export_unreal_asset()
+        self.add_progress(10)
+        self.post_export()
+        self.log("Asset publish complete")
+
+    def open_file(self):
+        """
+        Load the alembic export plugin and open the maya file
+        """
+        maya_utils.load_plugins(["AbcExport"])
+        cmds.file(self.data['wip_file_path'],  open=True, force=True)
+
+    def create_asset_version(self):
+        """
+        Create the asset version on ftrack and get publish path
+        """
+        self.data["entity"] = "build"
+        self.data["ext"] = "ma"
+        self.ctx = context.Context(overrides=self.data)
+
+        # set the ftrack data
+        self.asset_version = self.ftasset.set_ftrack_data(self.data)
+
+        # publish the file to ftrack
+        self.log("Publishing to Ftrack...")
+        asset_version_id = self.asset_version["id"]
+        message = f"{core_constants.VERSION_TEXT} {asset_version_id}"
+        self.log(message)
+
+        # set page completed
+        self.log(f"Asset Version: {asset_version_id}")
+        self.ftver.asset_version_id = asset_version_id
+
+    def export_unreal_asset(self):
+        """
+        Export the unreal asset
+        """
+        if not cmds.pluginInfo("fbxmaya", query=True, loaded=True):
+            return
+
+        if self.data["task_name"] not in ["modeling", "rigging"]:
+            self.log(f"Not a model or rig for Unreal")
+            return
+
+        # do not publish fbx camera
+        if self.data["asset_build_type_name"] == "Camera":
+            return
+
+        self.log(f"Creating Unreal asset")
+        fbx_asset_path = self.add_fbx_component()
+        fbx_asset_export.FbxAssetExport(fbx_asset_path)
+
+    def export_clean_asset(self):
+        """
+        Export the asset and reopen the file to
+        not have any unwanted nodes in there
+        """
+        self.logger.info("Running pre export tasks...")
+        if self.data["asset_build_type_name"] == "Camera":
+            return
+
+        top_nodes = maya_utils.get_top_level_nodes()
+        if len(top_nodes) == 1:
+            self.logger.info("Only one top node found...")
+            return
+
+        self.logger.info("Exporting as more than one top node found...")
+        top_node = maya_utils.get_asset_top_node()
+        cmds.select(top_node)
+        temp_lookdev_path = file_utils.join_from_list(
+            self.project_data.appdata, "temp_asset_export.ma")
+
+        self.log(f"temp asset path: {temp_lookdev_path}")
+        cmds.file(temp_lookdev_path, force=True, pr=True, es=True, typ="mayaAscii")
+        cmds.file(temp_lookdev_path, open=True, force=True)
+
+    def tag_and_copy_asset_version(self):
+        """
+        Create the ftrack publish version and
+        add the id to the top level node
+        """
+        # add tag to the asset attribute
+        maya_utils.add_ftrack_tag_to_asset(self.asset_version['id'])
+
+    def add_fbx_component(self):
+        # type: () -> str
+        """
+        Create a fbx of the asset
+
+        Return:
+            fbx_asset_path: Path of the fbx to export
+        """
+        self.log("Create Unreal component...")
+        self.log(self.ftasset.data)
+        fbx_asset_path = self.get_save_file_path("fbx")
+        self.ftver.asset_version_id = self.asset_version["id"]
+        self.ftver.add_component_dict({"FBX": fbx_asset_path})
+        self.log(f"Export FBX path: {fbx_asset_path}")
+        return fbx_asset_path
+
+    def create_alembic_component(self):
+        """
+        Alembic export args. These vary on the object type to cache
+        """
+        self.ftver.asset_version_id = self.asset_version["id"]
+        if self.data["asset_build_type_name"] == "Camera":
+            abc_export_args = " ".join(maya_constants.CAM_ABC_ARGS)
+            root = maya_constants.CAM_GRP
+        else:
+            abc_export_args = " ".join(maya_constants.MESH_ABC_ARGS)
+            root = maya_constants.GEO_GRP
+
+        # get alembic path from publish path
+        wip_file_path = self.ftasset.data["wip_file_path"]
+        ctx = context_utils.get_context_from_path(wip_file_path)
+        ctx.use_aov = "main"
+        abc_path = ctx.abc_sequence_path
+
+        # create alembic directory
+        file_utils.create_directories(os.path.dirname(abc_path))
+
+        # export alembic
+        abc_args = maya_constants.JOB_ARGS_FORMAT.format(step=1,
+                                                         start=1,
+                                                         end=2,
+                                                         args=abc_export_args,
+                                                         root=root,
+                                                         path=abc_path
+                                                         )
+        self.log(f"Alembic Command: {abc_args}")
+        cmds.AbcExport(j=abc_args, verbose=True)
+        component_dict = {"Alembic": abc_path}
+        self.ftver.add_component_dict(component_dict)
+
+    def create_usd_component(self):
+        """
+        Create the usd file and component
+        """
+        # get usd path from publish path
+        pub_filepath = self.ftasset.data["pub_file_path"]
+        ctx = context_utils.get_context_from_path(pub_filepath)
+        ctx.use_aov = "main"
+        usd_path = ctx.usd_path
+
+        # export the file
+        cmds.file(
+            usd_path,
+            force=True,
+            options="-mask 6399;-lightLinks 1;-shadowLinks 1;-fullPath",
+            type="Arnold-USD",
+            pr=True,
+            ea=True
+        )
+        self.log(f"Exported usd file: {usd_path}")
+        component_dict = {"USD": usd_path}
+        self.ftver.add_component_dict(component_dict)
+
+    def get_save_file_path(self, extension):
+        # type: (str) -> str
+        """
+        Get the save file path by taking the published file
+        path and replacing the extension with the given one
+
+        Args:
+            extension: New file extension to use
+
+        Returns:
+            save_file_path: Path of the file to save
+        """
+        pub_filepath = self.ftasset.data["pub_file_path"]
+        pub_filepath_no_ext, _ = os.path.splitext(pub_filepath)
+        save_file_path = f"{pub_filepath_no_ext}.{extension}"
+        return save_file_path
+
+    def create_asset_metadata(self):
+        """
+        Create and save asset metadata
+        """
+        asset_metadata_path = self.get_save_file_path("json")
+        asset_data = {
+            "material_name_to_type": self.material_name_to_type,
+            "mesh_to_materials": self.mesh_to_materials
+        }
+        file_utils.write_json(asset_metadata_path, asset_data)
+        component_dict = {"Metadata": asset_metadata_path}
+        self.ftver.add_component_dict(component_dict)
+
+    def create_materialx_file(self):
+        """
+        If there is geometry save a materialx file path
+        """
+        if not cmds.objExists(maya_constants.GEO_GRP):
+            return
+        cmds.select(maya_constants.GEO_GRP)
+        materialx_path = self.get_save_file_path("mtlx")
+        look_name = self.data["asset_build_name"]
+        cmds.arnoldExportToMaterialX(
+            filename=materialx_path,
+            look=look_name,
+            relative=True,
+            fullPath=True,
+            separator="/"
+        )
+        component_dict = {"MaterialX": materialx_path}
+        self.ftver.add_component_dict(component_dict)
+
+    @property
+    def material_name_to_type(self):
+        # type: () -> dict
+        """ Build dictionary of material name to its type """
+        material_name_to_type = dict()
+        for material in cmds.ls():
+            material_name_to_type[material] = cmds.objectType(material)
+        return material_name_to_type
+
+    @property
+    def mesh_to_materials(self):
+        # type: () -> dict
+        """ Dictionary of mesh path to its material name """
+        top_node = maya_utils.get_asset_top_node()
+        mesh_to_materials = dict()
+        all_meshes = cmds.listRelatives(top_node, ad=True, f=True, type="mesh")
+        if not all_meshes:
+            return mesh_to_materials
+
+        for mesh in all_meshes:
+            try:
+                sg = cmds.listConnections(mesh, type="shadingEngine")[0]
+            except (IndexError, TypeError):
+                continue
+            sg_attribute = f"{sg}.surfaceShader"
+            shader = cmds.listConnections(sg_attribute)[0]
+            mesh_to_materials[mesh] = shader
+        return mesh_to_materials
+
+
+if __name__ == "__main__":
+    exporter = AssetExporter()
+    exporter.batch_process(sys.argv[1])

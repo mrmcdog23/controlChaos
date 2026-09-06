@@ -74,7 +74,7 @@ def update_maya_context(ctx):
     ctx_btn = context_buttons.ContextButtons()
     set_button("entity", ctx.entity)
 
-    if ctx.is_build:
+    if ctx.is_asset:
         # asset name button
         ctx_btn.asset_names_btn()
         set_button("asset_build_name", ctx.asset_build)

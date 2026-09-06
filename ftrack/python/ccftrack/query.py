@@ -22,25 +22,25 @@ class FtQuery(FtShot, FtAsset):
             session: The ftrack session
             log: True if logging is wanted
         """
-        self._is_build = True
+        self._is_asset = True
         super(FtQuery, self).__init__(input_project=input_project,
                                       session=session,
                                       log=log
                                       )
 
     @property
-    def is_build(self):
+    def is_asset(self):
         """
         Returns bool True if it's an asset build
         """
-        return self._is_build
+        return self._is_asset
 
-    @is_build.setter
-    def is_build(self, is_build):
+    @is_asset.setter
+    def is_asset(self, is_asset):
         """
         Setter for bool if it's an asset build
         """
-        self._is_build = is_build
+        self._is_asset = is_asset
 
     def get_shot_components_of_type(self, asset_type, extensions, filter_name=None):
         # type: (str, list[str], Optional[str]) -> list[ftrack_api.entity.component]
@@ -63,7 +63,7 @@ class FtQuery(FtShot, FtAsset):
         resources_txt = " or ".join(resources)
 
         # the asset build id
-        if self.is_build:
+        if self.is_asset:
             parent_id = self.asset_build["id"]
         else:
             parent_id = self.shot["id"]
@@ -266,7 +266,7 @@ class FtQuery(FtShot, FtAsset):
             All version numbers in order
         """
         query = f"AssetVersion where task.name is {ctx.task} and {self.project_is} "
-        if ctx.is_build:
+        if ctx.is_asset:
             query += f"and asset.parent.name is {ctx.asset_build} "
         else:
             query += f"and asset.parent.name is {ctx.shot} " \

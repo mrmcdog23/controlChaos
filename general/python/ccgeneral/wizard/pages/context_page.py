@@ -95,10 +95,10 @@ class ContextPage(BasePublishPage):
         """
         Store the selected options in the wizard data
         """
-        if self.ctx.is_build:
+        if self.ctx.is_asset:
             self.data['entity'] = "build"
-            self.data['asset_build_type_name'] = self.ctx.build_type
-            self.data['asset_build_name'] = self.ctx.asset_build
+            self.data['asset_build_type_name'] = self.ctx.asset_type
+            self.data['asset_build_name'] = self.ctx.asset_name
         else:
             self.data['entity'] = "shot"
             self.data['sequence_name'] = self.ctx.sequence
