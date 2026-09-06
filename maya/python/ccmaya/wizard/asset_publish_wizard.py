@@ -20,17 +20,8 @@ class AssetWizard(MayaBaseWizard):
         self.exporter = asset_exporter.AssetExporter()
 
     @staticmethod
-    def wip_file_path():
-        """
-        The current maya file path
-        """
-        return cmds.file(q=True, sn=True)
-
-    @staticmethod
     def entity_type():
-        """
-        The entity type so export to check against
-        """
+        """ The entity type so export to check against """
         return "build"
 
     @property
@@ -48,14 +39,6 @@ class AssetWizard(MayaBaseWizard):
                  CompletePage
                  ]
         return pages
-
-    @classmethod
-    def does_valid_group_exist(cls):
-        # type: () -> bool
-        """
-        Check if a valid group name exists
-        """
-        return bool(maya_utils.get_asset_top_node())
 
     @classmethod
     def run_checks(cls):

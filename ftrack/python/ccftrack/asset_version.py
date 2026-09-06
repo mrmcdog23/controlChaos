@@ -741,19 +741,20 @@ class FtAssetVersion(FtBase):
             ctx_dict: Asset version as a dictionary
         """
         if self.is_asset:
-            ctx_dict = {"entity": "build",
-                        "asset_build_type_name": self.asset_build_type_name,
-                        "asset_build_name": self.asset_build_name,
-                        "task_name": self.task_name,
-                        "version_num": self.version_num
-                        }
+            ctx_dict = {
+                "entity": "asset",
+                "asset_build_type_name": self.asset_build_type_name,
+                "asset_build_name": self.asset_build_name,
+                "task_name": self.task_name,
+                "version_num": self.version_num
+            }
         else:
-            ctx_dict = {"entity": "shot",
-                        "episode_name": self.episode_name,
-                        "sequence_name": self.sequence_name,
-                        "shot_name": self.shot_name,
-                        "task_name": self.task_name,
-                        "version_num": self.version_num
-                        }
+            ctx_dict = {
+                "entity": "shot",
+                "episode_name": self.episode_name,
+                "sequence_name": self.sequence_name,
+                "shot_name": self.shot_name,
+                "task_name": self.task_name,
+                "version_num": self.version_num
+            }
         return ctx_dict
-

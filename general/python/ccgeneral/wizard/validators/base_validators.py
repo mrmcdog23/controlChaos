@@ -13,7 +13,7 @@ class BaseValidator(object):
     node_types = list()
     deadline_validator = bool()
 
-    def __init__(self, data):
+    def __init__(self, session, data):
         super(BaseValidator, self).__init__()
         self.is_valid = bool()
         self.is_deadline = bool()
@@ -21,6 +21,7 @@ class BaseValidator(object):
         self.nodes = list()
         self.logger = cc_logger()
         self.data = data
+        self.session = session
 
     @property
     def validate(self):

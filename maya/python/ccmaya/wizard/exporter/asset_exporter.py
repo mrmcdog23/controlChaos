@@ -25,13 +25,14 @@ class AssetExporter(BaseExporter):
         super(AssetExporter, self).__init__()
         self.asset_data = dict()
         self.asset_version_id = None
+        self.ctx = None
 
     def export(self):
         """
         Export the asset and publish it to ftrack
         """
         self.export_clean_asset()
-        self.pre_export()
+
         self.create_asset_version()
         self.add_progress(10)
 
@@ -42,18 +43,17 @@ class AssetExporter(BaseExporter):
         self.create_alembic_component()
         self.add_progress(10)
 
-        self.create_usd_component()
+        #self.create_usd_component()
         self.add_progress(10)
 
-        self.create_asset_metadata()
+        #self.create_asset_metadata()
         self.add_progress(10)
 
-        self.create_materialx_file()
+        #self.create_materialx_file()
         self.add_progress(10)
 
-        self.export_unreal_asset()
+        #self.export_unreal_asset()
         self.add_progress(10)
-        self.post_export()
         self.log("Asset publish complete")
 
     def open_file(self):
@@ -67,7 +67,7 @@ class AssetExporter(BaseExporter):
         """
         Create the asset version on ftrack and get publish path
         """
-        self.data["entity"] = "build"
+        self.data["entity"] = "asset"
         self.data["ext"] = "ma"
         self.ctx = context.Context(overrides=self.data)
 
@@ -144,7 +144,6 @@ class AssetExporter(BaseExporter):
             fbx_asset_path: Path of the fbx to export
         """
         self.log("Create Unreal component...")
-        self.log(self.ftasset.data)
         fbx_asset_path = self.get_save_file_path("fbx")
         self.ftver.asset_version_id = self.asset_version["id"]
         self.ftver.add_component_dict({"FBX": fbx_asset_path})
@@ -164,22 +163,20 @@ class AssetExporter(BaseExporter):
             root = maya_constants.GEO_GRP
 
         # get alembic path from publish path
-        wip_file_path = self.ftasset.data["wip_file_path"]
-        ctx = context_utils.get_context_from_path(wip_file_path)
-        ctx.use_aov = "main"
-        abc_path = ctx.abc_sequence_path
+        abc_path = self.ctx.alembic_file_path
 
         # create alembic directory
         file_utils.create_directories(os.path.dirname(abc_path))
 
         # export alembic
-        abc_args = maya_constants.JOB_ARGS_FORMAT.format(step=1,
-                                                         start=1,
-                                                         end=2,
-                                                         args=abc_export_args,
-                                                         root=root,
-                                                         path=abc_path
-                                                         )
+        abc_args = maya_constants.JOB_ARGS_FORMAT.format(
+            step=1,
+            start=1,
+            end=2,
+            args=abc_export_args,
+            root=root,
+            path=abc_path
+        )
         self.log(f"Alembic Command: {abc_args}")
         cmds.AbcExport(j=abc_args, verbose=True)
         component_dict = {"Alembic": abc_path}
@@ -190,10 +187,7 @@ class AssetExporter(BaseExporter):
         Create the usd file and component
         """
         # get usd path from publish path
-        pub_filepath = self.ftasset.data["pub_file_path"]
-        ctx = context_utils.get_context_from_path(pub_filepath)
-        ctx.use_aov = "main"
-        usd_path = ctx.usd_path
+        usd_path = self.ctx.usd_path
 
         # export the file
         cmds.file(
