@@ -179,19 +179,19 @@ class AssetExporter(BaseExporter):
         Create the usd file and component
         """
         # get usd path from publish path
-        usd_path = self.ctx.usd_path
+        usd_file_path = self.ctx.usd_file_path
 
         # export the file
         cmds.file(
-            usd_path,
+            usd_file_path,
             force=True,
             options="-mask 6399;-lightLinks 1;-shadowLinks 1;-fullPath",
             type="Arnold-USD",
             pr=True,
             ea=True
         )
-        self.log(f"Exported usd file: {usd_path}")
-        component_dict = {"USD": usd_path}
+        self.log(f"Exported usd file: {usd_file_path}")
+        component_dict = {"USD": usd_file_path}
         self.ftver.add_component_dict(component_dict)
 
     def get_save_file_path(self, extension):
