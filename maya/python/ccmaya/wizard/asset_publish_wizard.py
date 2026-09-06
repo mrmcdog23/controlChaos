@@ -21,6 +21,7 @@ class AssetWizard(MayaBaseWizard):
 
     @staticmethod
     def entity_type():
+        # type: () -> str
         """ The entity type so export to check against """
         return "build"
 

@@ -267,7 +267,7 @@ class FtQuery(FtShot, FtAsset):
         """
         query = f"AssetVersion where task.name is {ctx.task} and {self.project_is} "
         if ctx.is_asset:
-            query += f"and asset.parent.name is {ctx.asset_build} "
+            query += f"and asset.parent.name is {ctx.asset_name} "
         else:
             query += f"and asset.parent.name is {ctx.shot} " \
                      f"and asset.parent.parent.name is {ctx.sequence}"

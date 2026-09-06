@@ -218,3 +218,46 @@ def add_string_attribute(top_node, attribute_name, attribute_value):
     cmds.setAttr(attribute_long_name, l=False)
     cmds.setAttr(attribute_long_name, attribute_value, type="string")
     cmds.setAttr(attribute_long_name, l=True)
+
+
+def get_root_joint(namespace=None):
+    # type: (Optional[str]) -> Optional[str]
+    """
+    Find the root joint of a rig
+
+    Args:
+        namespace: Root joint namespace
+
+    Returns:
+        jnt: Root joint of the rig
+    """
+    if namespace:
+        joints = cmds.ls(f"{namespace}:*", type="joint")
+    else:
+        joints = cmds.ls(type="joint")
+
+    # if there are no joints then warn the user
+    if not joints:
+        logger.critical("No joints found")
+        return None
+
+    # set the joint and start count as a fail-safe
+    jnt = joints[0]
+    count = 0
+
+    # keep getting the joint parent until the parent is not a joint
+    while count < 100:
+        count += 1
+
+        # if there is no parent then the joint is the top level
+        parent_obj = cmds.listRelatives(jnt, p=True)
+        if not parent_obj:
+            break
+
+        # if the parent is a joint set that as the new joint
+        if cmds.objectType(parent_obj[0]) == "joint":
+            jnt = parent_obj[0]
+        else:
+            # if the parent isn't a joint then its the root
+            break
+    return jnt

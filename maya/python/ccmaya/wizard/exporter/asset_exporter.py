@@ -8,7 +8,7 @@ import ccmaya.utils.maya_utils as maya_utils
 import ccmaya.maya_constants as maya_constants
 import cccore.file_env.context as context
 import cccore.file_env.context_utils as context_utils
-#import ccmaya.asset.fbx_asset_export as fbx_asset_export
+import ccmaya.asset.fbx_asset_export as fbx_asset_export
 from ccgeneral.wizard.exporter.base_exporter import BaseExporter
 
 
@@ -52,7 +52,7 @@ class AssetExporter(BaseExporter):
         #self.create_materialx_file()
         self.add_progress(10)
 
-        #self.export_unreal_asset()
+        self.export_fbx_unreal_component()
         self.add_progress(10)
         self.log("Asset publish complete")
 
@@ -71,47 +71,38 @@ class AssetExporter(BaseExporter):
         self.data["ext"] = "ma"
         self.ctx = context.Context(overrides=self.data)
 
+        # work out the next version to publish
+        self.next_version = self.ftquery.next_version_from_ctx(self.ctx)
+        self.ctx.use_version = self.next_version
+        self.logger.info(f"Using next version number: {self.next_version}")
+
         # set the ftrack data
         self.asset_version = self.ftasset.set_ftrack_data(self.data)
 
         # publish the file to ftrack
-        self.log("Publishing to Ftrack...")
+        self.log("Publishing asset to FTrack...")
         asset_version_id = self.asset_version["id"]
         message = f"{core_constants.VERSION_TEXT} {asset_version_id}"
         self.log(message)
 
         # set page completed
-        self.log(f"Asset Version: {asset_version_id}")
         self.ftver.asset_version_id = asset_version_id
 
-    def export_unreal_asset(self):
-        """
-        Export the unreal asset
-        """
-        if not cmds.pluginInfo("fbxmaya", query=True, loaded=True):
-            return
-
-        if self.data["task_name"] not in ["modeling", "rigging"]:
-            self.log(f"Not a model or rig for Unreal")
-            return
-
-        # do not publish fbx camera
-        if self.data["asset_build_type_name"] == "Camera":
-            return
-
-        self.log(f"Creating Unreal asset")
-        fbx_asset_path = self.add_fbx_component()
-        fbx_asset_export.FbxAssetExport(fbx_asset_path)
+    @property
+    def is_camera(self):
+        # type: () -> str
+        """ Is it a camera publish asset """
+        return self.data["asset_build_type_name"] == "Camera"
 
     def export_clean_asset(self):
         """
         Export the asset and reopen the file to
         not have any unwanted nodes in there
         """
-        self.logger.info("Running pre export tasks...")
-        if self.data["asset_build_type_name"] == "Camera":
+        if self.is_camera:
             return
 
+        maya_utils.load_plugins(["fbxmaya"])
         top_nodes = maya_utils.get_top_level_nodes()
         if len(top_nodes) == 1:
             self.logger.info("Only one top node found...")
@@ -135,26 +126,10 @@ class AssetExporter(BaseExporter):
         # add tag to the asset attribute
         maya_utils.add_ftrack_tag_to_asset(self.asset_version['id'])
 
-    def add_fbx_component(self):
-        # type: () -> str
-        """
-        Create a fbx of the asset
-
-        Return:
-            fbx_asset_path: Path of the fbx to export
-        """
-        self.log("Create Unreal component...")
-        fbx_asset_path = self.get_save_file_path("fbx")
-        self.ftver.asset_version_id = self.asset_version["id"]
-        self.ftver.add_component_dict({"FBX": fbx_asset_path})
-        self.log(f"Export FBX path: {fbx_asset_path}")
-        return fbx_asset_path
-
     def create_alembic_component(self):
         """
         Alembic export args. These vary on the object type to cache
         """
-        self.ftver.asset_version_id = self.asset_version["id"]
         if self.data["asset_build_type_name"] == "Camera":
             abc_export_args = " ".join(maya_constants.CAM_ABC_ARGS)
             root = maya_constants.CAM_GRP
@@ -181,6 +156,23 @@ class AssetExporter(BaseExporter):
         cmds.AbcExport(j=abc_args, verbose=True)
         component_dict = {"Alembic": abc_path}
         self.ftver.add_component_dict(component_dict)
+
+    def export_fbx_unreal_component(self):
+        """
+        Export the unreal asset
+        """
+        if self.data["task_name"] not in ["modeling", "rigging"]:
+            self.log(f"Not a model or rig for Unreal")
+            return
+
+        # do not publish fbx camera
+        if self.is_camera:
+            return
+
+        fbx_asset_path = self.ctx.fbx_file_path
+        self.ftver.add_component_dict({"FBX": fbx_asset_path})
+        self.log(f"Export FBX path: {fbx_asset_path}")
+        fbx_asset_export.FbxAssetExport(fbx_asset_path)
 
     def create_usd_component(self):
         """
@@ -214,9 +206,9 @@ class AssetExporter(BaseExporter):
         Returns:
             save_file_path: Path of the file to save
         """
-        pub_filepath = self.ftasset.data["pub_file_path"]
-        pub_filepath_no_ext, _ = os.path.splitext(pub_filepath)
-        save_file_path = f"{pub_filepath_no_ext}.{extension}"
+        wip_file_path = self.ftasset.data["wip_file_path"]
+        wip_file_path_no_ext, _ = os.path.splitext(wip_file_path)
+        save_file_path = f"{wip_file_path_no_ext}.{extension}"
         return save_file_path
 
     def create_asset_metadata(self):
