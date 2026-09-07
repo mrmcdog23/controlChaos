@@ -48,6 +48,37 @@ def messagebox(title, message, msg_type, buttons=None, parent=None, launch=True)
     return button_text
 
 
+def cc_save_path(app_parent, overrides=None):
+    # type: (Any, Optional[dict]) -> Optional[str]
+    """
+    Save the file path next file
+
+    Args:
+        app_parent: The parent window
+        overrides: Values to override the context
+
+    Returns:
+        save_path: Path of the file to save
+    """
+    ctx = context.Context(overrides=overrides)
+    if not ctx.task:
+        messagebox("Shot Not Set",
+                   "Shot environment not set",
+                   "critical",
+                   parent=app_parent
+                   )
+        return
+    response = messagebox("WIP file save",
+                          "Save the Control Chaos WIP file?",
+                          "question",
+                          buttons=["Save File", "Cancel"],
+                          parent=app_parent
+                          )
+    if response != "Save File":
+        return
+    return ctx.next_save_path
+
+
 def cc_save_with_suffix(ext):
     # type: (str) -> Optional[str]
     """
