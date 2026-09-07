@@ -46,7 +46,7 @@ class ContextButtons(object):
                 del os.environ[variable]
 
         os.environ["entity"] = entity_name
-        if entity_name == "asset":
+        if entity_name == ctx_constants.BUILD:
             self.asset_types_btn()
         else:
             self.sequence_list_btn()
@@ -225,7 +225,6 @@ class ContextButtons(object):
         Args:
             episode: Name of the selected episode
         """
-        print("a")
         global sequence_btn
         if episode:
             FTRACK_SHOT.episode_name = episode
@@ -245,7 +244,6 @@ class ContextButtons(object):
         Args:
             sequence: Name of the selected sequence
         """
-        print("c")
         global shot_btn
         self.set_btn_text(ctx_constants.SEQUENCE_NAME, sequence_btn, sequence)
         shot_names = FTRACK_SHOT.get_shot_names(sequence)
