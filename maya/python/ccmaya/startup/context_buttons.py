@@ -154,6 +154,7 @@ class ContextButtons(object):
         global asset_types_btn
         asset_build_types_names = FTRACK_ASSET.asset_build_types_names
         cmd_format = '{0};ctx.asset_names_btn("{1}")'
+
         asset_types_btn = self.create_btn(ctx_constants.ASSET_BUILD_TYPE_NAME,
                                           asset_build_types_names,
                                           cmd_format
@@ -224,6 +225,7 @@ class ContextButtons(object):
         Args:
             episode: Name of the selected episode
         """
+        print("a")
         global sequence_btn
         if episode:
             FTRACK_SHOT.episode_name = episode
@@ -243,6 +245,7 @@ class ContextButtons(object):
         Args:
             sequence: Name of the selected sequence
         """
+        print("c")
         global shot_btn
         self.set_btn_text(ctx_constants.SEQUENCE_NAME, sequence_btn, sequence)
         shot_names = FTRACK_SHOT.get_shot_names(sequence)

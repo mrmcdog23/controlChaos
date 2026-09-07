@@ -22,7 +22,6 @@ class MayaValidatePage(ValidatePage):
     def asset_validators(self):
         # type: () -> asset_validators
         """ File of the asset validators """
-        print(asset_validators)
         return asset_validators
 
     @property

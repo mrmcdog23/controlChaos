@@ -40,7 +40,7 @@ class Context(object):
     def is_asset(self):
         # type: () -> bool
         """ Is it an asset build """
-        return bool(self.entity == "asset")
+        return bool(self.entity == "assets")
 
     def get_value(self, key_name):
         # type: (str) -> str
@@ -399,6 +399,12 @@ class Context(object):
             "version_num": self.version_int,
             "suffix": self.suffix
         }
+        if self.entity == "assets":
+            context_dict["asset_build_type_name"] = self.asset_type
+            context_dict["asset_build_name"] = self.asset_name
+        else:
+            context_dict["sequence_name"] = self.sequence
+            context_dict["shot_name"] = self.shot
         return context_dict
 
     '''

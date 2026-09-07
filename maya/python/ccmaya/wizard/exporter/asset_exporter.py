@@ -7,8 +7,8 @@ import cccore.core_constants as core_constants
 import ccmaya.utils.maya_utils as maya_utils
 import ccmaya.maya_constants as maya_constants
 import cccore.file_env.context as context
-import cccore.file_env.context_utils as context_utils
 import ccmaya.asset.fbx_asset_export as fbx_asset_export
+import cccore.file_env.ctx_constants as ctx_constants
 from ccgeneral.wizard.exporter.base_exporter import BaseExporter
 
 
@@ -43,7 +43,7 @@ class AssetExporter(BaseExporter):
         self.create_alembic_component()
         self.add_progress(10)
 
-        #self.create_usd_component()
+        self.create_usd_component()
         self.add_progress(10)
 
         #self.create_asset_metadata()
@@ -67,7 +67,7 @@ class AssetExporter(BaseExporter):
         """
         Create the asset version on ftrack and get publish path
         """
-        self.data["entity"] = "asset"
+        self.data["entity"] = ctx_constants.BUILD
         self.data["ext"] = "ma"
         self.ctx = context.Context(overrides=self.data)
 
