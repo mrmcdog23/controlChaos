@@ -49,28 +49,28 @@ global proc shelf_ControlChaos () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Publish shot or asset"
+        -annotation "Publish shot or asset" 
         -enableBackground 0
-        -backgroundColor 0 0 0
-        -highlightColor 0.321569 0.521569 0.65098
-        -align "center"
-        -label "Publish"
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Publish" 
         -labelOffset 0
         -rotation 0
         -flipX 0
         -flipY 0
         -useAlpha 1
-        -font "plainLabelFont"
-        -imageOverlayLabel "export"
-        -overlayLabelColor 0.8 0.8 0.8
-        -overlayLabelBackColor 0 0 0 0.2
-        -image "export_shot.png"
-        -image1 "export_shot.png"
-        -style "iconOnly"
+        -font "plainLabelFont" 
+        -imageOverlayLabel "publish"
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.2 
+        -image "export_shot.png" 
+        -image1 "export_shot.png" 
+        -style "iconOnly" 
         -marginWidth 0
         -marginHeight 1
-        -command "import ccmaya.wizard.launch_wizard as launch_wizard;launch_wizard.main()"
-        -sourceType "python"
+        -command "import ccmaya.wizard.launch_wizard as launch_wizard;launch_wizard.main()" 
+        -sourceType "python" 
         -commandRepeatable 1
         -flat 1
     ;
