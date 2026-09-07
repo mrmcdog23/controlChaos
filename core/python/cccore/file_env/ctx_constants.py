@@ -1,6 +1,6 @@
 # create constants
-BUILD = "assets"
-SHOT = "shots"
+ASSET = "asset"
+SEQUENCE = "sequence"
 ENTITY = "entity"
 
 # asset names
@@ -14,10 +14,10 @@ SHOT_NAME = "shot_name"
 VER = "version_num"
 
 # define lists and dictionary
-ENTITIES = [BUILD, SHOT]
+ENTITIES = [ASSET, SEQUENCE]
 ASSET_ORDER = [ENTITY, ASSET_BUILD_TYPE_NAME, ASSET_BUILD_NAME, TASK_NAME]
 SHOT_ORDER = [ENTITY, SEQUENCE_NAME, SHOT_NAME, TASK_NAME]
-ENTITY_DICT = {BUILD: ASSET_ORDER, SHOT: SHOT_ORDER}
+ENTITY_DICT = {ASSET: ASSET_ORDER, SEQUENCE: SHOT_ORDER}
 
 APP_FILE_SUBFOLDER = {
     "maya": "scenes",

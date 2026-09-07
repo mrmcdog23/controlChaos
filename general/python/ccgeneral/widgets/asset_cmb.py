@@ -166,7 +166,7 @@ class AssetCmb(base_ui.WidgetBase):
         Returns:
             data: The selected combobox information
         """
-        data = {"entity": ctx_constants.BUILD,
+        data = {"entity": ctx_constants.ASSET,
                 "asset_build_type_name": self.asset_build_type,
                 "asset_build_name": self.asset_build_name,
                 "task_name": self.task_name

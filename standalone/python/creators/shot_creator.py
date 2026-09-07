@@ -33,7 +33,11 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         "btn_add_specific_shot_number": "add",
         "btn_add_shot_range": "add",
         "btn_add_custom_name": "add",
-        "btn_reset": "refresh"
+        "btn_reset": "refresh",
+        "btn_remove_sequence": "remove",
+        "btn_remove_shot_range": "remove",
+        "btn_remove_shot_specific": "remove",
+        "btn_remove_shot_custom": "remove"
     }
 
     def __init__(self):
@@ -83,6 +87,16 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         self.btn_reset.clicked.connect(self.populate_sequences)
         self.lw_shot.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.lw_shot.customContextMenuRequested.connect(self.action_menu)
+        self.btn_remove_sequence.clicked.connect(self.remove_sequence)
+        self.chk_prefix.toggled.connect(self.enable_prefix)
+        self.btn_remove_shot_range.clicked.connect(self.remove_shots)
+        self.btn_remove_shot_specific.clicked.connect(self.remove_shots)
+        self.btn_remove_shot_custom.clicked.connect(self.remove_shots)
+
+    def enable_prefix(self, enable):
+        # type: () -> bool
+        """ Enable the line edit for prefix """
+        self.le_prefix.setEnabled(enable)
 
     def action_menu(self, event):
         """
@@ -130,8 +144,9 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         Returns:
             Name of the padded shot with the sequence
         """
+        prefix = self.le_prefix.text()
         shot_number_padded = str(shot_number).zfill(4)
-        return f"sh{shot_number_padded}"
+        return f"{prefix}{shot_number_padded}"
 
     def add_shot_range(self):
         """
@@ -236,12 +251,15 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         item = ContextItem(create_sequence_name, True)
         self.lw_sequence.addItem(item)
         self.enabled_create_button()
+        self.btn_remove_sequence.setEnabled(True)
 
     def add_custom_name(self):
         """
         Add a custom shot name to the sequence
         """
-        self.add_shot_to_list(self.le_custom_name.text())
+        prefix = self.le_prefix.text()
+        custom_name = self.le_custom_name.text()
+        self.add_shot_to_list( f"{prefix}{custom_name}")
 
     def get_text_to_item_dict(self, list_widget):
         # type: (QtWidgets.QListWidget, bool) -> dict
@@ -333,6 +351,11 @@ class ShotCreator(base_ui.StandaloneWindowBase):
 
         self.grp_shot.setEnabled(True)
         seq_item = items[0]
+        try:
+            seq_item.new_entity
+        except AttributeError:
+            return
+
         if not seq_item.new_entity:
             sequence_name = seq_item.text()
 
@@ -350,6 +373,9 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         shot_item_dict = self.get_text_to_item_dict(self.lw_shot)
         enable_btn = bool(seq_item_dict or shot_item_dict)
         self.btn_create_context.setEnabled(enable_btn)
+        self.btn_remove_shot_range.setEnabled(True)
+        self.btn_remove_shot_specific.setEnabled(True)
+        self.btn_remove_shot_custom.setEnabled(True)
 
     @staticmethod
     def get_current_item_text(list_widget):
@@ -381,18 +407,47 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         new_items_dict = self.get_text_to_item_dict(list_widget)
         return list(new_items_dict.keys())
 
+    def remove_sequence(self):
+        """
+        Remove the selected sequences
+        """
+        self.remove_items(self.lw_sequence)
+
+    def remove_shots(self):
+        """
+        Remove the selected shots
+        """
+        self.remove_items(self.lw_shot)
+
+    def remove_items(self, list_widget):
+        """
+        Remove the selected sequences
+        """
+        for item in list_widget.selectedItems():
+            try:
+                is_new = item.new_entity
+            except AttributeError:
+                is_new = True
+            if is_new:
+                list_widget.takeItem(list_widget.row(item))
+
+
     def create_context(self):
         """
         Create all episodes, sequences and shots
         """
+        # create sequences
+        for sequence_name in self.lw_sequence.items_text:
+            self.ftshot.create_sequence(sequence_name)
+
         # build a dictionary of what to create
         shots_to_create = self.get_entity_list_to_create(self.lw_shot)
 
         # add new episodes to dictionary
-        self.ftshot.create_sequence(self.sequence_name)
         for shot_name in shots_to_create:
             self.ftshot.create_shot(shot_name, self.sequence_name)
 
+        self.populate_sequences()
         self.logger.info("Shot creation complete")
         ui_utils.messagebox("Complete", "Created Shots", "info", parent=self)
 
