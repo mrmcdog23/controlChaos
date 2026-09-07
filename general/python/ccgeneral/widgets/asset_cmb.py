@@ -1,8 +1,9 @@
 """ Asset combo boxes to select the context """
 from typing import Optional
 import cccore.base_ui as base_ui
-import cccore.file_env.context as context
 import ccftrack.asset as asset
+import cccore.file_env.context as context
+import cccore.file_env.ctx_constants as ctx_constants
 
 
 class AssetCmb(base_ui.WidgetBase):
@@ -165,7 +166,7 @@ class AssetCmb(base_ui.WidgetBase):
         Returns:
             data: The selected combobox information
         """
-        data = {"entity": "asset",
+        data = {"entity": ctx_constants.BUILD,
                 "asset_build_type_name": self.asset_build_type,
                 "asset_build_name": self.asset_build_name,
                 "task_name": self.task_name
