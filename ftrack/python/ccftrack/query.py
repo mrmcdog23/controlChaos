@@ -274,7 +274,7 @@ class FtQuery(FtShot, FtAsset):
 
         if category:
             query += f' and asset.type.name is "{category}"'
-
+        self.logger.info(f"Query: {query}")
         avs = self.session.query(query).all()
         if not avs:
             return None
