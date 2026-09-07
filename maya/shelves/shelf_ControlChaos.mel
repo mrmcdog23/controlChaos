@@ -61,7 +61,7 @@ global proc shelf_ControlChaos () {
         -flipY 0
         -useAlpha 1
         -font "plainLabelFont" 
-        -imageOverlayLabel "publish"
+        -imageOverlayLabel "publish" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.2 
         -image "export_shot.png" 

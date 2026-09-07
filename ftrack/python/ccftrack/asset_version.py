@@ -7,6 +7,7 @@ from typing import Optional
 from ccftrack.base import FtBase
 import cccore.core_constants as core_constants
 import cccore.file_env.context_utils as context_utils
+import cccore.file_env.ctx_constants as ctx_constants
 import cccore.utils.file_utils as file_utils
 
 
@@ -742,7 +743,7 @@ class FtAssetVersion(FtBase):
         """
         if self.is_asset:
             ctx_dict = {
-                "entity": "asset",
+                "entity": ctx_constants.BUILD,
                 "asset_build_type_name": self.asset_build_type_name,
                 "asset_build_name": self.asset_build_name,
                 "task_name": self.task_name,

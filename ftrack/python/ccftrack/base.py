@@ -659,7 +659,7 @@ class FtBase(object):
         """
         The project asset folder
         """
-        return self.get_folder("asset", self.project_id)
+        return self.get_folder("assets", self.project_id)
 
     @property
     def task(self):

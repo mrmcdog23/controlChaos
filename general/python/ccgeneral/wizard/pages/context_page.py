@@ -7,6 +7,7 @@ from ccgeneral.wizard.pages.base_page import BasePublishPage
 import ccgeneral.widgets.status_cmb as status_cmb
 import ccgeneral.widgets.asset_cmb as asset_cmb
 import ccgeneral.widgets.shot_combobox as shot_cmb
+import cccore.file_env.ctx_constants as ctx_constants
 
 
 class ContextPage(BasePublishPage):
@@ -96,7 +97,7 @@ class ContextPage(BasePublishPage):
         Store the selected options in the wizard data
         """
         if self.ctx.is_asset:
-            self.data['entity'] = "asset"
+            self.data['entity'] = ctx_constants.BUILD
             self.data['asset_build_type_name'] = self.ctx.asset_type
             self.data['asset_build_name'] = self.ctx.asset_name
         else:
