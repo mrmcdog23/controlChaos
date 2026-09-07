@@ -86,8 +86,11 @@ class ProjectCreator(base_ui.StandaloneWindowBase):
 
         # Check the code is valid
         project_code = self.le_code.text()
-        if len(project_code) != 3:
+        if len(project_code) < 3:
             return "Project code is too short"
+        if len(project_code) > 4:
+            return "Project code is too long"
+
         if not project_code.isupper():
             return "Project code needs to be uppercase"
         if project_code in self.ftshot.projects_code:
