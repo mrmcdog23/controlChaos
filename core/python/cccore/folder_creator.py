@@ -5,6 +5,7 @@ import cccore.utils.file_utils as file_utils
 import cccore.data.server_data as server_data
 import cccore.utils.cc_logging as cc_logging
 import cccore.core_constants as core_constants
+import cccore.file_env.ctx_constants as ctx_constants
 
 
 class CreateFolders(object):
@@ -117,7 +118,9 @@ class CreateFolders(object):
         for sequence_name, shots_list in self.create_dict.items():
 
             # create sequences
-            sequence_dir = file_utils.join_file_names(self.project_root, "shots", sequence_name)
+            sequence_dir = file_utils.join_file_names(
+                self.project_root, ctx_constants.SEQUENCE, sequence_name
+            )
             file_utils.create_directory(sequence_dir)
             self.logger.info(f"Done creating sequence {sequence_name}")
 
@@ -169,7 +172,7 @@ class CreateFolders(object):
         """
         Create the asset on disk and on ftrack
         """
-        assets_dir = file_utils.join_file_names(self.project_root, "assets")
+        assets_dir = file_utils.join_file_names(self.project_root, ctx_constants.ASSET)
         file_utils.create_directory(assets_dir)
 
         for asset_build_type_name, asset_build_names in self.create_dict.items():

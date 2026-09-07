@@ -40,7 +40,7 @@ class Context(object):
     def is_asset(self):
         # type: () -> bool
         """ Is it an asset build """
-        return bool(self.entity == "assets")
+        return bool(self.entity == ctx_constants.ASSET)
 
     def get_value(self, key_name):
         # type: (str) -> str
@@ -116,13 +116,13 @@ class Context(object):
     def project_shots_dir(self):
         # type: () -> str
         """ The project shots directory """
-        return file_utils.join_file_names(self.project_root, "shots")
+        return file_utils.join_file_names(self.project_root, ctx_constants.SEQUENCE)
 
     @property
     def project_assets_dir(self):
         # type: () -> str
         """ The project assets directory """
-        return file_utils.join_file_names(self.project_root, "assets")
+        return file_utils.join_file_names(self.project_root, ctx_constants.ASSET)
 
     @property
     def task(self):
@@ -399,7 +399,7 @@ class Context(object):
             "version_num": self.version_int,
             "suffix": self.suffix
         }
-        if self.entity == "assets":
+        if self.entity == ctx_constants.ASSET:
             context_dict["asset_build_type_name"] = self.asset_type
             context_dict["asset_build_name"] = self.asset_name
         else:

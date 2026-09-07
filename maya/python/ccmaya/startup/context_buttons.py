@@ -46,7 +46,7 @@ class ContextButtons(object):
                 del os.environ[variable]
 
         os.environ["entity"] = entity_name
-        if entity_name == ctx_constants.BUILD:
+        if entity_name == ctx_constants.ASSET:
             self.asset_types_btn()
         else:
             self.sequence_list_btn()
@@ -85,10 +85,10 @@ class ContextButtons(object):
         Returns:
             btn: Button created
         """
-        entity_type = os.environ.get(ctx_constants.ENTITY, ctx_constants.BUILD)
+        entity_type = os.environ.get(ctx_constants.ENTITY, ctx_constants.ASSET)
 
         # remove previous buttons it could be switched entity
-        if entity_type == ctx_constants.BUILD:
+        if entity_type == ctx_constants.ASSET:
             use_list = ctx_constants.ASSET_ORDER[:]
             self.remove_btn_list(ctx_constants.SHOT_ORDER)
         else:

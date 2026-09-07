@@ -11,6 +11,7 @@ import cccore.utils.cc_logging as cc_logging
 import cccore.core_constants as core_constants
 import cccore.data.server_data as server_data
 import cccore.file_env.context_utils as context_utils
+from cccore.file_env import ctx_constants
 
 
 class ResultsError(ftrack_api.exception.NoResultFoundError):
@@ -659,7 +660,7 @@ class FtBase(object):
         """
         The project asset folder
         """
-        return self.get_folder("assets", self.project_id)
+        return self.get_folder(ctx_constants.ASSET, self.project_id)
 
     @property
     def task(self):

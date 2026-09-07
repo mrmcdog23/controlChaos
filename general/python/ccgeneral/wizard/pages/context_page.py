@@ -97,7 +97,7 @@ class ContextPage(BasePublishPage):
         Store the selected options in the wizard data
         """
         if self.ctx.is_asset:
-            self.data['entity'] = ctx_constants.BUILD
+            self.data['entity'] = ctx_constants.ASSET
             self.data['asset_build_type_name'] = self.ctx.asset_type
             self.data['asset_build_name'] = self.ctx.asset_name
         else:

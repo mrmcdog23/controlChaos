@@ -67,7 +67,7 @@ class AssetExporter(BaseExporter):
         """
         Create the asset version on ftrack and get publish path
         """
-        self.data["entity"] = ctx_constants.BUILD
+        self.data["entity"] = ctx_constants.ASSET
         self.data["ext"] = "ma"
         self.ctx = context.Context(overrides=self.data)
 

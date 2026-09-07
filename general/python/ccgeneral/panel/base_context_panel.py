@@ -28,8 +28,8 @@ IGNORE_FILE_EXT = (".autosave", "~")
 PROJECT_DATA = server_data.ProjectData()
 
 # import constants
-BUILD = ctx_constants.BUILD
-SHOT = ctx_constants.SHOT
+ASSET = ctx_constants.ASSET
+SEQUENCE = ctx_constants.SEQUENCE
 ENTITY = ctx_constants.ENTITY
 ASSET_BUILD_TYPE_NAME = ctx_constants.ASSET_BUILD_TYPE_NAME
 ASSET_BUILD_NAME = ctx_constants.ASSET_BUILD_NAME
@@ -490,7 +490,7 @@ class ContextPanel(base_ui.WidgetBase):
         self.btn_entity.set_variable(ctx.entity)
 
         # set the context based on the shot or asset
-        if ctx.entity == context_utils.SHOT:
+        if ctx.entity == SEQUENCE:
             self.btn_dict[SEQUENCE_NAME].set_variable(ctx.sequence)
             self.btn_dict[SHOT_NAME].set_variable(ctx.shot)
         else:
@@ -596,7 +596,7 @@ class ContextPanel(base_ui.WidgetBase):
             populate_list = self.ftasset.get_asset_build_names()
 
         elif next_button_name == TASK_NAME:
-            if os.environ[ENTITY] == BUILD:
+            if os.environ[ENTITY] == ASSET:
                 task_list = self.ftasset.get_asset_build_task_names(selected_text)
             else:
                 sequence_name = os.environ[SEQUENCE_NAME]

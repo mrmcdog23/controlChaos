@@ -17,10 +17,11 @@ def get_display_text(envvar, selected_text):
     Returns:
         display_text: Text to set on the button
     """
+    print (envvar, selected_text)
     if envvar == ctx_constants.SEQUENCE_NAME:
         display_text = selected_text
     elif envvar == ctx_constants.SHOT_NAME:
-        display_text = selected_text.replace("sh", "")
+        display_text = selected_text.split("_")[-1]
     elif envvar == ctx_constants.TASK_NAME:
         display_text = selected_text[:4]
     elif envvar == ctx_constants.ASSET_BUILD_TYPE_NAME:
@@ -73,7 +74,7 @@ def context_dict_from_path(path):
     values = no_root_path.split("/")
 
     # build the dictionary of the context values
-    is_asset = ctx_constants.BUILD in values
+    is_asset = ctx_constants.ASSET in values
     if is_asset:
         use_keys = ctx_constants.ASSET_KEYS
     else:

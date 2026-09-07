@@ -743,7 +743,7 @@ class FtAssetVersion(FtBase):
         """
         if self.is_asset:
             ctx_dict = {
-                "entity": ctx_constants.BUILD,
+                "entity": ctx_constants.ASSET,
                 "asset_build_type_name": self.asset_build_type_name,
                 "asset_build_name": self.asset_build_name,
                 "task_name": self.task_name,

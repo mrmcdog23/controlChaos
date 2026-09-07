@@ -540,7 +540,7 @@ class FtShot(FtBase):
         }
 
         new_shot = self.session.create('Shot', create_shot_dict)
-        self.create_task_template_for_entity("Shot", new_shot)
+        self.create_task_template_for_entity("shot", new_shot)
         self.session.commit()
 
     @property
