@@ -59,6 +59,7 @@ def update_maya_context(ctx):
     Args:
         ctx (context.Context): Class of data to set to
     """
+
     def set_button(variable_name, value):
         # type: (str, str) -> None
         """
@@ -74,13 +75,17 @@ def update_maya_context(ctx):
     ctx_btn = context_buttons.ContextButtons()
     set_button("entity", ctx.entity)
 
-    if ctx.is_build:
+    if ctx.is_asset:
+        # asset type button
+        ctx_btn.asset_types_btn()
+        set_button("asset_type", ctx.asset_type)
+
         # asset name button
-        ctx_btn.asset_names_btn()
-        set_button("asset_build_name", ctx.asset_build)
+        ctx_btn.asset_names_btn(ctx.asset_type)
+        set_button("asset_name", ctx.asset_name)
 
         # task button
-        ctx_btn.asset_task_btn(ctx.asset_build)
+        ctx_btn.asset_task_btn(ctx.asset_name)
         ctx_btn.set_shot_task(ctx.task)
     else:
         if ctx.episode:

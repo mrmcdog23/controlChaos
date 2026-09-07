@@ -96,9 +96,9 @@ def context_layout_form_context(ctx):
         form_layout: The context layout
     """
     context_dict = collections.OrderedDict()
-    if ctx.is_build:
-        context_dict["Type:"] = ctx.build_type
-        context_dict["Name:"] = ctx.asset_build
+    if ctx.is_asset:
+        context_dict["Type:"] = ctx.asset_type
+        context_dict["Name:"] = ctx.asset_name
         context_dict["Task:"] = ctx.task
     else:
         if ctx.episode:

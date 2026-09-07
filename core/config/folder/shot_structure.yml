@@ -30,6 +30,7 @@ maya:
   scripts:
   sounds:
   sourceimages:
+  usd:
 nuke:
   render:
   scripts:

@@ -5,15 +5,22 @@ VISIBILITY = ["v"]
 
 
 DEFAULT_CAMERAS = ["persp", "top", "front", "side"]
-EXPORT_GROUPS = ["GEO", "CAM", "ENV"]
-GEO_GRP = "GEO"
-CAM_GRP = "CAM"
-ENV_GRP = "ENV"
-JNT_GRP = "JNT"
-RIG_GRP = "RIG"
+
+# Ftrack attribute
+FTRACK_ID = "ftrackId"
+
+
 ROOT_JNT = "root_jnt"
 MAIN_CTRL = "main_ctl"
+
+# maya group names
+ASSET_GRP = "ASSET"
+CAM_GRP = "CAM"
+GEO_GRP = "GEO"
+RIG_GRP = "RIG"
+JNT_GRP = "JNTS"
 CTLS_GRP = "CTLS"
+GRP_NAMES = [ASSET_GRP, CAM_GRP, GEO_GRP, RIG_GRP]
 
 # alembic arguments
 MESH_ABC_ARGS = ["-uvWrite", "-writeVisibility", "-writeUVSets",

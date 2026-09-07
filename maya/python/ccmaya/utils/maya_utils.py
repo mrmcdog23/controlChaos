@@ -163,3 +163,101 @@ def get_model_panels():
         if model_panel in model_panels:
             all_model_panels.append(model_panel)
     return all_model_panels
+
+
+def get_top_level_nodes():
+    # type: () -> list[str]
+    """
+    Get a list of top level nodes in the scene
+    """
+    return [x for x in cmds.ls(assemblies=True)
+            if x not in maya_constants.DEFAULT_CAMERAS]
+
+
+def get_asset_top_node():
+    # type: () -> Optional[str]
+    """
+    Get the top node of the asset
+
+    Returns:
+        grp_name: Name of the top node
+    """
+    top_nodes = get_top_level_nodes()
+    for grp_name in maya_constants.GRP_NAMES:
+        if grp_name in top_nodes:
+            return grp_name
+
+
+def add_ftrack_tag_to_asset(ftrack_id):
+    # type: (str) -> None
+    """
+    Add the ftrack id as an attribute and set the published id
+
+    Args:
+        ftrack_id: Published ftrack id
+    """
+    top_node = get_top_level_nodes()[0]
+    add_string_attribute(top_node, maya_constants.FTRACK_ID, ftrack_id)
+
+
+def add_string_attribute(top_node, attribute_name, attribute_value):
+    # type: (str, str, str) -> None
+    """
+    Add a string attribute to a maya object
+
+    Args:
+        top_node: The node to add the attribute to
+        attribute_name: Attribute name to add
+        attribute_value: The string text to set
+    """
+    attribute_long_name = f"{top_node}.{attribute_name}"
+    if not cmds.objExists(attribute_long_name):
+        cmds.addAttr(top_node, longName=attribute_name, dt='string')
+
+    # unlock, set and lock the attribute
+    cmds.setAttr(attribute_long_name, l=False)
+    cmds.setAttr(attribute_long_name, attribute_value, type="string")
+    cmds.setAttr(attribute_long_name, l=True)
+
+
+def get_root_joint(namespace=None):
+    # type: (Optional[str]) -> Optional[str]
+    """
+    Find the root joint of a rig
+
+    Args:
+        namespace: Root joint namespace
+
+    Returns:
+        jnt: Root joint of the rig
+    """
+    if namespace:
+        joints = cmds.ls(f"{namespace}:*", type="joint")
+    else:
+        joints = cmds.ls(type="joint")
+
+    # if there are no joints then warn the user
+    if not joints:
+        logger.critical("No joints found")
+        return None
+
+    # set the joint and start count as a fail-safe
+    jnt = joints[0]
+    count = 0
+
+    # keep getting the joint parent until the parent is not a joint
+    while count < 100:
+        count += 1
+
+        # if there is no parent then the joint is the top level
+        parent_obj = cmds.listRelatives(jnt, p=True)
+        if not parent_obj:
+            break
+
+        # if the parent is a joint set that as the new joint
+        if cmds.objectType(parent_obj[0]) == "joint":
+            jnt = parent_obj[0]
+        else:
+            # if the parent isn't a joint then its the root
+            break
+    return jnt

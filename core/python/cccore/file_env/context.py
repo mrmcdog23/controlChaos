@@ -40,7 +40,7 @@ class Context(object):
     def is_asset(self):
         # type: () -> bool
         """ Is it an asset build """
-        return bool(self.entity == "asset")
+        return bool(self.entity == "assets")
 
     def get_value(self, key_name):
         # type: (str) -> str
@@ -172,19 +172,25 @@ class Context(object):
     @property
     def abc_dir(self):
         # type: () -> str
-        """ The project shots directory """
+        """ The project abc directory """
         return file_utils.join_file_names(self.app_dir, "abc", self.task)
 
     @property
     def cache_dir(self):
         # type: () -> str
-        """ The project shots directory """
+        """ The project cache directory """
         return file_utils.join_file_names(self.app_dir, "cache", self.task)
+
+    @property
+    def usd_dir(self):
+        # type: () -> str
+        """ The project usd directory """
+        return file_utils.join_file_names(self.app_dir, "usd", self.task)
 
     @property
     def data_dir(self):
         # type: () -> str
-        """ The project shots directory """
+        """ The project data directory """
         return file_utils.join_file_names(self.app_dir, "data", self.task)
 
     @property
@@ -340,6 +346,15 @@ class Context(object):
         fbx_path = file_utils.join_file_names(
             self.cache_dir, f"v{self.version_padded}", self.new_filename)
         return fbx_path
+
+    @property
+    def usd_file_path(self):
+        # type: () -> str
+        """ Work out the next fbx save path """
+        self.use_ext = "usd"
+        usd_path = file_utils.join_file_names(
+            self.usd_dir, f"v{self.version_padded}", self.new_filename)
+        return usd_path
     
     @property
     def data_file_path(self):
@@ -384,6 +399,12 @@ class Context(object):
             "version_num": self.version_int,
             "suffix": self.suffix
         }
+        if self.entity == "assets":
+            context_dict["asset_build_type_name"] = self.asset_type
+            context_dict["asset_build_name"] = self.asset_name
+        else:
+            context_dict["sequence_name"] = self.sequence
+            context_dict["shot_name"] = self.shot
         return context_dict
 
     '''
@@ -576,7 +597,7 @@ class Context(object):
         return str(self.version).zfill(3)
 
     @property
-    def is_build(self):
+    def is_asset(self):
         # type: () -> bool
         """ Is it an asset build """
         return bool(self.entity == "build")
@@ -723,7 +744,7 @@ class Context(object):
             context_dir: The current directory of the context
         """
         # get the template format
-        if self.is_build:
+        if self.is_asset:
             path_format = BUILD_TASK_DIR_FMT
         else:
             path_format = SHOT_TASK_DIR_FMT
@@ -815,7 +836,7 @@ class Context(object):
     def new_filename(self):
         # type: () -> str
         """ Get the file name from the context and information """
-        filename_format = BUILD_FILE_NAME_FMT if self.is_build else SHOT_FILE_NAME_FMT
+        filename_format = BUILD_FILE_NAME_FMT if self.is_asset else SHOT_FILE_NAME_FMT
         filename = self.format_name_from_dict(filename_format)
         if self.is_sequence and not self.is_single_frame_sequence:
             name = file_utils.get_file_name(filename)
@@ -1026,7 +1047,7 @@ class Context(object):
         Returns:
             sequence_file_name: File name constructed
         """
-        if self.is_build:
+        if self.is_asset:
             filename_format = BUILD_SEQ_NAME_FMT
         else:
             filename_format = SHOT_SEQ_NAME_FMT
@@ -1085,7 +1106,7 @@ class Context(object):
                         "version_padded": self.version_padded,
                         "version_num": self.version_int
                         }
-        if self.is_build:
+        if self.is_asset:
             context_dict["asset_build_type_name"] = self.build_type
             context_dict["asset_build_name"] = self.asset_build
         else:

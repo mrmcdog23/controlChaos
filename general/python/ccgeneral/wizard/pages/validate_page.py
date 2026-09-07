@@ -5,6 +5,7 @@ import cccore.base_ui as base_ui
 from CCPySide import QtWidgets
 from ccgeneral.wizard.pages.base_page import BasePublishPage
 from cccore.utils.cc_logging import cc_logger
+import cccore.file_env.context as context
 
 
 SELECTED_COLOUR = "rgb(50, 50, 250)"
@@ -23,9 +24,10 @@ class ValidatorWidget(base_ui.WidgetBase):
         "btn_autofix": "fix"
     }
 
-    def __init__(self, parent, valid_cls, data):
-        super(ValidatorWidget, self).__init__(parent, valid_cls, data)
-        self.valid_cls = valid_cls(data)
+    def __init__(self, parent, valid_cls, session, data):
+        super(ValidatorWidget, self).__init__(parent, valid_cls, session, data)
+        self.valid_cls = valid_cls(session, data)
+
         self.pw = parent
         self.is_selected = False
 
@@ -95,6 +97,7 @@ class ValidatePage(BasePublishPage):
         super().__init__(parent)
         self.grid_layout = None
         self.valid_widgets = list()
+        self.ctx = context.Context()
         self.registered_validators = list()
         self.logger = cc_logger()
         self.logger.disabled = True
@@ -171,9 +174,9 @@ class ValidatePage(BasePublishPage):
 
         # find all valid validators
         self.gather_validators()
-
+        session = self.wizard().ftasset.session
         for valid_cls in self.registered_validators:
-            valid_widget = ValidatorWidget(self, valid_cls, self.data)
+            valid_widget = ValidatorWidget(self, valid_cls, session, self.data)
             valid_widget.setHidden(valid_widget.valid_cls.is_valid)
             layout.addWidget(valid_widget)
             self.valid_widgets.append(valid_widget)
@@ -215,7 +218,12 @@ class ValidatePage(BasePublishPage):
         self.registered_validators = list()
         data = self.wizard().data
         self.add_validators_to_list(self.shared_validators, data)
-        validator_file = self.shot_validators
+
+        if self.ctx.task and self.ctx.is_asset:
+            validator_file = self.asset_validators
+        else:
+            validator_file = self.shot_validators
+
         self.add_validators_to_list(validator_file, data)
 
     def add_validators_to_list(self, validator_file, data):

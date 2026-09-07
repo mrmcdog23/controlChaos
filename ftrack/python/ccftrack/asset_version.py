@@ -347,7 +347,7 @@ class FtAssetVersion(FtBase):
         return bool(self.asset_build_type_name == "Camera")
 
     @property
-    def is_build(self):
+    def is_asset(self):
         # type: () -> bool
         """
         Check if the asset version is an asset build
@@ -740,20 +740,21 @@ class FtAssetVersion(FtBase):
         Returns:
             ctx_dict: Asset version as a dictionary
         """
-        if self.is_build:
-            ctx_dict = {"entity": "build",
-                        "asset_build_type_name": self.asset_build_type_name,
-                        "asset_build_name": self.asset_build_name,
-                        "task_name": self.task_name,
-                        "version_num": self.version_num
-                        }
+        if self.is_asset:
+            ctx_dict = {
+                "entity": "asset",
+                "asset_build_type_name": self.asset_build_type_name,
+                "asset_build_name": self.asset_build_name,
+                "task_name": self.task_name,
+                "version_num": self.version_num
+            }
         else:
-            ctx_dict = {"entity": "shot",
-                        "episode_name": self.episode_name,
-                        "sequence_name": self.sequence_name,
-                        "shot_name": self.shot_name,
-                        "task_name": self.task_name,
-                        "version_num": self.version_num
-                        }
+            ctx_dict = {
+                "entity": "shot",
+                "episode_name": self.episode_name,
+                "sequence_name": self.sequence_name,
+                "shot_name": self.shot_name,
+                "task_name": self.task_name,
+                "version_num": self.version_num
+            }
         return ctx_dict
-

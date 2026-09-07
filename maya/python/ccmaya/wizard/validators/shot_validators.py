@@ -12,8 +12,8 @@ class GroupsNamedCorrectlyValidator(BaseValidator):
     """
     validator_type = 'Groups named correctly'
 
-    def __init__(self, data):
-        super().__init__(data)
+    def __init__(self, session, data):
+        super().__init__(session, data)
 
     def validate(self):
         """
@@ -59,8 +59,8 @@ class AreGroupsAtDefaultValuesValidator(BaseValidator):
     """
     validator_type = 'Are Groups at default values'
 
-    def __init__(self, data):
-        super().__init__(data)
+    def __init__(self, session, data):
+        super().__init__(session, data)
         self.is_valid = True
         self.message = "All rigs at default"
 

@@ -38,7 +38,7 @@ class ShotExportWizard(MayaBaseWizard):
 
 def main():
     """
-    Launch the asset publish wizard
+    Launch the shot export wizard
     """
     message = ShotExportWizard.preflight_checks()
     if not message:

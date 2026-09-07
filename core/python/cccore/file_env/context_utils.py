@@ -73,8 +73,15 @@ def context_dict_from_path(path):
     values = no_root_path.split("/")
 
     # build the dictionary of the context values
+    is_asset = ctx_constants.BUILD in values
+    if is_asset:
+        use_keys = ctx_constants.ASSET_KEYS
+    else:
+        use_keys = ctx_constants.SHOT_KEYS
+
     for index, value in enumerate(values):
-        key = ctx_constants.SHOT_KEYS[index]
+        key = use_keys[index]
+
         context_dict[key] = value
 
     # extract the values from the file name

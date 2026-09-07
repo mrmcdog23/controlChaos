@@ -1,6 +1,6 @@
 # create constants
-BUILD = "asset"
-SHOT = "shot"
+BUILD = "assets"
+SHOT = "shots"
 ENTITY = "entity"
 
 # asset names
@@ -28,6 +28,17 @@ SHOT_KEYS = [
     "entity",
     "sequence_name",
     "shot_name",
+    "app_name",
+    "subfolder",
+    "task_name",
+    "username",
+    "file_name"
+]
+
+ASSET_KEYS = [
+    "entity",
+    "asset_type",
+    "asset_name",
     "app_name",
     "subfolder",
     "task_name",
