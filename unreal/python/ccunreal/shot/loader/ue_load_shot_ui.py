@@ -6,11 +6,12 @@ import ccunreal.utils.unreal_utils as unreal_utils
 import ccunreal.shot.loader.ue_load_shot as ue_load_shot
 import ccunreal.shot.loader.wdg_import_shot as wdg_import_shot
 from CCPySide import QtWidgets, QtCore
-from ccgeneral.widgets.shot_combobox import ShotComboBox
 import ccgeneral.shot.load_shot_ui as load_shot_ui
 
 
 class UELoadShotUI(load_shot_ui.LoadShotUI):
+    title = "Import Unreal Shot"
+
     def __init__(self, parent):
         super().__init__(parent=parent)
 
@@ -101,7 +102,7 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
             self.import_files_list, self.data, level_path, shot_path)
 
 
-def launch():
+def main():
     """
     Launch the unreal shot loader
     """

@@ -10,7 +10,7 @@ from ccgeneral.widgets.shot_combobox import ShotComboBox
 
 
 class LoadShotUI(base_ui.WidgetBase):
-    title = "Import Unreal Shot"
+    title = "Import Shot"
     window_icon = "shot"
     control_chaos_ss = "../../css/ue_stylesheet.css"
 
@@ -87,8 +87,8 @@ class LoadShotUI(base_ui.WidgetBase):
             self.lw_import_files.addItem(item)
 
         # set the frame range from the data
-        self.sb_start_frame.setValue(self.data["start_frame"])
-        self.sb_end_frame.setValue(self.data["end_frame"])
+        self.sb_start_frame.setValue(self.ftshot.start)
+        self.sb_end_frame.setValue(self.ftshot.end)
 
         # set the ftrack widgets
         self.txt_created_by.setText(self.ftver.created_by)
@@ -106,14 +106,6 @@ class LoadShotUI(base_ui.WidgetBase):
             file_path = item.data(QtCore.Qt.UserRole)
             import_files.append(file_path)
         return import_files
-
-    def closeEvent(self, event):
-        """
-        Save the values on ui close
-        """
-        event.accept()
-        #for key, value in self.cmb_shot.get_data().items():
-        #    self.ui_settings.setValue(key, value)
 
     def import_files(self):
         """

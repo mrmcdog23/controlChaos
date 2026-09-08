@@ -1,5 +1,3 @@
-import unreal as ue
-
 """ Utilities relating to Unreal """
 import sys
 import unreal as ue
