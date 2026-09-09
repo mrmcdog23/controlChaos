@@ -384,14 +384,14 @@ class AssetCreatorTool(BaseTool):
         self.launch_path = "{0}/standalone/python/creators/asset_creator.py"
 
 
-class VideoUploaderTool(BaseTool):
-    name = "video_uploader_tool"
+class MediaPublisherTool(BaseTool):
+    name = "media_publisher_tool"
 
     def __init__(self):
-        super(VideoUploaderTool, self).__init__()
-        self.display_text = "Video Uploader"
-        self.icon = "video_uploader.png"
-        self.launch_path = "{0}/standalone/python/uploader/video_uploader_wizard.py"
+        super(MediaPublisherTool, self).__init__()
+        self.display_text = "Media Publisher"
+        self.icon = "media_publisher.png"
+        self.launch_path = "{0}/standalone/python/uploader/media_publisher_wizard.py"
 
 
 APPLICATIONS = [
@@ -403,5 +403,5 @@ TOOLS = [
     ProjectCreatorTool,
     ShotCreatorTool,
     AssetCreatorTool,
-    VideoUploaderTool
+    MediaPublisherTool
 ]

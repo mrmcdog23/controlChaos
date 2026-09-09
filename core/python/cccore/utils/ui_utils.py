@@ -115,6 +115,16 @@ def get_status_stylesheet(status):
     return style_sheet
 
 
+def build_form_context_layout(context_dict):
+    form_layout = QtWidgets.QFormLayout()
+    for context_key, context_value in context_dict.items():
+        lbl_context_key = QtWidgets.QLabel(context_key)
+        lbl_context_value = QtWidgets.QLabel(context_value)
+        lbl_context_value.setFont(QtGui.QFont("Ariel", weight=QtGui.QFont.Bold))
+        form_layout.addRow(lbl_context_key, lbl_context_value)
+    return form_layout
+
+
 def context_layout_form_context(ctx):
     # type: (context.Context) -> QtWidgets.QFormLayout
     """
@@ -138,10 +148,5 @@ def context_layout_form_context(ctx):
         context_dict["Shot:"] = ctx.shot
         context_dict["Task:"] = ctx.task
 
-    form_layout = QtWidgets.QFormLayout()
-    for context_key, context_value in context_dict.items():
-        lbl_context_key = QtWidgets.QLabel(context_key)
-        lbl_context_value = QtWidgets.QLabel(context_value)
-        lbl_context_value.setFont(QtGui.QFont("Ariel", weight=QtGui.QFont.Bold))
-        form_layout.addRow(lbl_context_key, lbl_context_value)
+    form_layout = build_form_context_layout(context_dict)
     return form_layout

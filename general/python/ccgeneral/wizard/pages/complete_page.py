@@ -1,7 +1,9 @@
 """ The information once a wizard process is complete """
 import os
+import collections
 from CCPySide import QtWidgets, QtGui
 from ccgeneral.wizard.pages.base_page import BasePublishPage
+import cccore.utils.ui_utils as ui_utils
 
 
 class CompletePage(BasePublishPage):
@@ -50,6 +52,23 @@ class CompletePage(BasePublishPage):
                 icon_dict[icon_name] = job_type
         self.set_widget_icons(icon_dict=icon_dict)
 
+    def build_local_publish_info(self, ftver):
+        print (ftver.asset_build_name)
+        context_dict = collections.OrderedDict()
+        context_dict["Project:"] = ftver.project_name
+        if ftver.sequence_name:
+            context_dict["Sequence:"] = ftver.sequence_name
+            context_dict["Shot:"] = ftver.shot_name
+        else:
+            context_dict["Asset Type:"] = ftver.asset_build_name
+            context_dict["Asset Name:"] = ftver.asset_name
+
+        context_dict["Task:"] = ftver.task_name
+        context_dict["Version:"] = ftver.version_padded
+
+        form_layout = ui_utils.build_form_context_layout(context_dict)
+        return form_layout
+
     def initializePage(self):
         """
         Display the published information on the page
@@ -59,8 +78,8 @@ class CompletePage(BasePublishPage):
         if deadline_mode:
             self.build_deadline_widget(self.data["job_types"])
             return
-
-        asset_version_id = self.wizard().asset_version_id
+        asset_version_id ="3b143f9f-16ca-46c2-8fdb-505e4362cb17"
+        #asset_version_id = self.wizard().asset_version_id
         if not asset_version_id:
 
             self.publish_widget.setHidden(True)
@@ -87,10 +106,8 @@ class CompletePage(BasePublishPage):
 
         # build asset information
         asset_version = ftver.asset_version
-        for links in asset_version["link"]:
-            label = QtWidgets.QLabel(links['name'])
-            label.setStyleSheet("font-weight: bold")
-            self.publish_info_layout.addWidget(label)
+        form_layout = self.build_local_publish_info(ftver)
+        self.publish_info_layout.addLayout(form_layout)
 
         self.txt_comment.setText(asset_version["comment"])
 
