@@ -3,6 +3,7 @@ import os
 import cccore.base_ui as base_ui
 import cccore.utils.file_utils as file_utils
 import cccore.file_env.context as context
+import cccore.utils.cc_logging as cc_logging
 import ccftrack.shot as shot
 import ccftrack.asset_version as ft_version
 from CCPySide import QtWidgets, QtCore
@@ -19,6 +20,7 @@ class LoadShotUI(base_ui.WidgetBase):
         self.ui_settings = QtCore.QSettings('controlChaos', 'ue_load_shot')
         self.ftshot = shot.FtShot()
         self.ftver = ft_version.FtAssetVersion(session=self.ftshot.session)
+        self.logger = cc_logging.cc_logger()
         self.ctx = None
         self.data = dict()
 
@@ -93,6 +95,18 @@ class LoadShotUI(base_ui.WidgetBase):
         # set the ftrack widgets
         self.txt_created_by.setText(self.ftver.created_by)
         self.txt_comments_by.setText(self.ftver.comment)
+
+    @property
+    def start_frame(self):
+        # type: () -> int
+        """ The start frame in the ui """
+        return self.sb_start_frame.value()
+
+    @property
+    def end_frame(self):
+        # type: () -> int
+        """ The end frame in the ui """
+        return self.sb_end_frame.value()
 
     @property
     def import_files_list(self):

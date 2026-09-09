@@ -37,40 +37,6 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
         else:
             self.btn_import_files.setEnabled(True)
 
-    def populate_files(self):
-        """
-        Update the version list based on the asset selection
-        """
-        self.lw_import_files.clear()
-        self.cmb_shot.set_ftshot()
-
-        # get the versions from the combo boxes
-        version_num = self.cmb_shot.cmb_version.currentText()
-        if not version_num:
-            return
-
-        asset_version = self.ftshot.get_asset_version_from_number(version_num)
-        self.ftver.asset_version_id = asset_version["id"]
-        for component_name, component_path in self.ftver.component_to_path.items():
-            if component_name == "metadata":
-                self.data = file_utils.read_file(component_path)
-
-            if not component_path.endswith(".fbx"):
-                continue
-
-            item = QtWidgets.QListWidgetItem(os.path.basename(component_path))
-            item.setCheckState(QtCore.Qt.Checked)
-            item.setData(QtCore.Qt.UserRole, component_path)
-            self.lw_import_files.addItem(item)
-
-        # set the frame range from the data
-        self.sb_start_frame.setValue(self.data["start_frame"])
-        self.sb_end_frame.setValue(self.data["end_frame"])
-
-        # set the ftrack widgets
-        self.txt_created_by.setText(self.ftver.created_by)
-        self.txt_comments_by.setText(self.ftver.comment)
-
     @property
     def import_files_list(self):
         # type: () -> list[str]
@@ -84,14 +50,6 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
             import_files.append(file_path)
         return import_files
 
-    def closeEvent(self, event):
-        """
-        Save the values on ui close
-        """
-        event.accept()
-        #for key, value in self.cmb_shot.get_data().items():
-        #    self.ui_settings.setValue(key, value)
-
     def import_files(self):
         """
         Import cameras into unreal
@@ -99,7 +57,12 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
         level_path = self.wdg_ue_import_shot.level_path
         shot_path = self.wdg_ue_import_shot.shot_path
         ue_load_shot.UELoadShot(
-            self.import_files_list, self.data, level_path, shot_path)
+            self.import_files_list,
+            self.data, level_path,
+            shot_path,
+            self.start_frame,
+            self.end_frame
+        )
 
 
 def main():

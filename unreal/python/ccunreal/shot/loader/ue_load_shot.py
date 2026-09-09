@@ -21,7 +21,7 @@ class UELoadShot(object):
     """
     Load the shot into unreal from its selected asset version
     """
-    def __init__(self, import_file_list, data, level_path, shot_path):
+    def __init__(self, import_file_list, data, level_path, shot_path, start_frame, end_frame):
         # type: (list[str], str, str, str, int, int) -> None
         """
         Args:
@@ -35,6 +35,8 @@ class UELoadShot(object):
         self.data = data
         self.level_path = level_path
         self.shot_path = shot_path
+        self.start_frame = start_frame
+        self.end_frame = end_frame
         self.shot_name = ue.Paths.get_base_filename(shot_path)
 
         self.ls = None
@@ -53,18 +55,6 @@ class UELoadShot(object):
         self.create_ls()
         self.open_sequence()
         self.animation_import()
-
-    @property
-    def start_frame(self):
-        # type: () -> int
-        """ The first frame to import """
-        return self.data["start_frame"]
-
-    @property
-    def end_frame(self):
-        # type: () -> int
-        """ The last frame to import """
-        return self.data["end_frame"]
 
     @property
     def version_dir(self):
