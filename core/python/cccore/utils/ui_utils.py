@@ -116,6 +116,16 @@ def get_status_stylesheet(status):
 
 
 def build_form_context_layout(context_dict):
+    # type: (dict) -> QtWidgets.QFormLayout()
+    """
+    Build a QFormLayout from a context dictionary
+
+    Args:
+        context_dict: Information about the context dictionary
+
+    Returns:
+        form_layout: The QFormLayout object
+    """
     form_layout = QtWidgets.QFormLayout()
     for context_key, context_value in context_dict.items():
         lbl_context_key = QtWidgets.QLabel(context_key)

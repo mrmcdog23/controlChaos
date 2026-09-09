@@ -21,7 +21,6 @@ class  MediaPublisherWizard(base_wizard.BaseWizard):
         # type: () -> list[Any]
         """ List of wizard pages to add """
         pages = [
-            CompletePage,
             ShotComboBoxContextPage,
             SelectMoviePage,
             UploadProgressPage,

@@ -53,15 +53,22 @@ class CompletePage(BasePublishPage):
         self.set_widget_icons(icon_dict=icon_dict)
 
     def build_local_publish_info(self, ftver):
-        print (ftver.asset_build_name)
+        # type: (Any) -> QtWidgets.QFormLayout()
+        """
+        Build the local publish information
+
+        Args:
+            ftver: FTrack version class set
+        """
         context_dict = collections.OrderedDict()
         context_dict["Project:"] = ftver.project_name
-        if ftver.sequence_name:
+
+        if ftver.is_asset:
+            context_dict["Asset Type:"] = ftver.asset_build_type_name
+            context_dict["Asset Name:"] = ftver.asset_build_name
+        else:
             context_dict["Sequence:"] = ftver.sequence_name
             context_dict["Shot:"] = ftver.shot_name
-        else:
-            context_dict["Asset Type:"] = ftver.asset_build_name
-            context_dict["Asset Name:"] = ftver.asset_name
 
         context_dict["Task:"] = ftver.task_name
         context_dict["Version:"] = ftver.version_padded
@@ -78,8 +85,8 @@ class CompletePage(BasePublishPage):
         if deadline_mode:
             self.build_deadline_widget(self.data["job_types"])
             return
-        asset_version_id ="3b143f9f-16ca-46c2-8fdb-505e4362cb17"
-        #asset_version_id = self.wizard().asset_version_id
+
+        asset_version_id = self.wizard().asset_version_id
         if not asset_version_id:
 
             self.publish_widget.setHidden(True)

@@ -36,3 +36,5 @@ SEQUENCE_TYPES = ["png", "exr", "tif", "jpg", "jpeg", "fbx", "mov",
                   ]
 SINGLE_FRAME_SEQUENCE = ["abc", "fbx", "obj", "usd", "json", "mov", "cpio"]
 CACHE_TYPES = ["bgeo.sc", "vdb", "abc", "fbx"]
+
+ASSET_TYPES = ["camera", "prop", "vehicle", "character", "environment"]

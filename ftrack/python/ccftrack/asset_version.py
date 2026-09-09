@@ -235,24 +235,26 @@ class FtAssetVersion(FtBase):
     @property
     def asset_build_name(self):
         # type: () -> str
-        """ Asset build type name """
+        """ Asset build  name """
         return self.task['parent']['name']
+
+    @property
+    def asset_build_type(self):
+        # type: () -> ftrack_api.entity.assetbuild
+        """ Asset build of the asset version """
+        return self.asset_build['parent']
+
+    @property
+    def asset_build_type_name(self):
+        # type: () -> str
+        """ Asset build type name """
+        return self.asset_build['parent']['name']
 
     @property
     def task_id(self):
         # type: () -> str
         """ Task asset id """
         return self.task['id']
-
-    @property
-    def asset_build_type_name(self):
-        # type: () -> str
-        """
-        The asset build type name: e.g. "Character"
-        """
-        prefix = self.asset_build_name[:2]
-        prefix_dict = {v: k for k, v in core_constants.BUILD_MAPPINGS.items()}
-        return prefix_dict[prefix]
 
     @property
     def episode(self):
@@ -350,12 +352,8 @@ class FtAssetVersion(FtBase):
     @property
     def is_asset(self):
         # type: () -> bool
-        """
-        Check if the asset version is an asset build
-        """
-        shot_prefix = self.asset_build_name.startswith("sh")
-        is_digit = self.asset_build_name.isdigit()
-        return not shot_prefix and not is_digit
+        """ Check if the asset version is an asset build """
+        return self.asset_build_type_name in core_constants.ASSET_TYPES
 
     def add_component_dict(self, name_to_path):
         # type: (dict) -> None
@@ -745,7 +743,7 @@ class FtAssetVersion(FtBase):
             ctx_dict = {
                 "entity": ctx_constants.ASSET,
                 "asset_build_type_name": self.asset_build_type_name,
-                "asset_build_name": self.asset_build_name,
+                "asset_name": self.asset_name,
                 "task_name": self.task_name,
                 "version_num": self.version_num
             }
