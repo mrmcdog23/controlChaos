@@ -1,5 +1,6 @@
 import maya.cmds as cmds
 import ccmaya.maya_constants as maya_constants
+import cccore.utils.cc_logging as cc_logging
 
 
 class SceneAsset(object):
@@ -9,6 +10,7 @@ class SceneAsset(object):
         self._cam_grp = str()
         self._env_grp = str()
         self._jnt_grp = str()
+        self.logger = cc_logging.cc_logger()
 
     @property
     def is_camera(self):
@@ -70,10 +72,14 @@ class SceneAsset(object):
         """
         Get the root node to export the fullpath
         """
+        self.logger.info(f"checking camera for namespace: {self.namespace}")
         camera_tran = cmds.ls(self.namespace, type="transform")
+        self.logger.info(f"Camera transform: {camera_tran}")
         if not camera_tran:
             return
+        self.logger.info(f"Checking camera transform: {camera_tran[0]}")
         camera_shape = cmds.listRelatives(camera_tran[0], type="camera")
+        self.logger.info(f"Camera shape: {camera_shape}")
         if not camera_shape:
             return
         return camera_shape[0]
