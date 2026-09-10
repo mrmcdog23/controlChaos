@@ -81,11 +81,6 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
         Import cameras into unreal
         """
         level_path = self.wdg_ue_import_shot.level_path
-        import_files_list = [
-            "C:/Users/joele/Downloads/scen_downloads/GDVC_Test_Shots_Test_Shot_0100_layout_GDVC_Test_Shots_Test_Shot_0100_layout_v001_v003.fbx",
-            "C:/Users/joele/Downloads/scen_downloads/GDVC_Test_Shots_Test_Shot_0100_layout_camera1_v003.fbx",
-        ]
-        self.data = file_utils.read_file("C:/Users/joele/Downloads/scen_downloads/GDVC_Test_Shots_Test_Shot_0100_layout_metadata_v003.json")
         ue_load_shot.UELoadShot(
             import_files_list,
             self.data,
