@@ -30,14 +30,10 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         "lbl_icon_sequence": "sequence",
         "lbl_icon_shot": "shot",
         "btn_add_sequence": "add",
-        "btn_add_specific_shot_number": "add",
-        "btn_add_shot_range": "add",
-        "btn_add_custom_name": "add",
+        "btn_add_shots": "add",
         "btn_reset": "refresh",
         "btn_remove_sequence": "remove",
-        "btn_remove_shot_range": "remove",
-        "btn_remove_shot_specific": "remove",
-        "btn_remove_shot_custom": "remove"
+        "btn_remove_shots": "remove"
     }
 
     def __init__(self):
@@ -48,7 +44,6 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         self.folder_structure = dict()
         self.lbl_project_name.setText(self.project_data.project_name)
         self.create_layout()
-        self.set_option_hidden()
         self.populate_sequences()
         self.connect_signals()
 
@@ -57,11 +52,6 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         self.lyt_sequence.addWidget(self.lw_sequence)
         self.lw_shot = DragDropListWidget()
         self.lyt_shot.addWidget(self.lw_shot)
-
-    def set_option_hidden(self):
-        """ Set the option hidden on startup """
-        self.hide_shot_option(self.rbn_shots_in_range)
-        self.grp_shot.setEnabled(False)
 
     def enable_add_button(self):
         """
@@ -80,23 +70,13 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         self.lw_sequence.itemSelectionChanged.connect(self.populate_shots)
         self.btn_create_context.clicked.connect(self.create_context)
         self.btn_add_sequence.clicked.connect(self.add_sequence_to_create)
-        self.btn_add_custom_name.clicked.connect(self.add_custom_name)
-        self.rbn_specific_shot_number.group().buttonClicked.connect(self.hide_shot_option)
-        self.btn_add_specific_shot_number.clicked.connect(self.add_specific_shot)
-        self.btn_add_shot_range.clicked.connect(self.add_shot_range)
+        self.btn_add_shots.clicked.connect(self.add_shots)
         self.btn_reset.clicked.connect(self.populate_sequences)
         self.lw_shot.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.lw_shot.customContextMenuRequested.connect(self.action_menu)
         self.btn_remove_sequence.clicked.connect(self.remove_sequence)
-        self.chk_prefix.toggled.connect(self.enable_prefix)
-        self.btn_remove_shot_range.clicked.connect(self.remove_shots)
-        self.btn_remove_shot_specific.clicked.connect(self.remove_shots)
-        self.btn_remove_shot_custom.clicked.connect(self.remove_shots)
-
-    def enable_prefix(self, enable):
-        # type: () -> bool
-        """ Enable the line edit for prefix """
-        self.le_prefix.setEnabled(enable)
+        self.btn_remove_shots.clicked.connect(self.remove_shots)
+        self.rbn_suffix_in_range.toggled.connect(self.enable_shot_options)
 
     def action_menu(self, event):
         """
@@ -144,20 +124,28 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         Returns:
             Name of the padded shot with the sequence
         """
-        prefix = self.le_prefix.text()
+        suffix = self.le_name.text()
         shot_number_padded = str(shot_number).zfill(4)
-        return f"{prefix}{shot_number_padded}"
+        return f"{suffix}{shot_number_padded}"
 
-    def add_shot_range(self):
+    def add_shots(self):
         """
         Add shot in frame range
         """
-        start_range = self.sb_start_range.value()
-        end_range = self.sb_end_range.value() + 10
-
         new_shot_list = list()
-        for shot_number in range(start_range, end_range, 10):
-            new_shot_name = self.get_shot_name(shot_number)
+        if self.rbn_suffix_in_range.isChecked():
+            start_range = self.sb_start_range.value()
+            end_range = self.sb_end_range.value() + 10
+
+            for shot_number in range(start_range, end_range, 10):
+                new_shot_name = self.get_shot_name(shot_number)
+                if self.does_existing_shot_in_list(new_shot_name):
+                    return
+                new_shot_list.append(new_shot_name)
+        else:
+            suffix = self.le_name.text()
+            shot_number_padded = self.le_custom_suffix.text()
+            new_shot_name = f"{suffix}{shot_number_padded}"
             if self.does_existing_shot_in_list(new_shot_name):
                 return
             new_shot_list.append(new_shot_name)
@@ -195,19 +183,6 @@ class ShotCreator(base_ui.StandaloneWindowBase):
             return True
         return False
 
-    def add_specific_shot(self):
-        """
-        Add a specific shot number to the list
-        """
-        shot_number = self.sb_specific_shot_number.value()
-        specific_shot_name = self.get_shot_name(shot_number)
-
-        # check and warn the shot already exists
-        if not self.does_existing_shot_in_list(specific_shot_name):
-            item = ContextItem(specific_shot_name, True)
-            self.lw_shot.addItem(item)
-        self.enabled_create_button()
-
     def add_shot_to_list(self, specific_shot_name):
         # type: (str) -> None
         """
@@ -221,27 +196,17 @@ class ShotCreator(base_ui.StandaloneWindowBase):
             self.lw_shot.addItem(item)
         self.enabled_create_button()
 
-    def hide_shot_option(self, set_hidden):
+    def enable_shot_options(self, enabled):
         # type: (bool) -> None
         """
         Hide the shot options when the radio button is checked
 
         Args:
-            set_hidden: Set the widget hidden
+            enabled: Set the widgets enabled
         """
-        if set_hidden == self.rbn_shots_in_range:
-            self.wdg_shot_number.setHidden(True)
-            self.wdg_shots_in_range.setHidden(False)
-            self.wdg_custom_name.setHidden(True)
-
-        elif set_hidden == self.rbn_specific_shot_number:
-            self.wdg_shot_number.setHidden(False)
-            self.wdg_shots_in_range.setHidden(True)
-            self.wdg_custom_name.setHidden(True)
-        else:
-            self.wdg_shot_number.setHidden(True)
-            self.wdg_shots_in_range.setHidden(True)
-            self.wdg_custom_name.setHidden(False)
+        self.sb_start_range.setEnabled(enabled)
+        self.sb_end_range.setEnabled(enabled)
+        self.le_custom_suffix.setEnabled(not enabled)
 
     def add_sequence_to_create(self):
         """
@@ -373,9 +338,7 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         shot_item_dict = self.get_text_to_item_dict(self.lw_shot)
         enable_btn = bool(seq_item_dict or shot_item_dict)
         self.btn_create_context.setEnabled(enable_btn)
-        self.btn_remove_shot_range.setEnabled(True)
-        self.btn_remove_shot_specific.setEnabled(True)
-        self.btn_remove_shot_custom.setEnabled(True)
+        self.btn_remove_shots.setEnabled(True)
 
     @staticmethod
     def get_current_item_text(list_widget):
