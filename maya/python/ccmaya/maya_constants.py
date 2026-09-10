@@ -28,3 +28,16 @@ MESH_ABC_ARGS = ["-uvWrite", "-writeVisibility", "-writeUVSets",
                  ]
 CAM_ABC_ARGS = ["-worldSpace", "-stripNamespaces"]
 JOB_ARGS_FORMAT = "-step {step} -fr {start} {end} {args} -root {root} -file {path}"
+
+# frames per second dictionary
+FPS = {
+    15: "game",
+    23.976: "23.976fps",
+    24: "film",
+    25: "pal",
+    29.97: "29.97fps",
+    30: "game",
+    48: "show",
+    50: "palf",
+    60: "ntscf"
+}

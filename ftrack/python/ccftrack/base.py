@@ -1103,7 +1103,7 @@ class FtBase(object):
     def fps(self):
         # type: () -> float
         """ The current projects frames per second """
-        return float(self.project['custom_attributes']["project_fps"][0])
+        return float(self.project['custom_attributes']["fps"][0])
 
     @property
     def new_ingest(self):

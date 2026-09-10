@@ -21,7 +21,7 @@ class UELoadShot(object):
     """
     Load the shot into unreal from its selected asset version
     """
-    def __init__(self, import_file_list, data, level_path, shot_path, start_frame, end_frame):
+    def __init__(self, import_file_list, data, level_path, ls_path, version_dir, start_frame, end_frame, fps):
         # type: (list[str], str, str, str, int, int) -> None
         """
         Args:
@@ -34,16 +34,14 @@ class UELoadShot(object):
         self.import_file_list = import_file_list
         self.data = data
         self.level_path = level_path
-        self.shot_path = shot_path
+        self.ls_path = ls_path
+        self.version_dir = version_dir
         self.start_frame = start_frame
         self.end_frame = end_frame
-        self.shot_name = ue.Paths.get_base_filename(shot_path)
+        self.fps = fps
 
         self.ls = None
-        self.fps = 24.0
         self.imported_obj_paths = list()
-        self._version_dir = str()
-
         self.asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
         self.run_import()
 
@@ -55,20 +53,6 @@ class UELoadShot(object):
         self.create_ls()
         self.open_sequence()
         self.animation_import()
-
-    @property
-    def version_dir(self):
-        # type: () -> str
-        """
-        Workout and set the version import directory
-        """
-        if self._version_dir:
-            return self._version_dir
-
-        number_of_versions = unreal_utils.list_subfolders(self.shot_path, recursive=False)
-        next_version_number = len(number_of_versions) + 1
-        self._version_dir = ue.Paths.combine([self.shot_path, f"v{next_version_number}"])
-        return self._version_dir
 
     def create_level(self):
         """
@@ -90,14 +74,11 @@ class UELoadShot(object):
         """
         Create the shot level and level sequence
         """
-        # the shot level sequence
-        ls_path = ue.Paths.combine([self.version_dir, f"{LS_PREFIX}_{self.shot_name}"])
-
         # create the level sequence first
-        if ue.EditorAssetLibrary.does_asset_exist(ls_path):
-            self.ls = ue.load_asset(ls_path)
+        if ue.EditorAssetLibrary.does_asset_exist(self.ls_path):
+            self.ls = ue.load_asset(self.ls_path)
         else:
-            self.ls = sequencer_utils.create_level_sequence(ls_path, self.fps)
+            self.ls = sequencer_utils.create_level_sequence(self.ls_path, self.fps)
             subsys = ue.get_editor_subsystem(ue.EditorAssetSubsystem)
             subsys.save_asset(self.ls.get_full_name())
             ue.log(f"Level sequence path: {self.ls.get_full_name()}")
@@ -153,8 +134,11 @@ class UELoadShot(object):
             fbx_path: Path of the fbx file to import
         """
         # import the actor and its fbx path
+        ue.log_warning(f"file_data: {file_data}")
         skeleton, skeleton_mesh = self.import_skeleton_asset(file_data)
         ue.log_warning(f"Skeleton: {skeleton}")
+
+        ue.log_warning(f"Importing animation path: {fbx_path}")
         anim_importer = cache_importer.CacheImporter(self.version_dir, fbx_path)
         anim_importer.import_animation(skeleton=skeleton)
 

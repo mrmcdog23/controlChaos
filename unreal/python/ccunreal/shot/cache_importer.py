@@ -112,6 +112,14 @@ class CacheImporter(object):
         # Transform offsets — leave zeroed unless intentionally compensating
         anim_data = options.anim_sequence_import_data
         anim_data.set_editor_property('import_rotation', ue.Rotator(-90, 0, 0))
+
+        # Animation-specific import data
+        anim_data.set_editor_property("snap_to_closest_frame_boundary", True)
+
+        # Make sure the sampling rate matches your source export rate
+        #anim_data.set_editor_property("use_default_sample_rate", False)
+        #anim_data.set_editor_property("custom_sample_rate", 60)  # match your D
+
         asset_import_task.options = options
 
         self.run_task(asset_import_task)
