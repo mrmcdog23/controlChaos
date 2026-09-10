@@ -79,7 +79,7 @@ class AssetCmb(base_ui.WidgetBase):
         asset_build_types_names = self.ftasset.asset_build_types_names
         self.cmb_asset_build_type.addItems(asset_build_types_names)
         self.add_icons_to_combo(self.cmb_asset_build_type, asset_build_types_names)
-        self.set_combobox_index(self.cmb_asset_build_type, self.ctx.build_type)
+        self.set_combobox_index(self.cmb_asset_build_type, self.ctx.asset_type)
 
     def connect_signals(self):
         """
@@ -98,7 +98,7 @@ class AssetCmb(base_ui.WidgetBase):
         build_names = self.ftasset.get_asset_build_names(asset_build_type_name)
         self.cmb_asset_build_name.clear()
         self.cmb_asset_build_name.addItems(build_names)
-        self.set_combobox_index(self.cmb_asset_build_name, self.ctx.asset_build)
+        self.set_combobox_index(self.cmb_asset_build_name, self.ctx.asset_name)
 
     def populate_asset_tasks(self):
         """

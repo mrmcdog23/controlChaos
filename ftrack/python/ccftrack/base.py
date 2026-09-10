@@ -983,7 +983,8 @@ class FtBase(object):
             True if the status is not in an ignore status
         """
         status_name = asset_version["status"]['name']
-        return bool(status_name not in core_constants.IGNORE_STATUSES)
+        #return bool(status_name not in core_constants.IGNORE_STATUSES)
+        return True
 
     @property
     def latest_version_num(self):
