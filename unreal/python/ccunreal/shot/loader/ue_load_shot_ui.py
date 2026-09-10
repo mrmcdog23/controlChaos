@@ -69,7 +69,7 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
 
     @property
     def ls_path(self):
-        ls_name = f"{self.cmb_shot.sequence_name}_{self.cmb_shot.shot_name}_{self.cmb_shot.task_name}_{self.version_str}"
+        ls_name = f"{self.cmb_shot.sequence_name}_{self.cmb_shot.shot_name}_{self.cmb_shot.task_name}"
         return ue.Paths.combine([self.ls_dir, ls_name])
 
     @property
