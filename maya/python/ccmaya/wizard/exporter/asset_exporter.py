@@ -111,7 +111,7 @@ class AssetExporter(BaseExporter):
         self.logger.info("Exporting as more than one top node found...")
         top_node = maya_utils.get_asset_top_node()
         cmds.select(top_node)
-        temp_lookdev_path = file_utils.join_from_list(
+        temp_lookdev_path = file_utils.join_file_names(
             self.project_data.appdata, "temp_asset_export.ma")
 
         self.log(f"temp asset path: {temp_lookdev_path}")
