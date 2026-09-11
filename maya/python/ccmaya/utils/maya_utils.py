@@ -261,3 +261,17 @@ def get_root_joint(namespace=None):
             # if the parent isn't a joint then its the root
             break
     return jnt
+
+
+def get_scene_frame_range():
+    # type: () -> (int, int)
+    """
+    Get the start and end frame of the current scene
+
+    Returns:
+        start: First frame
+        end: Last frame
+    """
+    start = int(cmds.playbackOptions(q=True, min=True))
+    end = int(cmds.playbackOptions(q=True, max=True))
+    return start, end

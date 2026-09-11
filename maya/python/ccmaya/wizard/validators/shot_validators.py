@@ -1,6 +1,6 @@
 """ Maya validators for shot cameras """
 import maya.cmds as cmds
-from ccgeneral.wizard.validators.base_validators import BaseValidator
+from ccgeneral.wizard.validators.base_validators import BaseValidator, BaseFtrackRangeValidator
 import ccmaya.maya_constants as maya_constants
 import ccmaya.utils.maya_utils as maya_utils
 import ccmaya.asset.scene_asset as scene_asset
@@ -134,3 +134,23 @@ class AreGroupsAtDefaultValuesValidator(BaseValidator):
         if groups_not_at_default:
             self.is_valid = False
             self.message = groups_not_at_default
+
+
+class FtrackRangeValidator(BaseFtrackRangeValidator):
+    """
+    Run check the frame range on ftrack matches
+    """
+    def __init__(self, session, data):
+        super().__init__(session, data)
+
+    def scene_frame_range(self):
+        # type: () -> (int, int)
+        """
+        Get the frame range of the maya file
+
+        Returns:
+            Start and end frame of the play bar
+        """
+        start, end = maya_utils.get_scene_frame_range()
+        return start, end
+

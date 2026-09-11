@@ -597,7 +597,7 @@ class FtShot(FtBase):
             new_end: New End frame
         """
         message = f"Setting {self.shot_name} "
-        if new_start:
+        if new_start is not None:
             self.shot['custom_attributes']['fstart'] = new_start
             message += f"Start: {new_start} "
 

@@ -1,6 +1,7 @@
 """ Asset publisher in maya """
 import os
 import sys
+import tempfile
 import maya.cmds as cmds
 import cccore.utils.file_utils as file_utils
 import cccore.core_constants as core_constants
@@ -31,8 +32,6 @@ class AssetExporter(BaseExporter):
         """
         Export the asset and publish it to ftrack
         """
-        self.export_clean_asset()
-
         self.create_asset_version()
         self.add_progress(10)
 
@@ -93,30 +92,6 @@ class AssetExporter(BaseExporter):
         # type: () -> str
         """ Is it a camera publish asset """
         return self.data["asset_build_type_name"] == "Camera"
-
-    def export_clean_asset(self):
-        """
-        Export the asset and reopen the file to
-        not have any unwanted nodes in there
-        """
-        if self.is_camera:
-            return
-
-        maya_utils.load_plugins(["fbxmaya"])
-        top_nodes = maya_utils.get_top_level_nodes()
-        if len(top_nodes) == 1:
-            self.logger.info("Only one top node found...")
-            return
-
-        self.logger.info("Exporting as more than one top node found...")
-        top_node = maya_utils.get_asset_top_node()
-        cmds.select(top_node)
-        temp_lookdev_path = file_utils.join_file_names(
-            self.project_data.appdata, "temp_asset_export.ma")
-
-        self.log(f"temp asset path: {temp_lookdev_path}")
-        cmds.file(temp_lookdev_path, force=True, pr=True, es=True, typ="mayaAscii")
-        cmds.file(temp_lookdev_path, open=True, force=True)
 
     def tag_and_copy_asset_version(self):
         """
