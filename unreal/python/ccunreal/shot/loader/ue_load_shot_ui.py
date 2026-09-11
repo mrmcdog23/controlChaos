@@ -39,19 +39,6 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
             self.btn_import_files.setEnabled(True)
 
     @property
-    def import_files_list(self):
-        # type: () -> list[str]
-        """ Get a list of checked cameras """
-        import_files = list()
-        for index in range(self.lw_import_files.count()):
-            item = self.lw_import_files.item(index)
-            if item.checkState() != QtCore.Qt.CheckState.Checked:
-                continue
-            file_path = item.data(QtCore.Qt.UserRole)
-            import_files.append(file_path)
-        return import_files
-
-    @property
     def ls_dir(self):
         # type: () -> str
         """ Get the level sequence path """
@@ -82,7 +69,7 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
         """
         level_path = self.wdg_ue_import_shot.level_path
         ue_load_shot.UELoadShot(
-            import_files_list,
+            self.import_files_list,
             self.data,
             level_path,
             self.ls_path,
