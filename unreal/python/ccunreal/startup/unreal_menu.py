@@ -55,6 +55,11 @@ def main():
     main_menu = menus.find_menu("LevelEditor.MainMenu")
     control_chaos_menu = create_submenu(main_menu, "Control Chaos")
 
+    # asset menu
+    asset_menu = create_submenu(control_chaos_menu, "Asset")
+    command = "import ccunreal.asset.asset_loader as asset_loader;asset_loader.launch()"
+    create_command(asset_menu, "Asset Loader", command)
+
     # shot menu
     shot_menu = create_submenu(control_chaos_menu, "Shot")
     command = "import ccunreal.shot.import_fbx_cam as ifc;ifc.launch()"
