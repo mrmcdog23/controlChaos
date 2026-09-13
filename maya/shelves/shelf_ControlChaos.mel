@@ -96,7 +96,7 @@ global proc shelf_ControlChaos () {
         -flipY 0
         -useAlpha 1
         -font "plainLabelFont" 
-        -imageOverlayLabel "load" 
+        -imageOverlayLabel "asset"
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.2 
         -image "asset_loader.png" 
@@ -106,6 +106,41 @@ global proc shelf_ControlChaos () {
         -marginHeight 1
         -command "import ccmaya.asset.asset_loader as al;al.main()" 
         -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Shot Loader"
+        -enableBackground 0
+        -backgroundColor 0 0 0
+        -highlightColor 0.321569 0.521569 0.65098
+        -align "center"
+        -label "Shot Loader"
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont"
+        -imageOverlayLabel "shot"
+        -overlayLabelColor 0.8 0.8 0.8
+        -overlayLabelBackColor 0 0 0 0.2
+        -image "shot_loader.png"
+        -image1 "shot_loader.png"
+        -style "iconOnly"
+        -marginWidth 0
+        -marginHeight 1
+        -command "import ccmaya.shot.loader.maya_load_shot as msl;msl.main()"
+        -sourceType "python"
         -commandRepeatable 1
         -flat 1
     ;

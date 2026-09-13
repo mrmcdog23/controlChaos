@@ -17,7 +17,6 @@ def get_display_text(envvar, selected_text):
     Returns:
         display_text: Text to set on the button
     """
-    print (envvar, selected_text)
     if envvar == ctx_constants.SEQUENCE_NAME:
         display_text = selected_text
     elif envvar == ctx_constants.SHOT_NAME:
@@ -26,6 +25,8 @@ def get_display_text(envvar, selected_text):
         display_text = selected_text[:4]
     elif envvar == ctx_constants.ASSET_BUILD_TYPE_NAME:
         display_text = selected_text[:4]
+    elif envvar == ctx_constants.SEQUENCE:
+        display_text = selected_text[:3]
     else:
         display_text = selected_text[:]
     return display_text[:5]

@@ -6,7 +6,7 @@ import cccore.file_env.context as context
 import cccore.utils.cc_logging as cc_logging
 import ccftrack.shot as shot
 import ccftrack.asset_version as ft_version
-from CCPySide import QtWidgets, QtCore
+from CCPySide import QtWidgets, QtCore, QtGui
 from ccgeneral.widgets.shot_combobox import ShotComboBox
 
 
@@ -14,6 +14,7 @@ class LoadShotUI(base_ui.WidgetBase):
     title = "Import Shot"
     window_icon = "shot"
     control_chaos_ss = "../../css/ue_stylesheet.css"
+    ignore_types = list()
 
     def __init__(self, parent):
         super().__init__(parent=parent)
@@ -67,7 +68,6 @@ class LoadShotUI(base_ui.WidgetBase):
         Update the version list based on the asset selection
         """
         self.lw_import_files.clear()
-        self.cmb_shot.set_ftshot()
 
         # get the versions from the combo boxes
         version_num = self.cmb_shot.cmb_version.currentText()
@@ -80,12 +80,18 @@ class LoadShotUI(base_ui.WidgetBase):
             if component_name == "metadata":
                 self.data = file_utils.read_file(component_path)
 
-            if not component_path.endswith(".fbx"):
+            if not component_path.endswith(tuple(self.ignore_types)):
                 continue
 
+            # get the icon path
+            icon_name = file_utils.get_extension(component_path)
+            icon_path = self.get_icon_path(icon_name)
+
+            # create list widget item
             item = QtWidgets.QListWidgetItem(os.path.basename(component_path))
             item.setCheckState(QtCore.Qt.Checked)
             item.setData(QtCore.Qt.UserRole, component_path)
+            item.setIcon(QtGui.QIcon(icon_path))
             self.lw_import_files.addItem(item)
 
         # set the frame range from the data

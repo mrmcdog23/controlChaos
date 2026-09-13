@@ -46,12 +46,14 @@ class ContextButtons(object):
                 del os.environ[variable]
 
         os.environ["entity"] = entity_name
+        display_text = context_utils.get_display_text(entity_name, entity_name)
+
         if entity_name == ctx_constants.ASSET:
             self.asset_types_btn()
         else:
             self.sequence_list_btn()
         try:
-            cmds.button(entity_btn, e=True, l=entity_name)
+            cmds.button(entity_btn, e=True, l=display_text)
         except NameError:
             pass
 
