@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainMenu>
+  <menuBar>
+  <subMenu id="file_menu">
+      <scriptItem  id="h.save_inc_prompt">
+        <modifyItem><insertAfter>file_menu_sep_1</insertAfter></modifyItem>
+        <label>No8 File Save</label>
+          <scriptCode><![CDATA[import cchoudini.utils.hou_utils as hou_utils;hou_utils.cc_save()]]>
+          </scriptCode>
+      </scriptItem>
+      <separatorItem/>
+  </subMenu>
+
+      <subMenu id="cc_menu">
+      <label>No8</label>
+      <separatorItem/>
+
+      <subMenu id="cc.asset.menu">
+          <label>Asset</label>
+
+          <scriptItem id="cc.publish_hda">
+            <label>Publish HDA</label>
+          <scriptCode><![CDATA[import cchoudini.wizard.hda_publish_wizard as hdaw;hdaw.main()]]>
+          </scriptCode>
+          </scriptItem>
+
+          <scriptItem id="cc.publish_fbx">
+            <label>Publish FBX</label>
+          <scriptCode><![CDATA[import cchoudini.wizard.fbx_publish_wizard as fbxw;fbxw.main()]]>
+          </scriptCode>
+          </scriptItem>
+
+          <scriptItem id="cc.load_asset">
+            <label>Load Asset</label>
+          <scriptCode><![CDATA[import cchoudini.asset.asset_loader as aload;aload.main()]]>
+          </scriptCode>
+          </scriptItem>
+      </subMenu>
+
+      <subMenu id="cc.shot.menu">
+          <label>Shot</label>
+          <scriptItem id="cc.ingest_Loader">
+            <label>Ingest Loader</label>
+          <scriptCode><![CDATA[import cchoudini.shot.multi.ingester_loader as ingload;ingload.launch()]]>
+          </scriptCode>
+          </scriptItem>
+
+          <scriptItem id="cc.shot_browser">
+            <label>Shot Browser</label>
+          <scriptCode><![CDATA[import cchoudini.shot.multi.shot_browser as shot_browser;shot_browser.launch()]]>
+          </scriptCode>
+          </scriptItem>
+
+          <scriptItem id="cc.version_manager">
+            <label>Version Manager</label>
+          <scriptCode><![CDATA[import cchoudini.shot.multi.ver_manager as vm;vm.launch()]]>
+          </scriptCode>
+          </scriptItem>
+
+          <scriptItem id="cc.frame_range">
+            <label>Frame Range</label>
+          <scriptCode><![CDATA[import cchoudini.shot.hou_shot_frame_range as hsfr;hsfr.main()]]>
+          </scriptCode>
+          </scriptItem>
+      </subMenu>
+
+      <subMenu id="cc.camera.menu">
+          <label>Camera</label>
+          <scriptItem id="cc.camera_publish">
+            <label>Camera Publish</label>
+          <scriptCode><![CDATA[import cchoudini.wizard.camera_publish_wizard as cpw;cpw.main()]]>
+          </scriptCode>
+          </scriptItem>
+      </subMenu>
+
+      <subMenu id="cc.node.menu">
+          <label>Node</label>
+          <scriptItem id="cc.paste_nodes">
+            <label>Paste Nodes</label>
+          <scriptCode><![CDATA[import cchoudini.node.hou_paste_nodes as hpn;hpn.main()]]>
+          </scriptCode>
+          </scriptItem>
+      </subMenu>
+
+      <subMenu id="cc.texture.menu">
+          <label>Texture</label>
+
+          <scriptItem id="cc.load_textures">
+            <label>Texture Loader</label>
+          <scriptCode><![CDATA[import cchoudini.texture.texture_loader as tl;tl.main()]]>
+          </scriptCode>
+          </scriptItem>
+
+          <scriptItem id="cc.gltf_importer">
+            <label>GLTF Importer</label>
+          <scriptCode><![CDATA[import cchoudini.texture.gltf_importer as gltfimp;gltfimp.launch()]]>
+          </scriptCode>
+          </scriptItem>
+
+          <scriptItem id="cc.create_material">
+            <label>Create Material</label>
+          <scriptCode><![CDATA[import cchoudini.texture.material_creator as mcr;mcr.launch()]]>
+          </scriptCode>
+          </scriptItem>
+
+          <scriptItem id="cc.tx_manager">
+            <label>TX Manager</label>
+          <scriptCode><![CDATA[import cchoudini.utils.open_window as ow;ow.open_tx_manager()]]>
+          </scriptCode>
+          </scriptItem>
+      </subMenu>
+
+    <separatorItem/>
+    <scriptItem id="cc.reload_cc_modules">
+        <label>Reload Modules</label>
+      <scriptCode><![CDATA[import cccore.utils.file_utils as fu;fu.reload_cc_modules()]]>
+      </scriptCode>
+    </scriptItem>
+    </subMenu>
+  </menuBar>
+</mainMenu>
+
+
+

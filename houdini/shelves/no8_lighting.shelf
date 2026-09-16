@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- This file contains definitions of shelves, toolbars, and tools.
+ It should not be hand-edited when it is being used by the application.
+ Note, that two definitions of the same element are not allowed in
+ a single file. -->
+
+  <toolshelf name="lighting_proper" label="No.8 Lighting">
+    <memberTool name="lighting_template"/>
+    <memberTool name="lookdev_template"/>
+    <memberTool name="groom_template"/>
+    <memberTool name="save_as"/>
+    <memberTool name="object_merge"/>
+    <memberTool name="frame_range"/>
+    <memberTool name="absolute_path"/>
+    <memberTool name="arnold_material"/>
+    <memberTool name="copy_hip_file"/>
+    <memberTool name="light_blocker"/>
+  </toolshelf>
+
+  <tool name="lighting_template" label="Lighting Template" icon="$HOUDINI_ICONS/lighting_template.svg">
+    <script scriptType="python"><![CDATA[import cchoudini.utils.scene_utils as scene_utils;scene_utils.import_lighting_template()]]></script>
+  </tool>
+
+  <tool name="lookdev_template" label="Lookdev Template" icon="$HOUDINI_ICONS/lookdev_template.svg">
+    <script scriptType="python"><![CDATA[import cchoudini.utils.scene_utils as scene_utils;scene_utils.import_lookdev_template()]]></script>
+  </tool>
+
+  <tool name="groom_template" label="Groom Template" icon="$HOUDINI_ICONS/groom_template.svg">
+    <script scriptType="python"><![CDATA[import cchoudini.utils.scene_utils as scene_utils;scene_utils.import_groom_template()]]></script>
+  </tool>
+
+  <tool name="object_merge" label="Object Merge" icon="$HOUDINI_ICONS/object_merge.svg">
+    <script scriptType="python"><![CDATA[import cchoudini.utils.scene_utils as scene_utils;scene_utils.object_merge()]]></script>
+  </tool>
+
+  <tool name="save_as" label="Save As" icon="$HOUDINI_ICONS/save_as.svg">
+    <script scriptType="python"><![CDATA[import cchoudini.utils.hou_utils as hou_utils;hou_utils.cc_save()]]></script>
+  </tool>
+
+  <tool name="frame_range" label="Frame range" icon="hicon:/SVGIcons.index?TOOLS_view.svg">
+    <script scriptType="python"><![CDATA[import cchoudini.shot.hou_shot_frame_range as hsfr;hsfr.main()]]></script>
+  </tool>
+
+  <tool name="absolute_path" label="Absolute path" icon="$HOUDINI_ICONS/absolute_path.svg">
+    <script scriptType="python"><![CDATA[from cchoudini.utils.absolute_path import AbsolutePath;AbsolutePath()]]></script>
+  </tool>
+
+  <tool name="arnold_material" label="Arnold material" icon="$HOUDINI_ICONS/arnold_material.svg">
+    <script scriptType="python"><![CDATA[import cchoudini.texture.material_creator as material_creator;material_creator.launch()]]></script>
+  </tool>
+
+  <tool name="copy_hip_file" label="Copy hip file" icon="$HOUDINI_ICONS/copy_hip.svg">
+    <script scriptType="python"><![CDATA[import hou;hou.ui.copyTextToClipboard(hou.hipFile.path())]]></script>
+  </tool>
+
+  <tool name="light_blocker" label="Light Blocker" icon="$HOUDINI_ICONS/light_blocker.svg">
+    <script scriptType="python"><![CDATA[import light_blocker_transform;light_blocker_transform.main()]]></script>
+  </tool>
+</shelfDocument>

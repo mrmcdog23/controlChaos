@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainMenu>
+    <menuBar>
+    <subMenu id="file_menu">
+      <scriptItem  id="h.publish_flipbook">
+        <modifyItem><insertAfter>export_movie</insertAfter></modifyItem>
+        <label>Publish Flipbook</label>
+          <scriptCode><![CDATA[import cchoudini.wizard.mplay_publish_wizard as mpw;mpw.main()]]>
+          </scriptCode>
+      </scriptItem>
+    </subMenu>
+    </menuBar>
+</mainMenu>

@@ -104,10 +104,7 @@ class ContextButton(QtWidgets.QPushButton):
         self.selected_text = selected_text
 
         os.environ[self.envvar] = selected_text
-        if self.use_display_text:
-            display_text = context_utils.get_display_text(self.envvar, selected_text)
-        else:
-            display_text = selected_text
+        display_text = context_utils.get_display_text(self.envvar, selected_text)
         self.setText(display_text)
         self.pw.set_next_button(self.envvar, selected_text)
 
@@ -414,7 +411,7 @@ class ContextPanel(base_ui.WidgetBase):
         # get the context dictionary
         try:
             ctx = context.Context(overrides=context_dict)
-            if ctx.is_shot and not os.path.exists(ctx.shot_dir):
+            if not ctx.is_asset and not os.path.exists(ctx.shot_dir):
                 return
 
             # set the context buttons
@@ -530,7 +527,7 @@ class ContextPanel(base_ui.WidgetBase):
         entity_name = os.environ[ENTITY]
         self.use_list = ENTITY_DICT[entity_name]
         for text, btn in self.btn_dict.items():
-            if text != context_utils.ENTITY:
+            if text != ENTITY:
                 btn.setHidden(True)
 
     def set_project_icons(self):
@@ -597,13 +594,10 @@ class ContextPanel(base_ui.WidgetBase):
 
         elif next_button_name == TASK_NAME:
             if os.environ[ENTITY] == ASSET:
-                task_list = self.ftasset.get_asset_build_task_names(selected_text)
+                populate_list = self.ftasset.get_asset_build_task_names(selected_text)
             else:
                 sequence_name = os.environ[SEQUENCE_NAME]
-                task_list = self.ftshot.get_shot_task_names(sequence_name, selected_text)
-
-            # filter the task list by checking if the folder is on disk
-            populate_list = context_utils.filter_tasks_on_disk(task_list)
+                populate_list = self.ftshot.get_shot_task_names(sequence_name, selected_text)
 
         if next_button_name == SEQUENCE_NAME:
             populate_list = self.ftshot.sequence_names
@@ -624,7 +618,7 @@ class ContextPanel(base_ui.WidgetBase):
         Save the context as a dictionary
         """
         ctx = context.Context()
-        self.ui_settings.setValue("ctx_key", ctx.as_dict())
+        self.ui_settings.setValue("ctx_key", ctx.as_dict)
 
     @staticmethod
     def create_task_folder():
@@ -632,7 +626,7 @@ class ContextPanel(base_ui.WidgetBase):
         Check that the folder structure exists
         """
         ctx = context.Context()
-        task_dir = ctx.wip_dir
+        task_dir = ctx.user_dir
         if os.path.exists(task_dir):
             file_utils.create_directory(task_dir)
 

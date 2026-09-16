@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<menuDocument>
+  <menu>
+    <separatorItem/>
+
+    <subMenu id="cc.hda">
+      <label>HDA</label>
+
+      <scriptItem id="cc.hda.make_local">
+        <label>Make Definition Local</label>
+        <context>
+          <expression>
+          node = kwargs.get("node", None)
+          if node is None:
+              return False
+          if not node.type().definition():
+              return False
+          return True
+          </expression>
+        </context>
+        <scriptCode><![CDATA[import cchoudini.utils.hou_utils as hu;hu.hda_make_local()]]>
+        </scriptCode>
+      </scriptItem>
+
+      <scriptItem id="cc.hda.set_hda_to_latest">
+        <label>Set Definition To Latest</label>
+        <context>
+          <expression>
+          node = kwargs.get("node", None)
+          if node is None:
+              return False
+          if not node.type().definition():
+              return False
+          return True
+          </expression>
+        </context>
+        <scriptCode><![CDATA[import cchoudini.utils.hou_utils as hu;hu.set_hda_to_latest()]]>
+        </scriptCode>
+      </scriptItem>
+
+      <scriptItem id="cc.hda.remove_local">
+        <label>Remove Local Definitions</label>
+        <context>
+          <expression>
+          node = kwargs.get("node", None)
+          if node is None:
+              return False
+          if not node.type().definition():
+              return False
+          return True
+          </expression>
+        </context>
+        <scriptCode><![CDATA[import cchoudini.utils.hou_utils as hu;hu.hda_remove_local()]]>
+        </scriptCode>
+      </scriptItem>
+
+      <scriptItem id="cc.hda.publish_hda">
+        <label>Publish HDA</label>
+        <context>
+          <expression>
+          node = kwargs.get("node", None)
+          if node is None:
+              return False
+          return True
+          </expression>
+        </context>
+        <scriptCode><![CDATA[import cchoudini.wizard.hda_publish_wizard as hdaw;hdaw.main()]]>
+        </scriptCode>
+      </scriptItem>
+    </subMenu>
+
+    <scriptItem id="cc.node.share_nodes">
+      <label>Share Nodes</label>
+      <context>
+        <expression>
+        node = kwargs.get("node", None)
+        if node is None:
+            return False
+        return True
+        </expression>
+      </context>
+      <scriptCode><![CDATA[import cchoudini.node.hou_share_nodes as hsn;hsn.main()]]>
+      </scriptCode>
+    </scriptItem>
+
+    <scriptItem id="cc.node.cam_publish">
+      <label>Publish Camera</label>
+      <context>
+        <expression>
+        node = kwargs.get("node", None)
+        if node is None:
+            return False
+        if node.type().name() != "cam":
+            return False
+        return True
+        </expression>
+      </context>
+      <scriptCode><![CDATA[import cchoudini.wizard.camera_publish_wizard as cpw;cpw.main()]]>
+      </scriptCode>
+    </scriptItem>
+
+
+  </menu>
+</menuDocument>

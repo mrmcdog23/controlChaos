@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menuDocument>
+	<menu>
+		<scriptItem id="cc.create_override">
+			<label>Add Shot Override</label>
+			<scriptCode><![CDATA[import cchoudini.utils.shot_override_parm as sop;sop.create_override(kwargs)]]></scriptCode>
+		</scriptItem>
+		<scriptItem id="cc.remove_custom_parm">
+			<label>Remove Parameter</label>
+			<scriptCode><![CDATA[import cchoudini.utils.shot_override_parm as sop;sop.remove_override_parm(kwargs)]]></scriptCode>
+		</scriptItem>
+	</menu>
+</menuDocument>

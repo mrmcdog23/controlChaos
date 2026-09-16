@@ -335,7 +335,7 @@
             <number>999999999</number>
            </property>
            <property name="placeholderText">
-            <string>Narnia_Part_Two</string>
+            <string>Project_Name</string>
            </property>
           </widget>
          </item>
@@ -371,7 +371,7 @@
             <number>4</number>
            </property>
            <property name="placeholderText">
-            <string>NPT</string>
+            <string>ABC</string>
            </property>
           </widget>
          </item>

@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pythonPanelDocument>
+  <interface name="context_panel" label="No8 Project" icon="PANETYPES_viewer_cop" help_url="">
+    <script><![CDATA[manager_widget = None
+
+
+def onCreateInterface():
+    import cchoudini.panel.hou_context_panel
+    global context_widget
+    context_widget = cchoudini.panel.hou_context_panel.HouContextWidget()
+    return context_widget
+
+]]></script>
+    <help><![CDATA[ ]]></help>
+    <includeInPaneTabMenu menu_position="0" create_separator="false"/>
+  </interface>
+</pythonPanelDocument>
