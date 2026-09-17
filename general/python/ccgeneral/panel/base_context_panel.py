@@ -535,21 +535,16 @@ class ContextPanel(base_ui.WidgetBase):
         Set the project and pipeline icons and text
         """
         self.lbl_show_text.setText(self.project_data.project_name)
-        self.lbl_pipeline_text.setText(self.project_data.display_name)
+        self.lbl_pipeline_text.setText("Development")
         icon_dict = {
             "lbl_pipeline_icon": "development",
             "lbl_show_icon": "project",
+            "lbl_cc_project": "control_chaos_logo_transparent"
         }
         self.set_widget_icons(icon_dict=icon_dict)
 
-        # set the logo to the header label
-        logo_path = os.path.join(os.path.dirname(__file__), "context_header.png")
-        pixmap = QtGui.QPixmap(logo_path)
-        self.lbl_cc_project.setPixmap(pixmap)
-
         # reposition the ui
-        self.lbl_cc_project.setMinimumHeight(110)
-        self.lbl_cc_project.setMaximumHeight(110)
+        self.lbl_cc_project.setMaximumWidth(300)
 
     def set_next_button(self, envvar, selected_text):
         # type: (str, str) -> None

@@ -321,20 +321,6 @@ class FtBase(object):
         return attr_config["default"][0]
 
     @property
-    def is_commercial(self):
-        # type: () -> bool
-        """ Is the project a commercial project """
-        project_type = self.project["custom_attributes"]["project_type"][0]
-        return project_type == core_constants.COMMERCIAL
-
-    @property
-    def is_longform(self):
-        # type: () -> bool
-        """ Is the project a commercial project """
-        project_type = self.project["custom_attributes"]["project_type"][0]
-        return project_type == core_constants.LONGFORM
-
-    @property
     def usernames(self):
         # type: () -> list[str]
         """ Get a list of usernames """
