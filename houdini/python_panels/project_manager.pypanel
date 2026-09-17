@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <pythonPanelDocument>
-  <interface name="context_panel" label="No8 Project" icon="PANETYPES_viewer_cop" help_url="">
+  <interface name="context_panel" label="Control Chaos Project" icon="PANETYPES_viewer_cop" help_url="">
     <script><![CDATA[manager_widget = None
 
 

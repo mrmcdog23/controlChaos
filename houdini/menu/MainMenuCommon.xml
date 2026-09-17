@@ -4,7 +4,7 @@
   <subMenu id="file_menu">
       <scriptItem  id="h.save_inc_prompt">
         <modifyItem><insertAfter>file_menu_sep_1</insertAfter></modifyItem>
-        <label>No8 File Save</label>
+        <label>Control Chaos File Save</label>
           <scriptCode><![CDATA[import cchoudini.utils.hou_utils as hou_utils;hou_utils.cc_save()]]>
           </scriptCode>
       </scriptItem>
@@ -12,7 +12,7 @@
   </subMenu>
 
       <subMenu id="cc_menu">
-      <label>No8</label>
+      <label>Control Chaos</label>
       <separatorItem/>
 
       <subMenu id="cc.asset.menu">
