@@ -28,8 +28,8 @@ def launch_hou_win(win_class):
             inst.deleteLater()
 
     # find and launch the ui under the maya window
-    loading = win_class()
-    loading.load_houdini_style_sheet()
+    loading = win_class(parent=None)
+    #loading.load_houdini_style_sheet()
 
     # move the ui to a central position
     loading.move(900, 200)

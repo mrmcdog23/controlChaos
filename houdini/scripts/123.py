@@ -22,8 +22,6 @@ def run_setup_modules():
     if not hou.isUIAvailable():
         return
     create_cc_panel.make_context_panel()
-    import hdefereval
-    hdefereval.executeDeferred(lambda: flipbook_utils.set_flipbook_output())
 
 
 def register_callbacks(event):

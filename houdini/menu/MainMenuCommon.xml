@@ -27,23 +27,12 @@
 
       <subMenu id="cc.shot.menu">
           <label>Shot</label>
-          <scriptItem id="cc.ingest_Loader">
-            <label>Ingest Loader</label>
-          <scriptCode><![CDATA[import cchoudini.shot.multi.ingester_loader as ingload;ingload.launch()]]>
+          <scriptItem id="cc.loader_shot">
+            <label>Shot Loader</label>
+          <scriptCode><![CDATA[import cchoudini.shot.loader.hou_load_shot as hls;hls.main()]]>
           </scriptCode>
           </scriptItem>
 
-          <scriptItem id="cc.shot_browser">
-            <label>Shot Browser</label>
-          <scriptCode><![CDATA[import cchoudini.shot.multi.shot_browser as shot_browser;shot_browser.launch()]]>
-          </scriptCode>
-          </scriptItem>
-
-          <scriptItem id="cc.frame_range">
-            <label>Frame Range</label>
-          <scriptCode><![CDATA[import cchoudini.shot.hou_shot_frame_range as hsfr;hsfr.main()]]>
-          </scriptCode>
-          </scriptItem>
       </subMenu>
 
     <separatorItem/>

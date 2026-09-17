@@ -10,7 +10,7 @@ import cchoudini.utils.hou_utils as hou_utils
 import cchoudini.hou_constants as hou_constants
 import cchoudini.utils.create_parameters as create_parameters
 import cchoudini.node.ftrack_hou_node as ftrack_hou_node
-from cchoudini.node.cccache import No8CacheNode
+#from cchoudini.node.cccache import No8CacheNode
 from typing import Optional
 
 

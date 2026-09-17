@@ -129,7 +129,7 @@ class SwitchToShot(object):
             version_padded = str(asset_version['version']).zfill(3)
 
             # get the component path
-            file_path = file_utils.path_from_component(component)
+            file_path = file_utils.get_component_path(component)
             shot_asset = shot_assets.get(component_name)
             self.logger.info(f"Component name... {component_name}")
             self.logger.info(f"New path: {file_path}")

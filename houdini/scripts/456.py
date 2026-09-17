@@ -5,7 +5,6 @@ import toolutils
 import ftrack_api
 import cccore.utils.cc_logging as cc_logging
 import cccore.file_env.context_utils as context_utils
-import cchoudini.utils.flipbook_utils as flipbook_utils
 import cchoudini.panel.create_cc_panel as create_cc_panel
 import cchoudini.hou_constants as hou_constants
 
@@ -69,16 +68,5 @@ def set_project_environment():
         pass
 
 
-def run_colour_space():
-    """
-    Set the ocio colour space on the viewer
-    """
-    if not hou.isUIAvailable():
-        return
-    import hdefereval
-    hdefereval.executeDeferred(lambda: flipbook_utils.set_flipbook_output())
-
-
-run_colour_space()
 set_project_environment()
 

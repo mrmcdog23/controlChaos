@@ -3,15 +3,17 @@ import hou
 import cccore.utils.sequence_utils as sequence_utils
 import ccgeneral.asset.asset_loader as asset_loader
 import cchoudini.node.ftrack_hou_node as ftrack_hou_node
-import cchoudini.asset.load_published_alembic as load_published_alembic
+import cchoudini.asset.alembic_loader as alembic_loader
+import cchoudini.asset.fbx_loader as fbx_loader
 import cchoudini.utils.node_utils as node_utils
 import cchoudini.utils.hou_utils as hou_utils
 import ccftrack.query as query
 
 
 class HouAssetLoader(asset_loader.AssetLoaderBase):
+    use_cc_ss = False
     title = "Houdini Load Asset"
-    SUPPORTED_EXT = ["bgeo.sc", "hda", "usd", "abc"]
+    SUPPORTED_EXT = ["bgeo.sc", "hda", "usd", "abc", "fbx"]
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -82,25 +84,14 @@ class HouAssetLoader(asset_loader.AssetLoaderBase):
         for component_path in self.selected_components:
 
             component_name = path_component[component_path]
-            if component_path.endswith("hda"):
-                self.load_hda(component_name, component_path)
-                return
+            if component_path.endswith(".abc"):
+                load_inst = alembic_loader.AlembicLoader(component_path, self.asset_name)
 
-            elif component_path.endswith(("bgeo.sc", "vdb")):
-                self.load_cache_sequence(component_path)
-                return
-
-        if self.ftver.cache_path:
-            abc_load_inst = load_published_alembic.LoadPublishedAlembic(
-                self.ftver.cache_path,
-                self.ftver.materialx_component_path,
-                self.ftver.metadata_component_path,
-                self.asset_name
-            )
+            elif component_path.endswith(".fbx"):
+                load_inst = fbx_loader.FBXLoader(component_path, self.asset_name)
 
             # add the ftrack parameters
-            component_name = "Alembic"
-            ftnode = ftrack_hou_node.FTrackHouNode(abc_load_inst.geo_node, self.ftver, component_name)
+            ftnode = ftrack_hou_node.FTrackHouNode(load_inst.geo_node, self.ftver, component_name)
             ftnode.add_ftrack_parameters()
 
 
