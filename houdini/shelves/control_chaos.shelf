@@ -5,7 +5,7 @@
  Note, that two definitions of the same element are not allowed in
  a single file. -->
 
-  <toolshelf name="lighting_proper" label="No.8 Lighting">
+  <toolshelf name="lighting_proper" label="Control Chaos">
     <memberTool name="lighting_template"/>
     <memberTool name="lookdev_template"/>
     <memberTool name="groom_template"/>

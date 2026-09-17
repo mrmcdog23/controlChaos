@@ -286,7 +286,7 @@ class Context(object):
 
         while file_exists:
             self.use_version = version_num
-            file_path = os.path.join(save_dir, self.new_filename)
+            file_path = file_utils.join_file_names(save_dir, self.new_filename)
             file_exists = os.path.exists(file_path)
             version_num += 1
             if version_num == 200:

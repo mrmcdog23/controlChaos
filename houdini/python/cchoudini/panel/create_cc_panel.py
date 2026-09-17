@@ -3,7 +3,7 @@ import hou
 from typing import Optional
 from CCPySide import QtWidgets
 import cccore.data.server_data as server_data
-import cccore.core_constants as core_constants
+import cccore.file_env.ctx_constants as ctx_constants
 
 
 PROJECT_MANAGER_PANEL = "houdini/python_panels/project_manager.pypanel"
@@ -117,14 +117,16 @@ def get_ctx_panel():
         return None
 
     # get the context panel and create if not
-    ctx_panel = hou_window.findChild(QtWidgets.QWidget,
-                                     core_constants.CONTEXT_PANEL
-                                     )
+    ctx_panel = hou_window.findChild(
+        QtWidgets.QWidget,
+        ctx_constants.CONTEXT_PANEL
+    )
     if not ctx_panel:
         make_context_panel()
 
     # get the context panel
-    ctx_panel = hou_window.findChild(QtWidgets.QWidget,
-                                     core_constants.CONTEXT_PANEL
-                                     )
+    ctx_panel = hou_window.findChild(
+        QtWidgets.QWidget,
+        ctx_constants.CONTEXT_PANEL
+    )
     return ctx_panel

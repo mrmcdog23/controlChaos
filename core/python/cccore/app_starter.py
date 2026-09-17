@@ -402,6 +402,11 @@ class HoudiniApp(BaseApp):
         no8_hou_shared_toolbar = self.join_file_names(houdini_root_path, "shelves")
         self.toolbars_path.append(no8_hou_shared_toolbar)
 
+        # set the icons variable
+        houdini_icons_path = self.join_file_names(no8_hou_shared_toolbar, "icons")
+        os.environ["HOUDINI_ICONS"] = houdini_icons_path
+
+
     @staticmethod
     def add_directory_to_list(directory_path, list_variable):
         # type: (str, list[str]) -> None

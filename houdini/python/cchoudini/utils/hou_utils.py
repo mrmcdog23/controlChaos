@@ -4,10 +4,10 @@ import re
 import hou
 from typing import Optional, Any
 from CCPySide import QtWidgets
-import cccore.file_env.context as context
 import cccore.utils.ui_utils as ui_utils
 import cccore.utils.file_utils as file_utils
 import cccore.deadline.submit as submit
+import cccore.file_env.context as context
 import cchoudini.node.hda as hda
 import cchoudini.asset.shot_asset as shot_asset
 import cchoudini.hou_constants as hou_constants
@@ -185,10 +185,7 @@ def set_houdini_vars_from_ctx(ctx):
     if ctx.is_asset:
         output_prefix = ctx.asset_build
     else:
-        if ctx.episode:
-            output_prefix = f"{ctx.episode}_{ctx.sequence}_{ctx.shot}"
-        else:
-            output_prefix = f"{ctx.sequence}_{ctx.shot}"
+        output_prefix = f"{ctx.sequence}_{ctx.shot}"
     output_name = f"{output_prefix}_{ctx.task}"
 
     # set the render prefix and version
@@ -482,7 +479,7 @@ def get_random_frames_value(node):
         The random frame string
     """
     # account for random frame ranges
-    cc_custom_parm = node.parm(hou_constants.NO8_FRAME_RANGE)
+    cc_custom_parm = node.parm(hou_constants.cc_FRAME_RANGE)
     if cc_custom_parm and cc_custom_parm.evalAsString() == "Random Frames":
         return node.parm("random_frames").evalAsString()
 

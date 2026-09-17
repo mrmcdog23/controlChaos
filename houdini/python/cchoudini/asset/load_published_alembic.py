@@ -1,6 +1,5 @@
 """ Import the materialx file and rebuild the shader network """
 import hou
-import htoa.material as material
 import cccore.utils.file_utils as file_utils
 import cccore.utils.cc_logging as cc_logging
 import cchoudini.utils.hou_utils as hou_utils
