@@ -503,7 +503,7 @@ class FtAssetVersion(FtBase):
         for component in self.asset_version["components"]:
             if component['name'] != name:
                 continue
-            component_path_clean = file_utils.path_from_component(component)
+            component_path_clean = file_utils.get_component_path(component)
             return component_path_clean
 
     @property

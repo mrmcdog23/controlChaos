@@ -1,64 +1,32 @@
-""" Build the maya menu for No8 """
+""" Build the maya menu for Control Chaos """
 import maya.cmds as cmds
 import maya.mel as mel
 
 
 def build_cc_menu():
     """
-    Build the menu with No8 specific tools
+    Build the menu with Control Chaos specific tools
     """
     cc_menu = cmds.menu(
         "ccMenu",
         label="Control Chaos",
         parent=mel.eval("$retvalue = $gMainWindow;"),
     )
-    '''
+
     # asset menu
-    asset_menu = cmds.menuItem(label="Asset", subMenu=True, parent=no8_menu)
-    cmds.menuItem(label="Asset Publisher",
-                  command="import no8maya.wizard.asset_wizard as aw;aw.main()",
-                  parent=asset_menu
-                  )
+    asset_menu = cmds.menuItem(label="Asset", subMenu=True, parent=cc_menu)
     cmds.menuItem(label="Asset Loader",
-                  command="import no8maya.asset.asset_loader as al;al.main()",
-                  parent=asset_menu
-                  )
-    cmds.menuItem(label="Obj Import",
-                  command="import no8maya.asset.obj_importer as oi;oi.ObjImporter().show()",
-                  parent=asset_menu
-                  )
-    cmds.menuItem(label="Add Locator Attribute",
-                  command="import no8maya.utils.maya_utils as mu;mu.add_locator_attribute()",
+                  command="import ccmaya.asset.asset_loader as al;al.main()",
                   parent=asset_menu
                   )
 
     # shot menu
-    shot_menu = cmds.menuItem(label="Shot", subMenu=True, parent=no8_menu)
-    cmds.menuItem(label="Shot Publisher",
-                  command="import no8maya.wizard.shot_wizard as sw;sw.main()",
-                  parent=shot_menu
-                  )
-    cmds.menuItem(label="Version Manager",
-                  command="import no8maya.shot.multi.version_manager as vm;vm.launch()",
-                  parent=shot_menu
-                  )
-    cmds.menuItem(label="Set Frame Range",
-                  command="import no8maya.shot.maya_shot_frame_range as msfr;msfr.main()",
+    shot_menu = cmds.menuItem(label="Shot", subMenu=True, parent=cc_menu)
+    cmds.menuItem(label="Shot Loader",
+                  command="import ccmaya.shot.loader.maya_load_shot as msl;msl.main()",
                   parent=shot_menu
                   )
 
-    cmds.menuItem(label="Object Renamer",
-                  command="import no8maya.shot.renamer.object_renamer as objr;objr.main()",
-                  parent=shot_menu
-                  )
-
-    # texture menu
-    texture_menu = cmds.menuItem(label="Texture", subMenu=True, parent=no8_menu)
-    cmds.menuItem(label="TX Manager",
-                  command="import no8maya.utils.open_window as ow;ow.open_tx_manager()",
-                  parent=texture_menu
-                  )
-    '''
     # reload modules
     cmds.menuItem(divider=True, parent=cc_menu)
     cmds.menuItem(label="Reload Modules",

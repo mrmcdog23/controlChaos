@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mainMenu>
+  <menuBar>
+  <subMenu id="file_menu">
+      <scriptItem  id="h.save_inc_prompt">
+        <modifyItem><insertAfter>file_menu_sep_1</insertAfter></modifyItem>
+        <label>Control Chaos File Save</label>
+          <scriptCode><![CDATA[import cchoudini.utils.hou_utils as hou_utils;hou_utils.cc_save()]]>
+          </scriptCode>
+      </scriptItem>
+      <separatorItem/>
+  </subMenu>
+
+      <subMenu id="cc_menu">
+      <label>Control Chaos</label>
+      <separatorItem/>
+
+      <subMenu id="cc.asset.menu">
+          <label>Asset</label>
+
+          <scriptItem id="cc.load_asset">
+            <label>Load Asset</label>
+          <scriptCode><![CDATA[import cchoudini.asset.asset_loader as aload;aload.main()]]>
+          </scriptCode>
+          </scriptItem>
+      </subMenu>
+
+      <subMenu id="cc.shot.menu">
+          <label>Shot</label>
+          <scriptItem id="cc.loader_shot">
+            <label>Shot Loader</label>
+          <scriptCode><![CDATA[import cchoudini.shot.loader.hou_load_shot as hls;hls.main()]]>
+          </scriptCode>
+          </scriptItem>
+
+      </subMenu>
+
+    <separatorItem/>
+    <scriptItem id="cc.reload_cc_modules">
+        <label>Reload Modules</label>
+      <scriptCode><![CDATA[import cccore.utils.file_utils as fu;fu.reload_cc_modules()]]>
+      </scriptCode>
+    </scriptItem>
+    </subMenu>
+  </menuBar>
+</mainMenu>
+
+
+

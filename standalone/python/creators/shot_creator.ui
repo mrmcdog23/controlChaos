@@ -160,7 +160,7 @@
          <item>
           <widget class="QLabel" name="lb_sequence_count">
            <property name="text">
-            <string>New Sequence Name</string>
+            <string>Sequence Name</string>
            </property>
           </widget>
          </item>
@@ -170,7 +170,7 @@
             <number>999999993</number>
            </property>
            <property name="placeholderText">
-            <string>tattoonie</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -300,7 +300,7 @@
             <number>999999993</number>
            </property>
            <property name="placeholderText">
-            <string>rock</string>
+            <string>shot name</string>
            </property>
           </widget>
          </item>

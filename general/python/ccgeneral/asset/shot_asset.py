@@ -4,7 +4,7 @@ from typing import Optional, Any
 import ccftrack.query as query
 import ccftrack.asset_version as ft_asset_version
 import cccore.utils.cc_logging as cc_logging
-import cccore.utils.context_utils as context_utils
+import cccore.file_env.context_utils as context_utils
 
 
 class BaseShotAsset(object):

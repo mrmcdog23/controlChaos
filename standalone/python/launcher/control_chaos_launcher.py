@@ -34,7 +34,6 @@ class AppToolWidget(base_ui.WidgetBase):
         # take the data from the class and store in the widget
         self.name = self.appclass.name
         self.display_text = self.appclass.display_text
-        self.app_versions = self.appclass.app_versions
         self.is_app = self.appclass.is_app
 
         # set the app label and icon
@@ -89,7 +88,6 @@ class ControlChaosLauncher(base_ui.StandaloneWindowBase):
         self.app_list = list()
         self.tool_list = list()
         self.app_widgets = list()
-        self.app_versions = list()
         self.all_projects_data = dict()
 
         # initialize data

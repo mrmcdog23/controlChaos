@@ -9,7 +9,6 @@ logging.basicConfig(level=logging.INFO)
 
 
 class BaseEntity(object):
-    app_versions = list()
     name = str()
 
     def __init__(self):
@@ -201,7 +200,6 @@ class BaseApp(BaseEntity):
 
 
 class MayaApp(BaseApp):
-    app_versions = ["2027", "2026", "2025", "2024"]
     name = "maya"
 
     def __init__(self):
@@ -268,7 +266,6 @@ class UnrealApp(BaseApp):
     """
     Launching Unreal application
     """
-    app_versions = ["5.8", "5.7", "5.6"]
     name = "unreal"
 
     def __init__(self):
@@ -324,18 +321,128 @@ class HoudiniApp(BaseApp):
     """
     Launching Houdini application
     """
-    app_versions = ["21.0.512", "20.5.445", "20.0.590"]
-    name = "houdini"
-
     def __init__(self):
-        super().__init__()
+        super(HoudiniApp, self).__init__()
+        self.name = "houdini"
+        self.display_text = "Houdini"
+        self.icon = "houdini.png"
+        self.is_app = True
+
+        # create list variables
+        self.otls_paths = list()
+        self.toolbars_path = list()
+        self.houdini_icons = list()
+        self.houdini_paths = list()
+        self.houdini_menus = list()
+        self.third_party_houdini_dir = str()
+
+        self.hou_install = "/opt/Houdini"
+        self.launch_path = "C:/Program Files/Side Effects Software/Houdini {version}/bin/houdini.exe"
+
+    '''
+    @property
+    def python_version(self):
+        # type: () -> str
+        """
+        Python version to use to add site packages
+        """
+        project_data = server_data.ProjectData()
+        houdini_py_mappings = project_data.get("houdini_py_mappings")
+        houdini_py_version = houdini_py_mappings[self.app_version]
+        return str(houdini_py_version)
+    '''
+
+    def make_command_list(self):
+        """
+        Launch the houdini version
+        """
+        self.cmd_list = [self.exe_path]
+
+    def set_environment(self):
+        """
+        Set the nuke environment variables
+        """
+        super(HoudiniApp, self).set_environment()
+        self.set_houdini_core_variables()
+        self.join_variables()
+
+    @property
+    def major_version(self):
+        # type: () -> str
+        """ Get the houdini major version e.g. 20"""
+        return self.app_version.split(".")[0]
+
+    @property
+    def minor_version(self):
+        # type: () -> str
+        """ Get the houdini minor version e.g. 20.5 """
+        num = self.app_version.split(".")
+        return f"{num[0]}.{num[1]}"
+
+    def set_houdini_core_variables(self):
+        """
+        Set the houdini core variables
+        """
+        # add menu variable
+        os.environ["HOUDINI_NO_ENV_FILE"] = "1"
+
+        # set the scripts path
+        houdini_scripts_path = self.join_file_names(self.pipeline_root, "houdini", "python")
+        self.python_paths.append(houdini_scripts_path)
+
+        # add control chaos custom menus. need to join or it errors
+        pipeline_menu_path = self.join_file_names(self.pipeline_root, "houdini", "menu")
+        self.houdini_menus.append(pipeline_menu_path)
+
+        # houdini paths
+        houdini_root_path = self.join_file_names(self.pipeline_root, "houdini")
+        self.houdini_paths.append(houdini_root_path)
+
+        # add toolbars
+        cc_hou_shared_toolbar = self.join_file_names(houdini_root_path, "shelves")
+        self.toolbars_path.append(cc_hou_shared_toolbar)
+
+        # set the icons variable
+        houdini_icons_path = self.join_file_names(cc_hou_shared_toolbar, "icons")
+        os.environ["HOUDINI_ICONS"] = houdini_icons_path
+
+    @staticmethod
+    def add_directory_to_list(directory_path, list_variable):
+        # type: (str, list[str]) -> None
+        """
+        Add the directory to the variable list
+
+        Args:
+            directory_path: Path of the directory to add
+            list_variable: The variable list to add to
+        """
+        if os.path.exists(directory_path):
+            logging.info(f"Found directory: {directory_path}")
+            list_variable.append(directory_path)
+        else:
+            logging.warning(f"Directory not found: {directory_path}")
+
+    def join_variables(self):
+        """
+        Join all environment variables
+        """
+        self.join_env_variables("HOUDINI_TOOLBAR_PATH", self.toolbars_path)
+        self.join_env_variables("HOUDINI_OTLSCAN_PATH", self.otls_paths)
+        self.join_env_variables("HOUDINI_PATH", self.houdini_paths)
+        self.join_env_variables("HOUDINI_MENU_PATH", self.houdini_menus)
+
+    @property
+    def exe_path(self):
+        # type: () -> str
+        """ Work out the unreal exe path """
+        exe_path = self.launch_path.format(version=self.app_version)
+        return exe_path
 
 
 class NukeApp(BaseApp):
     """
     Launching Houdini application
     """
-    app_versions =  ["16.0v6", "16.0v4"]
     name = "nuke"
 
     def __init__(self):
@@ -396,7 +503,8 @@ class MediaPublisherTool(BaseTool):
 
 APPLICATIONS = [
     MayaApp,
-    UnrealApp
+    UnrealApp,
+    HoudiniApp
 ]
 TOOLS = [
     SlateMakerTool,

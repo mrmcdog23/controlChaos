@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pythonPanelDocument>
+  <interface name="shot_switcher_widget" label="Shot Switcher" icon="PANETYPES_viewer_cop" help_url="">
+    <script><![CDATA[manager_widget = None
+
+
+def onCreateInterface():
+    import cchoudini.panel.shot_switcher_panel
+    global shot_switcher_widget
+    shot_switcher_widget = cchoudini.panel.shot_switcher_panel.ShotSwitcherPanel()
+    return shot_switcher_widget
+
+]]></script>
+    <help><![CDATA[ ]]></help>
+    <includeInPaneTabMenu menu_position="0" create_separator="false"/>
+  </interface>
+</pythonPanelDocument>
