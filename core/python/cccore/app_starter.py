@@ -390,7 +390,7 @@ class HoudiniApp(BaseApp):
         houdini_scripts_path = self.join_file_names(self.pipeline_root, "houdini", "python")
         self.python_paths.append(houdini_scripts_path)
 
-        # add no8 custom menus. need to join or it errors
+        # add control chaos custom menus. need to join or it errors
         pipeline_menu_path = self.join_file_names(self.pipeline_root, "houdini", "menu")
         self.houdini_menus.append(pipeline_menu_path)
 
@@ -399,13 +399,12 @@ class HoudiniApp(BaseApp):
         self.houdini_paths.append(houdini_root_path)
 
         # add toolbars
-        no8_hou_shared_toolbar = self.join_file_names(houdini_root_path, "shelves")
-        self.toolbars_path.append(no8_hou_shared_toolbar)
+        cc_hou_shared_toolbar = self.join_file_names(houdini_root_path, "shelves")
+        self.toolbars_path.append(cc_hou_shared_toolbar)
 
         # set the icons variable
-        houdini_icons_path = self.join_file_names(no8_hou_shared_toolbar, "icons")
+        houdini_icons_path = self.join_file_names(cc_hou_shared_toolbar, "icons")
         os.environ["HOUDINI_ICONS"] = houdini_icons_path
-
 
     @staticmethod
     def add_directory_to_list(directory_path, list_variable):

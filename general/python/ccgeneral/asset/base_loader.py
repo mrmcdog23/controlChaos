@@ -10,10 +10,6 @@ from CCPySide import QtWidgets, QtCore
 class LoaderBase(base_ui.WindowBase):
     label_text = str()
     title = str()
-    icon_to_widget = {
-        "no8_logo_text": "lbl_no8_icon",
-        "load": "lbl_load_icon"
-    }
     SUPPORTED_EXT = list()
 
     def __init__(self, parent=None, *args, **kwargs):

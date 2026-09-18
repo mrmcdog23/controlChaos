@@ -1,11 +1,11 @@
-""" Build the maya menu for No8 """
+""" Build the maya menu for Control Chaos """
 import maya.cmds as cmds
 import maya.mel as mel
 
 
 def build_cc_menu():
     """
-    Build the menu with No8 specific tools
+    Build the menu with Control Chaos specific tools
     """
     cc_menu = cmds.menu(
         "ccMenu",

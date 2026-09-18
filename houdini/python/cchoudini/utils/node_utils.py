@@ -10,11 +10,11 @@ import cchoudini.utils.hou_utils as hou_utils
 import cchoudini.hou_constants as hou_constants
 import cchoudini.utils.create_parameters as create_parameters
 import cchoudini.node.ftrack_hou_node as ftrack_hou_node
-#from cchoudini.node.cccache import No8CacheNode
+#from cchoudini.node.cccache import CCCacheNode
 from typing import Optional
 
 
-NO8_FRAME_RANGE = hou_constants.NO8_FRAME_RANGE
+CC_FRAME_RANGE = hou_constants.CC_FRAME_RANGE
 
 
 def cccache_submit(cc_cache_node):
@@ -27,7 +27,7 @@ def cccache_submit(cc_cache_node):
     """
     local_or_farm = cc_cache_node.parm("local_or_farm").eval()
     if local_or_farm == 0:
-        No8CacheNode(cc_cache_node).submit()
+        CCCacheNode(cc_cache_node).submit()
     else:
         import cchoudini.wizard.cache_submit_wizard as cache_submit_wizard
         cache_submit_wizard.main(cc_cache_node)
@@ -120,7 +120,7 @@ def create_render_random_frames_parm(node):
     command = "import cchoudini.utils.node_utils as nu;nu.show_random_frames(hou.pwd())"
     create_parameters.menu_parm(
         node,
-        NO8_FRAME_RANGE,
+        CC_FRAME_RANGE,
         "Value Frame Range",
         "trange",
         items_list,
@@ -128,7 +128,7 @@ def create_render_random_frames_parm(node):
     )
 
     # connect expression and hide original
-    expression = f'ch("{node.path()}/{NO8_FRAME_RANGE}")'
+    expression = f'ch("{node.path()}/{CC_FRAME_RANGE}")'
     dest_parm = node.parm("trange")
     dest_parm.setExpression(
         expression,
@@ -138,7 +138,7 @@ def create_render_random_frames_parm(node):
 
     # add random frames string
     create_parameters.string_parm(
-        node, "random_frames", "Random Frames", NO8_FRAME_RANGE, value="2-10,21,24,28-32")
+        node, "random_frames", "Random Frames", CC_FRAME_RANGE, value="2-10,21,24,28-32")
     hide_parameter(node, "random_frames")
 
 
@@ -150,7 +150,7 @@ def show_random_frames(node):
     Args:
         node: The render node to add the random frames to
     """
-    random_frames = node.parm(NO8_FRAME_RANGE).eval()
+    random_frames = node.parm(CC_FRAME_RANGE).eval()
     show = random_frames == 3
     hide_parameter(node, "random_frames", not show)
     hide_parameter(node, "f", show)

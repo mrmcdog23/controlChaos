@@ -28,7 +28,7 @@ def set_frames_per_second():
 def create_save_menu_item():
     """
     Add the save menu item to the file menu to save the file
-    in the No8 structure
+    in the Control Chaos structure
     """
     from pymel.core.language import MelGlobals
     mel.eval("buildFileMenu")
@@ -85,7 +85,7 @@ def create_callbacks():
 
 def main():
     """
-    Add all no8 relevant ui and buttons
+    Add all Control Chaos relevant ui and buttons
     """
 
     project_data = server_data.ProjectData()

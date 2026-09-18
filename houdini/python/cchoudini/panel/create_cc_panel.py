@@ -11,9 +11,9 @@ PERFORMANCE_MONITOR_PANEL = "PerformanceMonitor"
 SHOT_SWITCHER_WIDGET = "shot_switcher_widget"
 
 
-class CreateNo8HoudiniPanel(object):
+class CreateCCHoudiniPanel(object):
     """
-    Create the No8 Houdini panel
+    Create the Control Chaos Houdini panel
     """
     def __init__(self):
         self.pypan = None
@@ -96,14 +96,14 @@ def make_context_panel():
     Create the cc project panel for houdini
     """
     import hdefereval
-    create_cc_panel_inst = CreateNo8HoudiniPanel()
+    create_cc_panel_inst = CreateCCHoudiniPanel()
     hdefereval.executeDeferred(lambda: create_cc_panel_inst.make_panel())
 
 
 def get_ctx_panel():
     # type: () -> Optional[QtWidgets.QWidget]
     """
-    Find the No8 Panel. Create it if it doesn't exist
+    Find the Control Chaos Panel. Create it if it doesn't exist
 
     Returns:
         ctx_panel: THe houdini cc panel

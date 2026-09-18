@@ -38,6 +38,6 @@ FILE_TEMPLATES = [
     LOOKDEV_TEMPLATE_LF_205445
 ]
 
-NO8_FRAME_RANGE = "cc_frame_range"
+CC_FRAME_RANGE = "cc_frame_range"
 
 USE_CACHE_PARM_NAME = "use_cache_path"

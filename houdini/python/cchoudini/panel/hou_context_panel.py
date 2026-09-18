@@ -1,4 +1,4 @@
-""" Add the No8 panel to houdini """
+""" Add the Control Chaos panel to houdini """
 import hou
 import cccore.file_env.context as context
 import cchoudini.utils.hou_utils as hou_utils
