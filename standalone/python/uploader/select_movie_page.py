@@ -2,12 +2,12 @@
 import os
 from CCPySide import QtWidgets, QtCore
 from ccgeneral.widgets.line_browser import LineBrowser
-from ccgeneral.wizard.pages.base_page import BasePublishPage
 import cccore.utils.file_utils as file_utils
 import cccore.utils.ffmpeg_utils as ffmpeg_utils
+from ccgeneral.wizard.pages.context_page import ShotComboBoxContextPage
 
 
-class SelectMoviePage(BasePublishPage):
+class SelectMoviePage(ShotComboBoxContextPage):
     title = "Publish Sequences"
     subtitle = "Select the sequences to publish"
 
@@ -18,15 +18,14 @@ class SelectMoviePage(BasePublishPage):
         self.seq_path_wdg = None
         self.ui_settings = QtCore.QSettings('cc', 'list_sequences')
 
-        # more variables
-        self.create_layout()
-        self.connect_signals()
+        #self.connect_signals()
 
     def initializePage(self):
         """
         Set the sequences from the start directory
         """
         super().initializePage()
+        self.create_sequence_path_widget()
         start_dir = self.ui_settings.value(
             "sequence_dir", self.project_data.project_root)
         self.seq_path_wdg.start_dir = start_dir
@@ -37,7 +36,7 @@ class SelectMoviePage(BasePublishPage):
         """ The selected sequence directory """
         return self.seq_path_wdg.line_edit.text()
 
-    def create_layout(self):
+    def create_sequence_path_widget(self):
         """
         Add the sequence line edit
         """
@@ -47,14 +46,9 @@ class SelectMoviePage(BasePublishPage):
             "Select a video to upload",
             str(),
             "Selected Movie",
-            file_filter="(*.mov *.mp4)"
+            file_filter="(*.mov *.mp4 *.png *.jpg)"
         )
-        self.main_layout.addWidget(self.seq_path_wdg)
-
-    def connect_signals(self):
-        """
-        Connect the signals to the widgets
-        """
+        self.additional_widgets.addWidget(self.seq_path_wdg)
         self.seq_path_wdg.line_edit.textChanged.connect(self.check_complete)
 
     def check_complete(self):
@@ -65,12 +59,15 @@ class SelectMoviePage(BasePublishPage):
         """
         Do not go to next page if it's not the project
         """
+        if not bool(self.pte_comment.toPlainText()):
+            return False
         return bool(self.movie_path)
 
     def validatePage(self):
         """
         Store the thumbnail path in the wizard data
         """
+        super().validatePage()
         thumbnail_path = file_utils.temp_file_path("movie_upload", "png")
         ffmpeg_utils.convert_image_type(self.movie_path, thumbnail_path)
         self.data["thumbnail_path"] = thumbnail_path

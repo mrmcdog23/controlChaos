@@ -1,7 +1,6 @@
 """ The standalone video publisher """
 import cccore.base_ui as base_ui
 import ccgeneral.wizard.base_wizard as base_wizard
-from ccgeneral.wizard.pages.context_page import ShotComboBoxContextPage
 from ccgeneral.wizard.pages.complete_page import CompletePage
 from upload_progress_page import UploadProgressPage
 from select_movie_page import SelectMoviePage
@@ -21,7 +20,6 @@ class  MediaPublisherWizard(base_wizard.BaseWizard):
         # type: () -> list[Any]
         """ List of wizard pages to add """
         pages = [
-            ShotComboBoxContextPage,
             SelectMoviePage,
             UploadProgressPage,
             CompletePage
