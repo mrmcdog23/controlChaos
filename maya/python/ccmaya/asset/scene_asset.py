@@ -72,14 +72,11 @@ class SceneAsset(object):
         """
         Get the root node to export the fullpath
         """
-        self.logger.info(f"checking camera for namespace: {self.namespace}")
         camera_tran = cmds.ls(self.namespace, type="transform")
-        self.logger.info(f"Camera transform: {camera_tran}")
         if not camera_tran:
             return
-        self.logger.info(f"Checking camera transform: {camera_tran[0]}")
+
         camera_shape = cmds.listRelatives(camera_tran[0], type="camera")
-        self.logger.info(f"Camera shape: {camera_shape}")
         if not camera_shape:
             return
         return camera_shape[0]
@@ -101,8 +98,10 @@ class SceneAsset(object):
             abc_args: String list of AbcExport arguments
         """
         if self.is_camera:
+            self.logger.info("Is a camera asset")
             abc_args = " ".join(maya_constants.CAM_ABC_ARGS)
         else:
+            self.logger.info("Is not a camera asset")
             abc_args = " ".join(maya_constants.MESH_ABC_ARGS)
         return abc_args
 
@@ -149,3 +148,14 @@ class SceneAsset(object):
             "asset_fbx_path": self.reference_path
         }
         return file_data
+
+    @property
+    def asset_top_node(self):
+        # type: () -> str
+        """
+        Get the top node of the asset group
+        """
+        parent_node = cmds.listRelatives(self.export_grp, p=True)
+        if not parent_node or self.namespace not in parent_node:
+            return parent_node
+

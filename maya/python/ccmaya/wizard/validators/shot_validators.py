@@ -52,7 +52,6 @@ class GroupsNamedCorrectlyValidator(BaseValidator):
             self.message = f"Missing group names:\n{missing_groups_str}"
 
 
-
 class AreGroupsAtDefaultValuesValidator(BaseValidator):
     """
     Validate all groups are at default values

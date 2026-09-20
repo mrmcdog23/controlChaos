@@ -24,6 +24,9 @@ class ShotExporter(BaseExporter):
     def __init__(self):
         super().__init__()
         self.ctx = None
+        self.start_frame = int()
+        self.end_frame = int()
+        self.namespace_to_data = dict()
         self.exported_files_to_data = dict()
         self.additional_components = dict()
 
@@ -33,24 +36,27 @@ class ShotExporter(BaseExporter):
         Open the wip maya file
         """
         maya_utils.load_plugins(["AbcExport"])
-        cmds.file(self.data['wip_file_path'],  open=True, force=True)
+        cmds.file(self.data["wip_file_path"],  open=True, force=True)
 
     def export(self):
         """
         Export the shot assets as fbx and alembic files
         """
-        self.cache_assets()
+        self.set_export_data()
+        self.cache_alembic_files()
+        self.cache_usd_files()
+        self.cache_fbx_files()
         self.write_metadata()
         self.publish_shot()
         self.log(f"Export Complete")
 
     @BaseExporter.add_to_percentage(15)
-    def cache_assets(self):
+    def set_export_data(self):
         """
         Cache all the assets in the scene
         """
         self.logger.info("Caching assets...")
-        all_namespaces = self.data.get("namespaces", list())
+        self.all_namespaces = self.data.get("namespaces", list())
 
         # set the next version number
         self.ctx = context.Context(self.data)
@@ -58,24 +64,87 @@ class ShotExporter(BaseExporter):
         self.logger.info(f"Using next version number: {self.next_version}")
 
         self.ctx.use_version = self.next_version
-        self.abc_version_dir = self.ctx.alembic_file_path
 
-        namespace_to_data = dict()
-        for namespace in all_namespaces:
+        self.ftshot.set_from_context(self.ctx)
+        self.start_frame = self.ftshot.start
+        self.end_frame = self.ftshot.end
+
+    def cache_alembic_files(self):
+        """
+        Loop through all the namespaces and export the alembic files
+        """
+        self.abc_version_dir = self.ctx.alembic_file_path
+        for namespace in self.all_namespaces:
             abc_path = self.abc_export(namespace)
             scene_asset_inst = scene_asset.SceneAsset(namespace)
             self.exported_files_to_data[abc_path] = scene_asset_inst.asset_data_dict
 
             # store the namespace data to be reused for the fbx files
-            namespace_to_data[namespace] = scene_asset_inst.asset_data_dict
+            self.namespace_to_data[namespace] = scene_asset_inst.asset_data_dict
 
+    def cache_usd_files(self):
+        """
+        Cache all of the usd files
+        """
+        self.abc_version_dir = self.ctx.alembic_file_path
+        for namespace in self.all_namespaces:
+            usd_path = self.usd_export(namespace)
+            scene_asset_inst = scene_asset.SceneAsset(namespace)
+            self.exported_files_to_data[usd_path] = scene_asset_inst.asset_data_dict
+
+    def usd_export(self, namespace):
+        # type: (str) -> str
+        """
+        Cache a usd file from the namespace
+
+        Args:
+            namespace: The namespace of the object
+
+        Returns:
+            usd_path: Path of the exported usd file
+        """
+        self.logger.info(f"Exporting usd {namespace}")
+        self.ctx.use_suffix = namespace
+        usd_path = self.ctx.usd_file_path
+
+        scene_asset_inst = scene_asset.SceneAsset(namespace)
+        cmds.select(scene_asset_inst.asset_top_node)
+        self.logger.info(f"Select the top node: {scene_asset_inst.asset_top_node}")
+
+        cmds.mayaUSDExport(
+            file=usd_path,
+            selection=True,
+            frameRange=(self.start_frame, self.end_frame),
+            frameStride=1.0,
+            exportSkels="auto",
+            exportSkin="auto",
+            exportBlendShapes=True,
+            exportVisibility=True,
+            exportColorSets=True,
+            mergeTransformAndShape=True,
+            stripNamespaces=True,
+            eulerFilter=True,
+            shadingMode="useRegistry",
+            convertMaterialsTo=["UsdPreviewSurface"],
+            defaultMeshScheme="catmullClark",
+        )
+        self.logger.info(f"Exported USD file: {usd_path}")
+
+        # add namespace to additional dictionary
+        self.additional_components[f"usd_{namespace}"] = abc_path
+        return usd_path
+
+    def cache_fbx_files(self):
+        """
+        Cache  the fbx files
+        """
         # run the fbx export separately
-        fbx_inst = fbx_anim_export.FbxAnimExport(all_namespaces, self.ctx)
+        fbx_inst = fbx_anim_export.FbxAnimExport(self.all_namespaces, self.ctx)
         fbx_inst.run_fbx_exports()
 
         # add the fbx paths to the exported files dictionary
         for namespace, fbx_path in fbx_inst.namespace_to_fbx_path.items():
-            self.exported_files_to_data[fbx_path] = namespace_to_data[namespace]
+            self.exported_files_to_data[fbx_path] = self.namespace_to_data[namespace]
 
             # add fbx namespace to additional dictionary
             self.additional_components[f"fbx_{namespace}"] = fbx_path
@@ -98,14 +167,11 @@ class ShotExporter(BaseExporter):
         file_utils.create_directories(os.path.dirname(abc_path))
         self.logger.info(f"Alembic path: {abc_path}")
 
-        start = int(cmds.playbackOptions(q=True, min=True))
-        end = int(cmds.playbackOptions(q=True, max=True))
-
         self.logger.info("Build alembic export args...")
         abc_args = maya_constants.JOB_ARGS_FORMAT.format(
             step=1,
-            start=start,
-            end=end,
+            start=self.start_frame,
+            end=self.end_frame,
             args=scene_asset_inst.abc_export_args,
             root=scene_asset_inst.export_grp,
             path=abc_path
@@ -139,8 +205,8 @@ class ShotExporter(BaseExporter):
         # update and save all metadata
         data = {
             "exported_files_to_data": self.exported_files_to_data,
-            "start_frame": int(cmds.playbackOptions(q=True, min=True)),
-            "end_frame": int(cmds.playbackOptions(q=True, max=True)),
+            "start_frame": self.start_frame,
+            "end_frame": self.end_frame,
             "master_scene": cmds.file(q=True, sn=True)
         }
         data.update(self.data)

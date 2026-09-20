@@ -30,31 +30,16 @@ class AssetExporter(BaseExporter):
 
     def export(self):
         """
-        Export the asset and publish it to ftrack
+        Export the asset and publish it to FTrack
         """
         self.create_asset_version()
-        self.add_progress(10)
-
         self.tag_and_copy_asset_version()
-        self.add_progress(10)
-
-        # write the data out
         self.create_alembic_component()
-        self.add_progress(10)
-
         self.create_usd_component()
-        self.add_progress(10)
-
-        #self.create_asset_metadata()
-        self.add_progress(10)
-
-        #self.create_materialx_file()
-        self.add_progress(10)
-
         self.export_fbx_unreal_component()
-        self.add_progress(10)
         self.log("Asset publish complete")
 
+    @BaseExporter.add_to_percentage(10)
     def open_file(self):
         """
         Load the alembic export plugin and open the maya file
@@ -62,6 +47,7 @@ class AssetExporter(BaseExporter):
         maya_utils.load_plugins(["AbcExport"])
         cmds.file(self.data['wip_file_path'],  open=True, force=True)
 
+    @BaseExporter.add_to_percentage(10)
     def create_asset_version(self):
         """
         Create the asset version on ftrack and get publish path
@@ -93,6 +79,7 @@ class AssetExporter(BaseExporter):
         """ Is it a camera publish asset """
         return self.data["asset_build_type_name"] == "Camera"
 
+    @BaseExporter.add_to_percentage(10)
     def tag_and_copy_asset_version(self):
         """
         Create the ftrack publish version and
@@ -101,11 +88,12 @@ class AssetExporter(BaseExporter):
         # add tag to the asset attribute
         maya_utils.add_ftrack_tag_to_asset(self.asset_version['id'])
 
+    @BaseExporter.add_to_percentage(10)
     def create_alembic_component(self):
         """
         Alembic export args. These vary on the object type to cache
         """
-        if self.data["asset_build_type_name"] == "Camera":
+        if self.is_camera:
             abc_export_args = " ".join(maya_constants.CAM_ABC_ARGS)
             root = maya_constants.CAM_GRP
         else:
@@ -132,6 +120,7 @@ class AssetExporter(BaseExporter):
         component_dict = {"Alembic": abc_path}
         self.ftver.add_component_dict(component_dict)
 
+    @BaseExporter.add_to_percentage(10)
     def export_fbx_unreal_component(self):
         """
         Export the unreal asset
@@ -149,6 +138,7 @@ class AssetExporter(BaseExporter):
         self.log(f"Export FBX path: {fbx_asset_path}")
         fbx_asset_export.FbxAssetExport(fbx_asset_path)
 
+    @BaseExporter.add_to_percentage(10)
     def create_usd_component(self):
         """
         Create the usd file and component
