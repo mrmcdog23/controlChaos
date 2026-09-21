@@ -1,0 +1,225 @@
+""" Create a playblast of the scene """
+import os
+import glob
+import tempfile
+import maya.mel as mel
+import maya.cmds as cmds
+import cccore.utils.cc_logging as cc_logging
+import cccore.utils.ffmpeg_utils as ffmpeg_utils
+#import cccore.utils.apply_hud as apply_hud
+import cccore.data.server_data as server_data
+#import ccmaya.audio_utils as audio_utils
+import ccmaya.utils.maya_utils as maya_utils
+#import ccmaya.render.rendersetup_utils as render_utils
+import cccore.utils.file_utils as file_utils
+import mtoa.utils as mutils
+import mtoa.core as core
+
+
+GLOBAL_ATTR_VALUE = {
+    "outFormatControl": 0,
+    "animation": 1,
+    "putFrameBeforeExt": 1,
+    "extensionPadding": 4,
+    "periodInExt": 1,
+    "imageFormat": 32
+}
+NAME = "TEMP"
+MAYA_HARDWARE = "mayaHardware2"
+BATCH_RENDER_CMD = 'global string $ogsRenderOptions = "";' \
+                   'mayaBatchRenderProcedure(0, "", "",' \
+                   ' "{renderer}", $ogsRenderOptions);'
+
+
+class PlayblastScene(object):
+    def __init__(self, render_data):
+
+        self.render_data = render_data
+        self.logger = cc_logging.cc_logger()
+        self.project_data = server_data.ProjectData()
+
+        self.playblast_dir = str()
+        self.bg = float()
+        self.completed_renders = list()
+        self.mov_path = str()
+        self.created_mov = bool()
+
+        # set data from the dictionary given
+        self.height = render_data.get("height")
+        self.width = render_data.get("width")
+        self.name = render_data.get("name", NAME)
+        self.renderer = render_data.get("renderer")
+
+    @property
+    def start_frame(self):
+        min_time = int(cmds.playbackOptions(q=True, min=True))
+        return self.render_data.get("start_frame", min_time)
+
+    @property
+    def end_frame(self):
+        max_time = int(cmds.playbackOptions(q=True, max=True))
+        return self.render_data.get("end_frame", max_time)
+
+    def run_playblast(self):
+        # type: () -> str
+        """
+        Render and generate a mov file
+
+        Returns:
+            mov_path: Path to the movie file
+        """
+        self.playblast_settings()
+        self.set_render_globals()
+        self.set_scene_render_camera()
+        self.playblast_scene()
+        self.get_completed_renders()
+        self.cleanup()
+
+    def run_arnold_render(self):
+        self.arnold_settings()
+        self.set_render_globals()
+        self.set_scene_render_camera()
+        self.playblast_scene()
+
+    def arnold_render_scene(self):
+        cmds.arnoldRender(cam=cam, w=1920, h=1080)
+
+    def arnold_settings(self):
+        self.logger.info(f"Setting to Arnold renderer...")
+        self.bg = 0.24
+        mel.eval("setCurrentRenderer mayaHardware2")
+
+    def playblast_settings(self):
+        self.logger.info(f"Setting to playblast settings...")
+        self.bg = 0.0
+        cmds.loadPlugin("mtoa", quiet=True)
+        core.createOptions()  # makes sure defaultArnoldRenderOptions exists
+        cmds.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
+
+    def set_render_globals(self):
+        """
+        Set the general render globals such
+        as resolution and frame range
+        """
+        # set output resolution
+        cmds.setAttr('defaultResolution.width', self.width)
+        cmds.setAttr('defaultResolution.height', self.height)
+        cmds.setAttr('defaultRenderGlobals.imageFilePrefix', self.name, type="string")
+
+        # set frame range
+        frame_ranges = {"startFrame": self.start_frame, "endFrame": self.end_frame}
+        GLOBAL_ATTR_VALUE.update(frame_ranges)
+
+        for attr, value in GLOBAL_ATTR_VALUE.items():
+            attribute = f"defaultRenderGlobals.{attr}"
+            self.logger.info(f"Setting... {attribute} ...to... {value}")
+            cmds.setAttr(attribute, value)
+
+        # set colour management and appdata directory
+        cmds.colorManagementPrefs(e=True, outputTransformEnabled=True)
+        self.playblast_dir = file_utils.join_file_names(tempfile.gettempdir(), "playblast")
+        self.logger.info(f"Render directory: {self.playblast_dir}")
+        file_utils.create_directory(self.playblast_dir)
+        cmds.workspace(self.playblast_dir, openWorkspace=True)
+
+    @property
+    def render_camera(self):
+        return maya_utils.render_cameras()[0]
+
+    def set_scene_render_camera(self):
+        """
+        Set the scene render camera background
+        """
+        for scene_cam in cmds.ls(type="camera"):
+            cmds.setAttr(f"{scene_cam}.renderable", 0)
+
+        # set render camera
+        cmds.setAttr(f"{self.render_camera}.renderable", 1)
+        attr = f"{self.render_camera}.backgroundColor"
+        cmds.setAttr(attr, self.bg, self.bg, self.bg, type="double3")
+
+    def convert_to_mov(self):
+        """
+        From the rendered image sequence generate the movie file
+        """
+        self.logger.info("Generating movie file...")
+        image_path = self.completed_renders[0].replace("\\", "/")
+        self.mov_path = f"{self.directory}/{self.name}.mov".replace("\\", "/")
+
+        # apply hud through nuke
+        self.publish_data["image_path"] = image_path
+        self.publish_data["mov_path"] = self.mov_path
+        audio_dict = audio_utils.get_audio_dict()
+        self.publish_data.update(audio_dict)
+        self.publish_data["start"] = self.start
+        self.publish_data["end"] = self.end
+
+        # add the camera name if set off from batch republish
+        if not self.publish_data.get("camera_name"):
+            self.publish_data["camera_name"] = maya_utils.render_cameras()[0]
+
+        self.logger.info(f"Publish data: {self.publish_data}")
+        self.created_mov = apply_hud.create_rty_hud_mov(self.publish_data)
+        self.logger.info("Created Movie: {}".format(self.created_mov))
+
+    def get_completed_renders(self):
+        # type: () -> list[str]
+        """
+        Where the renders go is unpredictable so search all
+        the subdirectories. If it's not in images then search
+        the entire root for the renders.
+        """
+        regex = f"{self.playblast_dir}/images/**/{self.name}*.png"
+        self.logger.info(f"Regex: {regex}")
+        self.completed_renders = glob.glob(regex, recursive=True)
+
+        if not self.completed_renders:
+            regex = f"{self.playblast_dir}/**/{self.name}*.png"
+            self.logger.info(f"Sub regex: {regex}")
+            self.completed_renders = glob.glob(regex, recursive=True)
+
+        # log renders found
+        number_found = len(self.completed_renders)
+        self.logger.info(f"Found: {number_found}")
+
+    def cleanup(self):
+        """
+        Remove the rendered files
+        """
+        if not self.created_mov:
+            self.logger.warning("Moving generation failed. Will keep the renders for debugging")
+            return
+
+        self.logger.info("Cleaning up...")
+        for render in self.completed_renders:
+            if self.project_data.appdata in render:
+                self.logger.info("Removing: {0}".format(render))
+                os.remove(render)
+
+    def playblast_scene(self):
+        """
+        Create the hardware render
+        """
+        for frame_num in range(self.start_frame, (self.end_frame + 1)):
+            self.logger.info(f"Rendering frame: {frame_num}")
+            cmds.currentTime(frame_num, e=True)
+            cmds.setAttr("defaultRenderGlobals.startFrame", frame_num)
+            cmds.setAttr("defaultRenderGlobals.endFrame", frame_num)
+            render_cmd = BATCH_RENDER_CMD.format(renderer=self.renderer)
+            self.logger.info(render_cmd)
+            mel.eval(render_cmd)
+        self.logger.info("Render Complete")
+
+    def render_current_frame(self):
+        # type: () -> str
+        """
+        Rendering the first frame in the file
+
+        Returns:
+            current_frame: Path to the rendered image
+        """
+        self.logger.info("Rendering the first frame")
+        self.start = self.min_time
+        self.end = self.min_time
+        self.set_render_globals()
+        self.playblast_scene()
