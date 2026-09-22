@@ -48,6 +48,17 @@ class MayaThumbnailPage(ThumbnailPage):
         Connect the signals to the widget
         """
         self.btn_capture_thumbnail.clicked.connect(self.capture_thumbnail)
+        self.chk_turntable.toggled.connect(self.enable_render_type)
+
+    def enable_render_type(self, enable):
+        """
+        Enable the render options
+
+        Args:
+            enable: whether to enable the render type
+        """
+        self.rbn_playblast.setEnabled(enable)
+        self.rbn_arnold.setEnabled(enable)
 
     def closeEvent(self, event):
         """
@@ -77,6 +88,10 @@ class MayaThumbnailPage(ThumbnailPage):
         """
         self.data["thumbnail_path"] = self.thumbnail_path
         self.data["turntable"] = self.chk_turntable.isChecked()
+        if self.rbn_playblast.isChecked():
+            self.data["renderer"] = "mayaHardware2"
+        else:
+            self.data["renderer"] = "arnold"
         return True
 
     def isComplete(self):

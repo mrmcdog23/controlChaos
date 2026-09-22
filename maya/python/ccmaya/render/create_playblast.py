@@ -30,7 +30,10 @@ BATCH_RENDER_CMD = 'global string $ogsRenderOptions = "";' \
 
 class PlayblastScene(object):
     def __init__(self, render_data):
-
+        # type: (dict) -> None
+        """
+        The data to dictate the render
+        """
         self.render_data = render_data
         self.logger = cc_logging.cc_logger()
         self.project_data = server_data.ProjectData()
@@ -49,11 +52,15 @@ class PlayblastScene(object):
 
     @property
     def start_frame(self):
+        # type: () -> int
+        """ The first frame of the render  """
         min_time = int(cmds.playbackOptions(q=True, min=True))
         return self.render_data.get("start_frame", min_time)
 
     @property
     def end_frame(self):
+        # type: () -> int
+        """ The last frame of the render  """
         max_time = int(cmds.playbackOptions(q=True, max=True))
         return self.render_data.get("end_frame", max_time)
 
@@ -66,10 +73,7 @@ class PlayblastScene(object):
     def create_images(self):
         # type: () -> str
         """
-        Render and generate a mov file
-
-        Returns:
-            mov_path: Path to the movie file
+        Render and generate a movie file
         """
         if self.is_arnold_render:
             self.arnold_settings()
@@ -82,6 +86,9 @@ class PlayblastScene(object):
         self.convert_to_movie()
 
     def arnold_settings(self):
+        """
+        Set the arnold render settings
+        """
         self.logger.info(f"Setting to playblast settings...")
         self.bg = 0.0
         cmds.loadPlugin("mtoa", quiet=True)
@@ -90,6 +97,9 @@ class PlayblastScene(object):
         cmds.setAttr("defaultArnoldRenderOptions.abortOnLicenseFail", 0)
 
     def hardware_settings(self):
+        """
+        Set the hardware render settings
+        """
         self.logger.info(f"Setting to Arnold renderer...")
         self.bg = 0.24
         mel.eval("setCurrentRenderer mayaHardware2")
@@ -122,6 +132,8 @@ class PlayblastScene(object):
 
     @property
     def render_camera(self):
+        # type: () -> str
+        """ Get the current render camera """
         return maya_utils.render_cameras()[0]
 
     def set_scene_render_camera(self):

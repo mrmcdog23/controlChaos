@@ -14,7 +14,6 @@ START = 1
 END = 100
 HEIGHT = 540
 WIDTH = 1024
-HARDWARE_RENDER = True
 
 
 class MakeTurntableRender(object):
@@ -31,7 +30,9 @@ class MakeTurntableRender(object):
         self.create_render()
 
     def snap_object_to_center(self):
-        # snap the object to the origin
+        """
+        Snap the object to the origin
+        """
         cmds.select(self.top_node)
         cmds.xform(cpc=True)
         loc = cmds.spaceLocator()[0]
@@ -39,7 +40,9 @@ class MakeTurntableRender(object):
         cmds.delete(loc)
 
     def set_object_pivot_and_rotations(self):
-        # move the object to be on the base
+        """
+        Move the object to be on the base
+        """
         _, bbminy, _ = cmds.getAttr(f"{self.top_node}.boundingBoxMin")[0]
         _, transy, _ = cmds.getAttr(f"{self.top_node}.translate")[0]
         diff = (bbminy - transy) * -1
@@ -50,13 +53,10 @@ class MakeTurntableRender(object):
         cmds.xform(worldSpace=True, pivots=(0, 0, 0))
         cmds.select(cl=True)
 
-        # Set the start and end frame animation and time slider
-        cmds.setKeyframe(self.top_node, v=0, t=START, at='rotateY')
-        cmds.setKeyframe(self.top_node, v=360, t=END + 1, at='rotateY')
-        cmds.playbackOptions(min=START, ast=START, max=END, aet=END)
-
     def set_frame_range(self):
-        # Set the start and end frame animation and time slider
+        """
+        Set the start and end frame animation and time slider
+        """
         cmds.setKeyframe(self.top_node, v=0, t=START, at='rotateY')
         cmds.setKeyframe(self.top_node, v=360, t=END + 1, at='rotateY')
         cmds.playbackOptions(min=START, ast=START, max=END, aet=END)
@@ -65,7 +65,6 @@ class MakeTurntableRender(object):
         """
         Create the turntable of the asset
         """
-        # create the render camera
         _, cam_shape = cmds.camera()
         cmds.viewFit(cam_shape, all=True)
         cmds.setAttr(f"{cam_shape}.panZoomEnabled", True)
@@ -85,7 +84,9 @@ class MakeTurntableRender(object):
         return transform, shape
 
     def make_area_light(self, name, position, target, exposure, color=(1, 1, 1), size=4, samples=3):
-        """Quad area light placed at `position`, aimed at `target`."""
+        """
+        Quad area light placed at `position`, aimed at `target`.
+        """
         xform, shape = self.create_ai_light("aiAreaLight", name)
         cmds.setAttr(shape + ".exposure", exposure)
         cmds.setAttr(shape + ".color", *color, type="double3")
@@ -98,8 +99,17 @@ class MakeTurntableRender(object):
         cmds.delete(aim)
         return xform
 
-    def build_three_point_rig(self):
-        if HARDWARE_RENDER:
+    @property
+    def is_arnold_render(self):
+        # type: () -> bool
+        """ If it is an arnold render """
+        return self.data["renderer"] == "arnold"
+
+    def build_three_point_rig(self):#
+        """
+        If it is an arnold render then create a light rig
+        """
+        if not self.is_arnold_render:
             return
 
         target_pos=(0, 2, 0)
@@ -138,19 +148,17 @@ class MakeTurntableRender(object):
         return grp
 
     def create_render(self):
-        # create the render
+        """
+        Create the render and make the movie from it
+        """
         render_data = {
             "start_frame": START,
             "end_frame": END,
             "name": self.data["asset_build_name"],
             "height": HEIGHT,
-            "width": WIDTH
+            "width": WIDTH,
+            "renderer": self.data["renderer"]
         }
-        if HARDWARE_RENDER:
-            render_data["renderer"] = "mayaHardware2"
-        else:
-            render_data["renderer"] = "arnold"
-
         playblast_cls = create_playblast.PlayblastScene(render_data=render_data)
         playblast_cls.create_images()
 
