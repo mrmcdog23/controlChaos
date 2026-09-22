@@ -4,16 +4,13 @@ import glob
 import tempfile
 import maya.mel as mel
 import maya.cmds as cmds
+import mtoa.core as core
 import cccore.utils.cc_logging as cc_logging
 import cccore.utils.ffmpeg_utils as ffmpeg_utils
-#import cccore.utils.apply_hud as apply_hud
-import cccore.data.server_data as server_data
-#import ccmaya.audio_utils as audio_utils
-import ccmaya.utils.maya_utils as maya_utils
-#import ccmaya.render.rendersetup_utils as render_utils
 import cccore.utils.file_utils as file_utils
-import mtoa.utils as mutils
-import mtoa.core as core
+import cccore.utils.sequence_utils as sequence_utils
+import cccore.data.server_data as server_data
+import ccmaya.utils.maya_utils as maya_utils
 
 
 GLOBAL_ATTR_VALUE = {
@@ -60,7 +57,13 @@ class PlayblastScene(object):
         max_time = int(cmds.playbackOptions(q=True, max=True))
         return self.render_data.get("end_frame", max_time)
 
-    def run_playblast(self):
+    @property
+    def is_arnold_render(self):
+        # type: () -> bool
+        """ If it is an arnold render """
+        return self.render_data["renderer"] == "arnold"
+
+    def create_images(self):
         # type: () -> str
         """
         Render and generate a mov file
@@ -68,33 +71,28 @@ class PlayblastScene(object):
         Returns:
             mov_path: Path to the movie file
         """
-        self.playblast_settings()
+        if self.is_arnold_render:
+            self.arnold_settings()
+        else:
+            self.hardware_settings()
         self.set_render_globals()
         self.set_scene_render_camera()
         self.playblast_scene()
         self.get_completed_renders()
-        self.cleanup()
-
-    def run_arnold_render(self):
-        self.arnold_settings()
-        self.set_render_globals()
-        self.set_scene_render_camera()
-        self.playblast_scene()
-
-    def arnold_render_scene(self):
-        cmds.arnoldRender(cam=cam, w=1920, h=1080)
+        self.convert_to_movie()
 
     def arnold_settings(self):
-        self.logger.info(f"Setting to Arnold renderer...")
-        self.bg = 0.24
-        mel.eval("setCurrentRenderer mayaHardware2")
-
-    def playblast_settings(self):
         self.logger.info(f"Setting to playblast settings...")
         self.bg = 0.0
         cmds.loadPlugin("mtoa", quiet=True)
         core.createOptions()  # makes sure defaultArnoldRenderOptions exists
         cmds.setAttr("defaultRenderGlobals.currentRenderer", "arnold", type="string")
+        cmds.setAttr("defaultArnoldRenderOptions.abortOnLicenseFail", 0)
+
+    def hardware_settings(self):
+        self.logger.info(f"Setting to Arnold renderer...")
+        self.bg = 0.24
+        mel.eval("setCurrentRenderer mayaHardware2")
 
     def set_render_globals(self):
         """
@@ -138,30 +136,6 @@ class PlayblastScene(object):
         attr = f"{self.render_camera}.backgroundColor"
         cmds.setAttr(attr, self.bg, self.bg, self.bg, type="double3")
 
-    def convert_to_mov(self):
-        """
-        From the rendered image sequence generate the movie file
-        """
-        self.logger.info("Generating movie file...")
-        image_path = self.completed_renders[0].replace("\\", "/")
-        self.mov_path = f"{self.directory}/{self.name}.mov".replace("\\", "/")
-
-        # apply hud through nuke
-        self.publish_data["image_path"] = image_path
-        self.publish_data["mov_path"] = self.mov_path
-        audio_dict = audio_utils.get_audio_dict()
-        self.publish_data.update(audio_dict)
-        self.publish_data["start"] = self.start
-        self.publish_data["end"] = self.end
-
-        # add the camera name if set off from batch republish
-        if not self.publish_data.get("camera_name"):
-            self.publish_data["camera_name"] = maya_utils.render_cameras()[0]
-
-        self.logger.info(f"Publish data: {self.publish_data}")
-        self.created_mov = apply_hud.create_rty_hud_mov(self.publish_data)
-        self.logger.info("Created Movie: {}".format(self.created_mov))
-
     def get_completed_renders(self):
         # type: () -> list[str]
         """
@@ -169,32 +143,18 @@ class PlayblastScene(object):
         the subdirectories. If it's not in images then search
         the entire root for the renders.
         """
-        regex = f"{self.playblast_dir}/images/**/{self.name}*.png"
+        regex = f"{self.playblast_dir}/images/**/{self.name}*.*"
         self.logger.info(f"Regex: {regex}")
         self.completed_renders = glob.glob(regex, recursive=True)
 
         if not self.completed_renders:
-            regex = f"{self.playblast_dir}/**/{self.name}*.png"
+            regex = f"{self.playblast_dir}/**/{self.name}*.*"
             self.logger.info(f"Sub regex: {regex}")
             self.completed_renders = glob.glob(regex, recursive=True)
 
         # log renders found
         number_found = len(self.completed_renders)
         self.logger.info(f"Found: {number_found}")
-
-    def cleanup(self):
-        """
-        Remove the rendered files
-        """
-        if not self.created_mov:
-            self.logger.warning("Moving generation failed. Will keep the renders for debugging")
-            return
-
-        self.logger.info("Cleaning up...")
-        for render in self.completed_renders:
-            if self.project_data.appdata in render:
-                self.logger.info("Removing: {0}".format(render))
-                os.remove(render)
 
     def playblast_scene(self):
         """
@@ -210,16 +170,23 @@ class PlayblastScene(object):
             mel.eval(render_cmd)
         self.logger.info("Render Complete")
 
-    def render_current_frame(self):
-        # type: () -> str
+    def convert_to_movie(self):
         """
-        Rendering the first frame in the file
+        From the rendered image sequence generate the movie file
+        """
+        self.logger.info("Generating movie file...")
+        image_path = self.completed_renders[0].replace("\\", "/")
+        self.temp_mov_path = file_utils.temp_file_path(self.name, "mov")
+        seq_data = sequence_utils.get_sequence_data(image_path)
+        created = ffmpeg_utils.run_ffmpeg_hud_command(
+            self.start_frame,
+            seq_data.nuke_path,
+            self.temp_mov_path
+            )
+        self.logger.info(f"Created Movie: {created}")
 
-        Returns:
-            current_frame: Path to the rendered image
-        """
-        self.logger.info("Rendering the first frame")
-        self.start = self.min_time
-        self.end = self.min_time
-        self.set_render_globals()
-        self.playblast_scene()
+        # remove the render
+        if created:
+            for render_path in self.completed_renders:
+                self.logger.info(f"Removing: {render_path}")
+                os.remove(render_path)

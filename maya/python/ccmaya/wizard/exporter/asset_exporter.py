@@ -5,11 +5,12 @@ import tempfile
 import maya.cmds as cmds
 import cccore.utils.file_utils as file_utils
 import cccore.core_constants as core_constants
+import cccore.file_env.context as context
+import cccore.file_env.ctx_constants as ctx_constants
+import ccmaya.asset.fbx_asset_export as fbx_asset_export
+import ccmaya.asset.make_turntable as make_turntable
 import ccmaya.utils.maya_utils as maya_utils
 import ccmaya.maya_constants as maya_constants
-import cccore.file_env.context as context
-import ccmaya.asset.fbx_asset_export as fbx_asset_export
-import cccore.file_env.ctx_constants as ctx_constants
 from ccgeneral.wizard.exporter.base_exporter import BaseExporter
 
 
@@ -37,6 +38,7 @@ class AssetExporter(BaseExporter):
         self.create_alembic_component()
         self.create_usd_component()
         self.export_fbx_unreal_component()
+        self.create_turntable()
         self.log("Asset publish complete")
 
     @BaseExporter.add_to_percentage(10)
@@ -236,6 +238,17 @@ class AssetExporter(BaseExporter):
             shader = cmds.listConnections(sg_attribute)[0]
             mesh_to_materials[mesh] = shader
         return mesh_to_materials
+
+    def create_turntable(self):
+        """
+        Create the turntable file
+        """
+        if not self.data["turntable"]:
+            self.log("Skipping turntable")
+            return
+        make_tt_inst = make_turntable.MakeTurntableRender(self.data)
+        self.log(f"Generate movie path: {make_tt_inst.movie_path}")
+        self.ftver.add_playable_component(make_tt_inst.movie_path)
 
 
 if __name__ == "__main__":

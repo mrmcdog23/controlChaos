@@ -33,12 +33,13 @@ class AssetWizard(MayaBaseWizard):
         Returns:
             pages (list[QtWidgets.QWizardPage]): List of wizard pages
         """
-        pages = [AssetContextPage,
-                 MayaValidatePage,
-                 MayaThumbnailPage,
-                 MayaProgressPage,
-                 CompletePage
-                 ]
+        pages = [
+            AssetContextPage,
+            MayaValidatePage,
+            MayaThumbnailPage,
+            MayaProgressPage,
+            CompletePage
+        ]
         return pages
 
     @classmethod

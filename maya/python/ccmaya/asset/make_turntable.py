@@ -14,9 +14,7 @@ START = 1
 END = 100
 HEIGHT = 540
 WIDTH = 1024
-
-
-cmds.loadPlugin("mtoa", quiet=True)
+HARDWARE_RENDER = True
 
 
 class MakeTurntableRender(object):
@@ -101,6 +99,9 @@ class MakeTurntableRender(object):
         return xform
 
     def build_three_point_rig(self):
+        if HARDWARE_RENDER:
+            return
+
         target_pos=(0, 2, 0)
         distance=10
         add_skydome=True
@@ -143,11 +144,15 @@ class MakeTurntableRender(object):
             "end_frame": END,
             "name": self.data["asset_build_name"],
             "height": HEIGHT,
-            "width": WIDTH,
-            "renderer": "arnold"
+            "width": WIDTH
         }
+        if HARDWARE_RENDER:
+            render_data["renderer"] = "mayaHardware2"
+        else:
+            render_data["renderer"] = "arnold"
 
         playblast_cls = create_playblast.PlayblastScene(render_data=render_data)
-        mov_path = playblast_cls.run_arnold_render()
-        self.logging.info(f"Created: {mov_path}")
-        return mov_path
+        playblast_cls.create_images()
+
+        self.movie_path = playblast_cls.temp_mov_path
+        self.logging.info(f"Created: {self.movie_path}")

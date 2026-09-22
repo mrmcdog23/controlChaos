@@ -66,7 +66,7 @@ class MayaThumbnailPage(ThumbnailPage):
         image = OpenMaya.MImage()
         view.readColorBuffer(image, True)
         image.writeToFile(self.thumbnail_path, "png")
-        self.set_widget_icons(icon_dict={self.thumbnail_path: "thumbnail_image"})
+        self.set_widget_icons(icon_dict={"thumbnail_image": self.thumbnail_path})
 
         self.created_thumbnail = True
         self.completeChanged.emit()
@@ -76,6 +76,7 @@ class MayaThumbnailPage(ThumbnailPage):
         Store the thumbnail path in the wizard data
         """
         self.data["thumbnail_path"] = self.thumbnail_path
+        self.data["turntable"] = self.chk_turntable.isChecked()
         return True
 
     def isComplete(self):
