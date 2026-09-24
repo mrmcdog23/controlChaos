@@ -7,7 +7,8 @@ import ccunreal.unreal_constants as unreal_constants
 import ccunreal.shot.cache_importer as cache_importer
 import ccunreal.utils.api_wrap as api_wrap
 import cccore.utils.file_utils as file_utils
-import ccunreal.asset.import_fbx_asset as import_fbx_asset
+import ccunreal.asset.fbx_asset_import as fbx_asset_import
+import ccftrack.asset_version as asset_version
 
 
 # constants
@@ -43,6 +44,7 @@ class UELoadShot(object):
         self.ls = None
         self.imported_obj_paths = list()
         self.asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
+        self.ftver = asset_version.FtAssetVersion()
         self.run_import()
 
     def run_import(self):
@@ -120,8 +122,9 @@ class UELoadShot(object):
             skeleton_mesh: The unreal skeleton mesh as an asset
         """
         # import the actor and its fbx path
-        asset_importer = import_fbx_asset.ImportAsset(
-            file_data["asset_fbx_path"], file_data["namespace"], True)
+        self.ftver.asset_version_id = file_data["ftrack_id"]
+        asset_importer = fbx_asset_import.FBXAssetImport(
+            file_data["asset_fbx_path"], self.ftver, True)
         asset_importer.import_asset()
         return asset_importer.skeleton, asset_importer.skeleton_mesh
 
@@ -245,8 +248,9 @@ class UELoadShot(object):
             fbx_path: Path of the environment fbx file
         """
         # import the actor and its fbx path
-        asset_importer = import_fbx_asset.ImportAsset(
-            file_data["asset_fbx_path"], file_data["namespace"], False)
+        self.ftver.asset_version_id = file_data["ftrack_id"]
+        asset_importer = fbx_asset_import.FBXAssetImport(
+            file_data["asset_fbx_path"], self.ftver, False)
         asset_importer.import_asset()
         static_mesh = asset_importer.static_mesh
         ue.log_warning(f"Static mesh path: {static_mesh}")

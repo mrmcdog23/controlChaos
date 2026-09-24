@@ -57,7 +57,7 @@ def main():
 
     # asset menu
     asset_menu = create_submenu(control_chaos_menu, "Asset")
-    command = "import ccunreal.asset.asset_loader as asset_loader;asset_loader.launch()"
+    command = "import ccunreal.asset.ue_asset_loader as ue_asset_loader;ue_asset_loader.launch()"
     create_command(asset_menu, "Asset Loader", command)
 
     # shot menu

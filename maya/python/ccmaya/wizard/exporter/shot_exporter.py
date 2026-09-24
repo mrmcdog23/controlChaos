@@ -131,7 +131,7 @@ class ShotExporter(BaseExporter):
         self.logger.info(f"Exported USD file: {usd_path}")
 
         # add namespace to additional dictionary
-        self.additional_components[f"usd_{namespace}"] = abc_path
+        self.additional_components[f"usd_{namespace}"] = usd_path
         return usd_path
 
     def cache_fbx_files(self):

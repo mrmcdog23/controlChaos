@@ -59,9 +59,7 @@ class SceneAsset(object):
     @property
     def jnt_grp(self):
         # type: () -> str
-        """
-        Get the root node to export the fullpath
-        """
+        """ Get the root node to export the fullpath """
         if not self._jnt_grp:
             self._jnt_grp = self.find_group(maya_constants.JNT_GRP)
         return self._jnt_grp
@@ -69,9 +67,7 @@ class SceneAsset(object):
     @property
     def cam_grp(self):
         # type: () -> str
-        """
-        Get the root node to export the fullpath
-        """
+        """ Get the root node to export the fullpath """
         camera_tran = cmds.ls(self.namespace, type="transform")
         if not camera_tran:
             return
@@ -83,6 +79,8 @@ class SceneAsset(object):
 
     @property
     def root_joint(self):
+        # type: () -> str
+        """ Get the root joint to export the fullpath """
         joints = cmds.listRelatives(self.jnt_grp, type="joint", f=True)
         if not joints:
             return
@@ -140,12 +138,24 @@ class SceneAsset(object):
         return self._ref_path
 
     @property
+    def ftrack_id(self):
+        # type: () -> str
+        """ The ftrack asset id """
+        ftrack_ids = cmds.ls(f"{self.namespace}:*.ftrackId")
+        if not ftrack_ids:
+            return
+        return cmds.getAttr(ftrack_ids[0])
+
+    @property
     def asset_data_dict(self):
+        # type: () -> dict
+        """ The asset dictionary """
         file_data = {
             "is_camera": self.is_camera,
             "is_skeleton_mesh": self.is_skeleton_mesh,
             "namespace": self.namespace,
-            "asset_fbx_path": self.reference_path
+            "asset_fbx_path": self.reference_path,
+            "ftrack_id": self.ftrack_id
         }
         return file_data
 
