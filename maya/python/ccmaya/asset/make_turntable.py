@@ -10,8 +10,10 @@ import cccore.utils.cc_logging as cc_logging
 
 
 # constants
-START = 1
-END = 100
+OBJ_START = 1
+OBJ_END = 100
+CAM_START = 101
+CAM_END = 200
 HEIGHT = 540
 WIDTH = 1024
 
@@ -57,19 +59,24 @@ class MakeTurntableRender(object):
         """
         Set the start and end frame animation and time slider
         """
-        cmds.setKeyframe(self.top_node, v=0, t=START, at='rotateY')
-        cmds.setKeyframe(self.top_node, v=360, t=END + 1, at='rotateY')
-        cmds.playbackOptions(min=START, ast=START, max=END, aet=END)
+        cmds.setKeyframe(self.top_node, v=0, t=OBJ_START, at='rotateY')
+        cmds.setKeyframe(self.top_node, v=360, t=OBJ_END + 1, at='rotateY')
+        cmds.playbackOptions(min=OBJ_START, ast=OBJ_START, max=CAM_END, aet=CAM_END)
 
     def create_render_camera(self):
         """
         Create the turntable of the asset
         """
-        _, cam_shape = cmds.camera()
+        cam, cam_shape = cmds.camera()
         cmds.viewFit(cam_shape, all=True)
         cmds.setAttr(f"{cam_shape}.panZoomEnabled", True)
         cmds.setAttr(f"{cam_shape}.renderPanZoom", True)
         cmds.setAttr(f"{cam_shape}.zoom", 1.2)
+
+        camera_group = cmds.group(cam, n="camera_group")
+        cmds.xform(camera_group, pivots=(0, 0, 0), worldSpace=True)
+        cmds.setKeyframe(camera_group, v=0, t=CAM_START, at='rotateY')
+        cmds.setKeyframe(camera_group, v=360, t=CAM_END + 1, at='rotateY')
 
     def create_ai_light(self, node_type, name):
         """
@@ -152,8 +159,8 @@ class MakeTurntableRender(object):
         Create the render and make the movie from it
         """
         render_data = {
-            "start_frame": START,
-            "end_frame": END,
+            "start_frame": OBJ_START,
+            "end_frame": CAM_END,
             "name": self.data["asset_build_name"],
             "height": HEIGHT,
             "width": WIDTH,
