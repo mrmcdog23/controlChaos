@@ -7,6 +7,7 @@ import mtoa.utils as mutils
 import ccmaya.utils.maya_utils as maya_utils
 import ccmaya.render.create_playblast as create_playblast
 import cccore.utils.cc_logging as cc_logging
+import ccmaya.maya_constants as maya_constants
 
 
 # constants
@@ -24,6 +25,7 @@ class MakeTurntableRender(object):
         self.logging = cc_logging.cc_logger()
         self.top_node = maya_utils.get_asset_top_node()
 
+        self.hide_curves()
         self.snap_object_to_center()
         self.set_object_pivot_and_rotations()
         self.set_frame_range()
@@ -31,10 +33,35 @@ class MakeTurntableRender(object):
         self.build_three_point_rig()
         self.create_render()
 
+    @property
+    def is_rig(self):
+        return self.top_node == maya_constants.RIG_GRP
+
+    def hide_curves(self):
+        """
+        Hide curves and joints
+        """
+        # Hide all joints via draw style
+        for joint in cmds.ls(type='joint'):
+            try:
+                cmds.setAttr(f'{joint}.drawStyle', 2)
+                cmds.setAttr(f'{joint}.visibility', 0)
+            except RuntimeError:
+                pass
+
+        # Hide all NURBS curves
+        for curve in cmds.ls(type='nurbsCurve'):
+            try:
+                cmds.setAttr(f'{curve}.visibility', 0)
+            except RuntimeError:
+                pass
+
     def snap_object_to_center(self):
         """
         Snap the object to the origin
         """
+        if self.is_rig:
+            return
         cmds.select(self.top_node)
         cmds.xform(cpc=True)
         loc = cmds.spaceLocator()[0]
@@ -45,6 +72,8 @@ class MakeTurntableRender(object):
         """
         Move the object to be on the base
         """
+        if self.is_rig:
+            return
         _, bbminy, _ = cmds.getAttr(f"{self.top_node}.boundingBoxMin")[0]
         _, transy, _ = cmds.getAttr(f"{self.top_node}.translate")[0]
         diff = (bbminy - transy) * -1
