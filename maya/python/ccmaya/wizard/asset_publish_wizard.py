@@ -5,6 +5,7 @@ import ccmaya.maya_constants as maya_constants
 import ccmaya.wizard.exporter.asset_exporter as asset_exporter
 from ccgeneral.wizard.pages.complete_page import CompletePage
 from ccgeneral.wizard.pages.context_page import AssetContextPage
+from ccmaya.wizard.pages.turntable_page import TurntablePage
 from ccmaya.wizard.pages.maya_thumbnail_page import MayaThumbnailPage
 from ccmaya.wizard.pages.maya_progress_page import MayaProgressPage
 from ccmaya.wizard.pages.maya_validator_page import MayaValidatePage
@@ -36,6 +37,7 @@ class AssetWizard(MayaBaseWizard):
         pages = [
             AssetContextPage,
             MayaValidatePage,
+            TurntablePage,
             MayaThumbnailPage,
             MayaProgressPage,
             CompletePage

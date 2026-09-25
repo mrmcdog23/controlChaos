@@ -24,12 +24,14 @@ class MakeTurntableRender(object):
         self.data = data
         self.logging = cc_logging.cc_logger()
         self.top_node = maya_utils.get_asset_top_node()
+        self.cam = None
 
         self.hide_curves()
         self.snap_object_to_center()
-        self.set_object_pivot_and_rotations()
+        self.set_object_pivot()
         self.set_frame_range()
         self.create_render_camera()
+        self.set_object_rotations()
         self.build_three_point_rig()
         self.create_render()
 
@@ -68,7 +70,7 @@ class MakeTurntableRender(object):
         cmds.pointConstraint(loc, self.top_node)
         cmds.delete(loc)
 
-    def set_object_pivot_and_rotations(self):
+    def set_object_pivot(self):
         """
         Move the object to be on the base
         """
@@ -88,24 +90,33 @@ class MakeTurntableRender(object):
         """
         Set the start and end frame animation and time slider
         """
-        cmds.setKeyframe(self.top_node, v=0, t=OBJ_START, at='rotateY')
-        cmds.setKeyframe(self.top_node, v=360, t=OBJ_END + 1, at='rotateY')
-        cmds.playbackOptions(min=OBJ_START, ast=OBJ_START, max=CAM_END, aet=CAM_END)
+        cmds.playbackOptions(min=OBJ_START, ast=OBJ_START, max=OBJ_END, aet=OBJ_END)
 
     def create_render_camera(self):
         """
         Create the turntable of the asset
         """
-        cam, cam_shape = cmds.camera()
-        cmds.viewFit(cam_shape, all=True)
+        self.cam, cam_shape = cmds.camera()
         cmds.setAttr(f"{cam_shape}.panZoomEnabled", True)
         cmds.setAttr(f"{cam_shape}.renderPanZoom", True)
         cmds.setAttr(f"{cam_shape}.zoom", 1.2)
+        cmds.setAttr(f"{self.cam}.rotateX", -20)
+        cmds.viewFit(cam_shape, all=True)
 
-        camera_group = cmds.group(cam, n="camera_group")
-        cmds.xform(camera_group, pivots=(0, 0, 0), worldSpace=True)
-        cmds.setKeyframe(camera_group, v=0, t=CAM_START, at='rotateY')
-        cmds.setKeyframe(camera_group, v=360, t=CAM_END + 1, at='rotateY')
+    def set_object_rotations(self):
+        """
+        Rotate either the object or camera
+        """
+        if self.data["rotate_object"]:
+            self.logging.info("Rotating the object...")
+            cmds.setKeyframe(self.top_node, v=0, t=OBJ_START, at='rotateY')
+            cmds.setKeyframe(self.top_node, v=360, t=OBJ_END + 1, at='rotateY')
+        else:
+            self.logging.info("Rotating the camera around the object...")
+            camera_group = cmds.group(self.cam, n="camera_group")
+            cmds.xform(camera_group, pivots=(0, 0, 0), worldSpace=True)
+            cmds.setKeyframe(camera_group, v=0, t=OBJ_START, at='rotateY')
+            cmds.setKeyframe(camera_group, v=360, t=OBJ_END + 1, at='rotateY')
 
     def create_ai_light(self, node_type, name):
         """
@@ -189,7 +200,7 @@ class MakeTurntableRender(object):
         """
         render_data = {
             "start_frame": OBJ_START,
-            "end_frame": CAM_END,
+            "end_frame": OBJ_END,
             "name": self.data["asset_build_name"],
             "height": HEIGHT,
             "width": WIDTH,

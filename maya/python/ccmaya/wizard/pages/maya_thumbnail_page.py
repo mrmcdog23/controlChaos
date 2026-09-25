@@ -48,7 +48,6 @@ class MayaThumbnailPage(ThumbnailPage):
         Connect the signals to the widget
         """
         self.btn_capture_thumbnail.clicked.connect(self.capture_thumbnail)
-        self.chk_turntable.toggled.connect(self.enable_render_type)
 
     def enable_render_type(self, enable):
         """
@@ -87,14 +86,15 @@ class MayaThumbnailPage(ThumbnailPage):
         Store the thumbnail path in the wizard data
         """
         self.data["thumbnail_path"] = self.thumbnail_path
-        self.data["turntable"] = self.chk_turntable.isChecked()
-        if self.rbn_playblast.isChecked():
-            self.data["renderer"] = "mayaHardware2"
-        else:
-            self.data["renderer"] = "arnold"
         return True
 
     def isComplete(self):
         # type: () -> bool
         """ Is complete once the picture is taken """
         return self.created_thumbnail
+
+    def skipPage(self):
+        """
+        Skip page if publish has been set to False
+        """
+        return self.data.get("turntable", False)

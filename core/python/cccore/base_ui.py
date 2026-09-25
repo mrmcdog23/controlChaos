@@ -155,6 +155,8 @@ class Ui(object):
         """
         if not self.use_cc_ss:
             return
+        if os.environ.get("APP_NAME", str()) == "maya":
+            return
         self._cc_style_sheet = self.read_css(self.control_chaos_ss)
         if self.additional_stylesheet:
             self._cc_style_sheet += self.additional_stylesheet
