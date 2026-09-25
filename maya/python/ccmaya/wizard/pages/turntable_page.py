@@ -7,7 +7,7 @@ from ccgeneral.wizard.pages.base_page import BasePublishPage
 
 class TurntablePage(BasePublishPage):
     title = "Turntable Asset Page"
-    subtitle = "Make a turntable of the asset on publisht"
+    subtitle = "Make a turntable of the asset on publish"
 
     def __init__(self, parent=None):
         super().__init__(parent)
