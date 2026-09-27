@@ -13,7 +13,7 @@ import ccftrack.query as query
 class HouAssetLoader(asset_loader.AssetLoaderBase):
     use_cc_ss = False
     title = "Houdini Load Asset"
-    SUPPORTED_EXT = ["bgeo.sc", "hda", "usd", "abc", "fbx"]
+    supported_ext = ["bgeo.sc", "hda", "usd", "abc", "fbx"]
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -77,7 +77,7 @@ class HouAssetLoader(asset_loader.AssetLoaderBase):
 
         # list components in the asset version
         self.asset_name = self.ftver.asset_build_name
-        ext_tuple = tuple(self.SUPPORTED_EXT)
+        ext_tuple = tuple(self.supported_ext)
         component_paths = self.ftver.get_component_path_dict(ext_tuple)
         path_component = dict(zip(component_paths.values(), component_paths.keys()))
 

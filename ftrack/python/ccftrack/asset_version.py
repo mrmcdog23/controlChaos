@@ -182,7 +182,7 @@ class FtAssetVersion(FtBase):
     def cache_path(self):
         # type: () -> str
         """ Path of the cache component """
-        cache_path = self.get_component_path("Alembic")
+        cache_path = self.get_component_path("alembic")
         if not cache_path:
             cache_path = self.get_component_path("CachePath")
         return cache_path

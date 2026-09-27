@@ -7,7 +7,7 @@ from CCPySide import QtWidgets
 
 class MayaAssetLoader(asset_loader.AssetLoaderBase):
     title = "Maya Load Asset"
-    use_cc_ss = False
+    supported_ext = ["usd", "ma", "abc", "fbx"]
 
     def __init__(self, parent=None):
         self.rbn_reference = None
@@ -50,6 +50,7 @@ class MayaAssetLoader(asset_loader.AssetLoaderBase):
         """
         maya_files_dict = dict()
         for component_name, component_path in component_paths.items():
+            print (component_name, component_path)
             if component_path.endswith(".ma"):
                 maya_files_dict[component_name] = component_path
 

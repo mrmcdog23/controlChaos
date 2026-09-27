@@ -7,7 +7,7 @@ import ccunreal.asset.usd_asset_import as usd_asset_import
 
 class UnrealAssetLoader(asset_loader.AssetLoaderBase):
     title = "Unreal Load Asset"
-    SUPPORTED_EXT = [".fbx", ".usd"]
+    supported_ext = [".fbx", ".usd"]
 
     def __init__(self, parent):
         super().__init__(parent=parent)

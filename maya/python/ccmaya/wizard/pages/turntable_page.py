@@ -3,6 +3,7 @@ import maya.OpenMayaUI as OpenMayaUI
 import maya.OpenMaya as OpenMaya
 from CCPySide import QtWidgets
 from ccgeneral.wizard.pages.base_page import BasePublishPage
+import cccore.file_env.context as context
 
 
 class TurntablePage(BasePublishPage):
@@ -41,3 +42,9 @@ class TurntablePage(BasePublishPage):
             self.data["renderer"] = "arnold"
         self.data["rotate_object"] = self.rbn_object.isChecked()
         return True
+
+    def skipPage(self):
+        """
+        Skip page if it a camera being published
+        """
+        return context.Context().asset_type == "camera"

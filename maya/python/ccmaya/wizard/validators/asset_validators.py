@@ -11,7 +11,7 @@ class GeoGroupValidator(BaseValidator):
     """
     validator_type = 'Does "GEO" node exists'
     task_names = ["rigging", "modeling"]
-    ignore_types = ["Camera"]
+    ignore_types = ["camera"]
     is_autofixable = False
 
     def __init__(self, session, data):
@@ -44,7 +44,7 @@ class RigGroupValidator(BaseValidator):
     """
     validator_type = 'Are rig group names correct'
     task_names = ["rigging"]
-    ignore_types = ["Camera"]
+    ignore_types = ["camera"]
     is_autofixable = False
 
     def __init__(self, session, data):

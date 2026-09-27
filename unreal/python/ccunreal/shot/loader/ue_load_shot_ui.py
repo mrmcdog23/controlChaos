@@ -12,7 +12,7 @@ import ccgeneral.shot.load_shot_ui as load_shot_ui
 
 class UELoadShotUI(load_shot_ui.LoadShotUI):
     title = "Import Unreal Shot"
-    ignore_types = ["fbx"]
+    ignore_types = ["ma"]
 
     def __init__(self, parent):
         super().__init__(parent=parent)
@@ -63,6 +63,10 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
     @property
     def version_dir(self):
         return ue.Paths.combine([self.ls_dir, self.version_str])
+
+    def closeEvent(self, event):
+        for key, value in self.cmb_shot.get_data().items():
+            self.ui_settings.setValue(key, value)
 
     def import_files(self):
         """

@@ -102,13 +102,15 @@ def get_shot_namespaces():
         shot_assets_dict: Dict of published assets
     """
     shot_assets_list = list()
-    for geo_grp in cmds.ls("*:GEO"):
+    shot_assets = cmds.ls("*:GEO")
+    shot_assets.extend(cmds.ls("*:CAM"))
+
+    for geo_grp in shot_assets:
         is_referenced = cmds.referenceQuery(geo_grp, inr=True)
         if not is_referenced:
             continue
         namespace = geo_grp.split(":")[0]
         shot_assets_list.append(namespace)
-    shot_assets_list.extend(render_cameras())
     return shot_assets_list
 
 

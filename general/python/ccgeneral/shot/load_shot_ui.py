@@ -30,15 +30,6 @@ class LoadShotUI(base_ui.WidgetBase):
         self.populate_files()
         self.connect_signals()
 
-    def load_settings(self):
-        """
-        Load the settings to create the context
-        """
-        overrides = dict()
-        for key in ["sequence_name", "shot_name", "task_name"]:
-            overrides[key] = self.ui_settings.value(key)
-        self.ctx = context.Context(overrides=overrides)
-
     def create_layout(self):
         """
         Create the layout for the ui
@@ -79,8 +70,9 @@ class LoadShotUI(base_ui.WidgetBase):
         for component_name, component_path in self.ftver.component_to_path.items():
             if component_name == "metadata":
                 self.data = file_utils.read_file(component_path)
+                continue
 
-            if not component_path.endswith(tuple(self.ignore_types)):
+            if component_path.endswith(tuple(self.ignore_types)):
                 continue
 
             # get the icon path

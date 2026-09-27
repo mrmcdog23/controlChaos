@@ -10,7 +10,7 @@ from CCPySide import QtWidgets, QtCore
 class LoaderBase(base_ui.WindowBase):
     label_text = str()
     title = str()
-    SUPPORTED_EXT = list()
+    supported_ext = list()
 
     def __init__(self, parent=None, *args, **kwargs):
         super().__init__(parent)
@@ -146,7 +146,7 @@ class LoaderBase(base_ui.WindowBase):
 
         # list components
         self.tw_components_list.clear()
-        ext_tuple = tuple(self.SUPPORTED_EXT)
+        ext_tuple = tuple(self.supported_ext)
         component_paths = self.ftver.get_component_path_dict(ext_tuple)
         filtered_paths = self.filtered_component_paths(component_paths)
 

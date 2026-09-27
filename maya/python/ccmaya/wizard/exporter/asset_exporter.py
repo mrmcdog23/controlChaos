@@ -35,6 +35,7 @@ class AssetExporter(BaseExporter):
         """
         self.create_asset_version()
         self.tag_and_copy_asset_version()
+        self.save_master_file()
         self.create_alembic_component()
         self.create_usd_component()
         self.export_fbx_unreal_component()
@@ -48,6 +49,14 @@ class AssetExporter(BaseExporter):
         """
         maya_utils.load_plugins(["AbcExport"])
         cmds.file(self.data['wip_file_path'],  open=True, force=True)
+
+    def save_master_file(self):
+        """
+        Save the work in progress file as a component
+        """
+        component_dict = {"master_file_path": self.data['wip_file_path']}
+        self.ftver.add_component_dict(component_dict)
+
 
     @BaseExporter.add_to_percentage(10)
     def create_asset_version(self):
@@ -79,7 +88,7 @@ class AssetExporter(BaseExporter):
     def is_camera(self):
         # type: () -> str
         """ Is it a camera publish asset """
-        return self.data["asset_build_type_name"] == "Camera"
+        return self.data["asset_build_type_name"] == "camera"
 
     @BaseExporter.add_to_percentage(10)
     def tag_and_copy_asset_version(self):
@@ -119,7 +128,7 @@ class AssetExporter(BaseExporter):
         )
         self.log(f"Alembic Command: {abc_args}")
         cmds.AbcExport(j=abc_args, verbose=True)
-        component_dict = {"Alembic": abc_path}
+        component_dict = {"alembic": abc_path}
         self.ftver.add_component_dict(component_dict)
 
     @BaseExporter.add_to_percentage(10)
@@ -243,7 +252,7 @@ class AssetExporter(BaseExporter):
         """
         Create the turntable file
         """
-        if not self.data["turntable"]:
+        if not self.data.get("turntable"):
             self.log("Skipping turntable")
             return
         make_tt_inst = make_turntable.MakeTurntableRender(self.data)

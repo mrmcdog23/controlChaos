@@ -36,7 +36,7 @@ class SceneAsset(object):
     @property
     def export_grp(self):
         if self.is_camera:
-            return self.namespace
+            return self.cam_grp
         if self.geo_grp:
             return self.geo_grp
 
@@ -68,14 +68,14 @@ class SceneAsset(object):
     def cam_grp(self):
         # type: () -> str
         """ Get the root node to export the fullpath """
-        camera_tran = cmds.ls(self.namespace, type="transform")
+        camera_tran = cmds.ls(f"{self.namespace}:*", type="transform")
         if not camera_tran:
             return
 
         camera_shape = cmds.listRelatives(camera_tran[0], type="camera")
         if not camera_shape:
             return
-        return camera_shape[0]
+        return camera_tran[0]
 
     @property
     def root_joint(self):
