@@ -10,7 +10,7 @@ import cccore.file_env.context as context
 class MayaLoadShotUI(load_shot_ui.LoadShotUI):
     use_cc_ss = False
     title = "Import Maya Shot"
-    ignore_types = ["fbx", "abc"]
+    #ignore_types = ["fbx", "abc"]
 
     def __init__(self, parent):
         super().__init__(parent=parent)

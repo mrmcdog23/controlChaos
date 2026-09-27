@@ -166,6 +166,8 @@ class SceneAsset(object):
         Get the top node of the asset group
         """
         parent_node = cmds.listRelatives(self.export_grp, p=True)
-        if not parent_node or self.namespace not in parent_node:
+        if not parent_node:
+            return self.export_grp
+        if self.namespace not in parent_node:
             return parent_node
 
