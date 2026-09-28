@@ -68,12 +68,8 @@ class SceneAsset(object):
     def cam_grp(self):
         # type: () -> str
         """ Get the root node to export the fullpath """
-        camera_tran = cmds.ls(f"{self.namespace}:*", type="transform")
+        camera_tran = cmds.ls(f"{self.namespace}:CAM", type="transform")
         if not camera_tran:
-            return
-
-        camera_shape = cmds.listRelatives(camera_tran[0], type="camera")
-        if not camera_shape:
             return
         return camera_tran[0]
 

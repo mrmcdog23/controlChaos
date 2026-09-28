@@ -57,7 +57,6 @@ class AssetExporter(BaseExporter):
         component_dict = {"master_file_path": self.data['wip_file_path']}
         self.ftver.add_component_dict(component_dict)
 
-
     @BaseExporter.add_to_percentage(10)
     def create_asset_version(self):
         """
@@ -98,6 +97,7 @@ class AssetExporter(BaseExporter):
         """
         # add tag to the asset attribute
         maya_utils.add_ftrack_tag_to_asset(self.asset_version['id'])
+        cmds.file(save=True, type='mayaAscii')
 
     @BaseExporter.add_to_percentage(10)
     def create_alembic_component(self):
