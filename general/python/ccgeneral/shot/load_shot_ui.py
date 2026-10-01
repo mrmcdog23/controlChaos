@@ -15,6 +15,11 @@ class LoadShotUI(base_ui.WidgetBase):
     window_icon = "shot"
     control_chaos_ss = "../../css/ue_stylesheet.css"
     ignore_types = list()
+    widget_to_icon = {
+        "lbl_usd": "usd",
+        "lbl_fbx": "fbx",
+        "lbl_alembic": "abc"
+    }
 
     def __init__(self, parent):
         super().__init__(parent=parent)
@@ -24,6 +29,7 @@ class LoadShotUI(base_ui.WidgetBase):
         self.logger = cc_logging.cc_logger()
         self.ctx = None
         self.data = dict()
+        self.all_usd = str()
 
         self.load_settings()
         self.create_layout()
@@ -43,6 +49,28 @@ class LoadShotUI(base_ui.WidgetBase):
         """
         self.btn_import_files.clicked.connect(self.import_files)
         self.cmb_shot.cmb_version.currentIndexChanged.connect(self.populate_files)
+        self.rbn_all.group().buttonClicked.connect(self.filter_files)
+        self.chk_all_usd.clicked.connect(self.enable_all)
+
+    def enable_all(self, enable):
+        self.lw_import_files.setEnabled(not enable)
+
+    def filter_files(self, radio_button):
+        # type: (QtWidgets.QRadioButton) -> None
+        """
+        Show or hide the list widget item
+
+        Args:
+            radio_button: The clicked radio button
+        """
+        import_type = radio_button.text().lower()
+        for index in range(self.lw_import_files.count()):
+            item = self.lw_import_files.item(index)
+            if import_type == "all":
+                hide = False
+            else:
+                hide = not item.text().endswith(import_type)
+            item.setHidden(hide)
 
     def enable_btn(self):
         """
@@ -58,6 +86,7 @@ class LoadShotUI(base_ui.WidgetBase):
         """
         Update the version list based on the asset selection
         """
+        self.all_usd = str()
         self.lw_import_files.clear()
 
         # get the versions from the combo boxes
@@ -68,6 +97,8 @@ class LoadShotUI(base_ui.WidgetBase):
         asset_version = self.ftshot.get_asset_version_from_number(version_num)
         self.ftver.asset_version_id = asset_version["id"]
         for component_name, component_path in self.ftver.component_to_path.items():
+            file_name = os.path.basename(component_path)
+
             if component_name == "metadata":
                 self.data = file_utils.read_file(component_path)
                 continue
@@ -75,12 +106,16 @@ class LoadShotUI(base_ui.WidgetBase):
             if component_path.endswith(tuple(self.ignore_types)):
                 continue
 
+            if file_name.endswith(".usd") and "_all_" in file_name:
+                self.all_usd = component_path
+                continue
+
             # get the icon path
             icon_name = file_utils.get_extension(component_path)
             icon_path = self.get_icon_path(icon_name)
 
             # create list widget item
-            item = QtWidgets.QListWidgetItem(os.path.basename(component_path))
+            item = QtWidgets.QListWidgetItem(file_name)
             item.setCheckState(QtCore.Qt.Checked)
             item.setData(QtCore.Qt.UserRole, component_path)
             item.setIcon(QtGui.QIcon(icon_path))
@@ -93,6 +128,17 @@ class LoadShotUI(base_ui.WidgetBase):
         # set the ftrack widgets
         self.txt_created_by.setText(self.ftver.created_by)
         self.txt_comments_by.setText(self.ftver.comment)
+
+        # hide or show the usd checkobox and enable options
+        usd_all_file_found = bool(self.all_usd)
+        self.grp_import_all.setHidden(not usd_all_file_found)
+        if not usd_all_file_found:
+            enable_files = True
+        elif usd_all_file_found and self.chk_all_usd.isChecked():
+            enable_files = False
+        else:
+            enable_files = True
+        self.lw_import_files.setEnabled(enable_files)
 
     @property
     def start_frame(self):

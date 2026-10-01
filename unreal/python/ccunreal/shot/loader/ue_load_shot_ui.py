@@ -1,9 +1,9 @@
 """ Import shot to Unreal """
 import os
 import unreal as ue
-import cccore.utils.file_utils as file_utils
 import cccore.file_env.context as context
 import ccunreal.utils.unreal_utils as unreal_utils
+import ccunreal.shot.loader.import_all_usd as import_all_usd
 import ccunreal.shot.loader.ue_load_shot as ue_load_shot
 import ccunreal.shot.loader.wdg_import_shot as wdg_import_shot
 from CCPySide import QtWidgets, QtCore
@@ -72,17 +72,21 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
         """
         Import cameras into unreal
         """
-        level_path = self.wdg_ue_import_shot.level_path
-        ue_load_shot.UELoadShot(
-            self.import_files_list,
-            self.data,
-            level_path,
-            self.ls_path,
-            self.version_dir,
-            self.start_frame,
-            self.end_frame,
-            self.ftshot.fps
-        )
+        # hide or show the usd checkobox and enable options
+        if self.all_usd and self.chk_all_usd.isChecked():
+            import_all_usd.import_all_usd_as_stage(self.all_usd)
+        else:
+            level_path = self.wdg_ue_import_shot.level_path
+            ue_load_shot.UELoadShot(
+                self.import_files_list,
+                self.data,
+                level_path,
+                self.ls_path,
+                self.version_dir,
+                self.start_frame,
+                self.end_frame,
+                self.ftshot.fps
+            )
 
 
 def main():

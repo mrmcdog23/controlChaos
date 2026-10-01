@@ -88,11 +88,14 @@ class ShotExporter(BaseExporter):
         """
         self.abc_version_dir = self.ctx.alembic_file_path
         for namespace in self.all_namespaces:
-            usd_path = self.usd_export(namespace)
+            usd_path = self.usd_export(namespace=namespace)
             scene_asset_inst = scene_asset.SceneAsset(namespace)
             self.exported_files_to_data[usd_path] = scene_asset_inst.asset_data_dict
 
-    def usd_export(self, namespace):
+        # select all nodes and export all
+        self.usd_export(namespace="all", export_all=True)
+
+    def usd_export(self, namespace=None, export_all=False):
         # type: (str) -> str
         """
         Cache a usd file from the namespace
@@ -107,9 +110,16 @@ class ShotExporter(BaseExporter):
         self.ctx.use_suffix = namespace
         usd_path = self.ctx.usd_file_path
 
-        scene_asset_inst = scene_asset.SceneAsset(namespace)
-        cmds.select(scene_asset_inst.asset_top_node)
-        self.logger.info(f"Select the top node: {scene_asset_inst.asset_top_node}")
+        if not export_all:
+            scene_asset_inst = scene_asset.SceneAsset(namespace)
+            cmds.select(scene_asset_inst.asset_top_node)
+            self.logger.info(f"Select the top node: {scene_asset_inst.asset_top_node}")#
+        else:
+            cmds.select(cl=True)
+            for ns in self.all_namespaces:
+                scene_asset_inst = scene_asset.SceneAsset(ns)
+                cmds.select(scene_asset_inst.asset_top_node, add=True)
+                self.logger.info(f"Select the top node: {scene_asset_inst.asset_top_node}")  #
 
         cmds.mayaUSDExport(
             file=usd_path,
