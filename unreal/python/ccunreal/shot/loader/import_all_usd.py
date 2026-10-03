@@ -23,3 +23,6 @@ def import_all_usd_as_stage(usd_path):
         ue.LevelSequenceEditorBlueprintLibrary.open_level_sequence(sequence)
     else:
         print("No level sequence: the stage may have no animation/time samples.")
+
+    ue.LevelSequenceEditorBlueprintLibrary.set_lock_camera_cut_to_viewport(True)
+    ue.LevelSequenceEditorBlueprintLibrary.refresh_current_level_sequence()

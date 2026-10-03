@@ -161,6 +161,8 @@ class LoadShotUI(base_ui.WidgetBase):
             item = self.lw_import_files.item(index)
             if item.checkState() != QtCore.Qt.CheckState.Checked:
                 continue
+            if item.isHidden():
+                continue
             file_path = item.data(QtCore.Qt.UserRole)
             import_files.append(file_path)
         return import_files
