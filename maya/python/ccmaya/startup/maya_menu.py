@@ -26,6 +26,14 @@ def build_cc_menu():
                   command="import ccmaya.shot.loader.maya_load_shot as msl;msl.main()",
                   parent=shot_menu
                   )
+    cmds.menuItem(label="Export Animation",
+                  command="import ccmaya.shot.import_export.animation_exporter as aex;aex.main()",
+                  parent=shot_menu
+                  )
+    cmds.menuItem(label="Import Animation",
+                  command="import ccmaya.shot.import_export.animation_importer as aip;aip.main()",
+                  parent=shot_menu
+                  )
 
     # reload modules
     cmds.menuItem(divider=True, parent=cc_menu)
