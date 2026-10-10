@@ -524,7 +524,7 @@ class FtAssetVersion(FtBase):
     def master_component_path(self):
         # type: () -> str
         """ Get the Master file component """
-        return self.get_component_path("MasterFile")
+        return self.get_component_path("master_file_path")
 
     @property
     def fbx_component_path(self):
@@ -731,6 +731,33 @@ class FtAssetVersion(FtBase):
         return version_numbers
 
     @property
+    def version_text(self):
+        # type: () -> str
+        """
+        The version in text string with padding:
+        e.g. "v004"
+
+        Returns:
+            Version in string form  e.g. "v004"
+        """
+        return self.ver_text_from_ver_num(self.asset_version)
+
+    @staticmethod
+    def ver_text_from_ver_num(version):
+        # type: (dict) -> str
+        """
+        From the ftrack version convert to a padded number string
+
+        Args:
+            version: Version in ftrack form
+
+        Returns:
+            version_text: The padded version with v at start
+        """
+        version_num_padded = str(version['version']).zfill(3)
+        return version_num_padded
+
+    @property
     def as_dict(self):
         # type: () -> dict
         """
@@ -757,3 +784,4 @@ class FtAssetVersion(FtBase):
                 "version_num": self.version_num
             }
         return ctx_dict
+

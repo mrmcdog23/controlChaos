@@ -32,6 +32,7 @@ class Context(object):
         self.use_is_single_frame_sequence = None
         self.use_version = None
         self.use_task = None
+        self.use_username = None
         self.use_ingest_subfolder = None
         self.project_data = server_data.ProjectData()
         self.logger = cc_logging.cc_logger()
@@ -110,7 +111,7 @@ class Context(object):
     def username(self):
         # type: () -> str
         """ Get the current application name """
-        return self.get_value("username")
+        return self.use_username if self.use_username else self.get_value("username")
 
     @property
     def project_shots_dir(self):
@@ -292,6 +293,12 @@ class Context(object):
             if version_num == 200:
                 return None
         return file_path
+
+    @property
+    def save_file_path(self):
+        # type: () -> str
+        """ Get the save file path from data given"""
+        return file_utils.join_file_names(self.user_dir, self.new_filename)
 
     @property
     def ext(self):

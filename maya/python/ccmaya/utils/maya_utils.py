@@ -5,6 +5,7 @@ from typing import Optional, Any
 from CCPySide import QtWidgets, shiboken
 import cccore.utils.cc_logging as cc_logging
 import ccmaya.maya_constants as maya_constants
+import ccmaya.asset.scene_asset as scene_asset
 import cccore.utils.ui_utils as ui_utils
 import cccore.file_env.ctx_constants as ctx_constants
 
@@ -277,3 +278,49 @@ def get_scene_frame_range():
     start = int(cmds.playbackOptions(q=True, min=True))
     end = int(cmds.playbackOptions(q=True, max=True))
     return start, end
+
+
+def maya_messagebox(title, message, msg_type, buttons=None):
+    # type: (str, str, str, Optional[list[str]]) -> int
+    """
+    Create and display a QMessageBox
+
+    Args:
+        title: The tile of the message box
+        message: Message to display
+        msg_type: Type of message (warning, info or critical)
+        buttons: List of button to display
+
+    Returns:
+        response: The clicked button text
+    """
+    response = ui_utils.messagebox(
+        title,
+        message,
+        msg_type,
+        buttons=buttons,
+        parent=get_maya_main_window()
+    )
+    return response
+
+
+def get_scene_assets(session=None):
+    # type: (Any) -> dict
+    """
+    Get all shot assets that are ftrack related and referenced
+
+    Args:
+        session: Current ftrack session
+
+    Returns:
+        shot_assets_dict: Dict of published assets
+    """
+    scene_assets_dict = dict()
+    ftrack_attrs = cmds.ls("*:*." + maya_constants.FTRACK_ID)
+    for ftattr in ftrack_attrs:
+        namespace = ftattr.split(":")[0]
+        asset = scene_asset.SceneAsset(namespace=namespace, session=session)
+        if not session:
+            session = asset.ftver.session
+        scene_assets_dict[asset.namespace] = asset
+    return scene_assets_dict

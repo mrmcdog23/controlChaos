@@ -149,13 +149,17 @@ class Ui(object):
         """
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
 
+    @property
+    def is_maya(self):
+        return os.environ.get("APP_NAME", str()) == "maya"
+
     def load_cc_style_sheet(self):
         """
         Load the cc Animation style sheet on to the current ui
         """
         if not self.use_cc_ss:
             return
-        if os.environ.get("APP_NAME", str()) == "maya":
+        if self.is_maya:
             return
         self._cc_style_sheet = self.read_css(self.control_chaos_ss)
         if self.additional_stylesheet:
@@ -387,6 +391,7 @@ class Ui(object):
         for btn in self.findChildren(QtWidgets.QPushButton):
             if btn.property("btn_ss") is not None:
                 btn.setStyleSheet(btn_style_sheet)
+                print (btn.objectName())
 
     def save_previous_ui_settings(self):
         """
@@ -643,7 +648,11 @@ class ControlChaosHeader(WidgetBase):
         self.lbl_title.setText(title.upper())
 
         # set the style sheet
-        icon_dir_image_path = self.get_icon_path("control_chaos_logo_mid")
+        if self.is_maya:
+            header_name = "control_chaos_logo_transparent"
+        else:
+            header_name = "control_chaos_logo_mid"
+        icon_dir_image_path = self.get_icon_path(header_name)
         style_sheet = (
             f"background-image: url('{icon_dir_image_path}');"
             f"background-repeat: no-repeat;"

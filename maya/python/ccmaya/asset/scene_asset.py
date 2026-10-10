@@ -1,16 +1,31 @@
 import maya.cmds as cmds
 import ccmaya.maya_constants as maya_constants
 import cccore.utils.cc_logging as cc_logging
+import ccftrack.asset_version as asset_version
 
 
 class SceneAsset(object):
-    def __init__(self, namespace):
+    def __init__(self, namespace=None, session=None, ref_node=None):
         self.namespace = namespace
         self._geo_grp = str()
         self._cam_grp = str()
         self._env_grp = str()
         self._jnt_grp = str()
+        self._ref_node = ref_node
         self.logger = cc_logging.cc_logger()
+        self.ftver = asset_version.FtAssetVersion(session=session)
+        self.set_asset_version()
+
+    @property
+    def reference_node(self):
+        # type: () -> str
+        """ The asset reference node """
+        if not self._ref_node:
+            use_object = self.find_ftrack_id_attributes(self.namespace)
+            if not use_object:
+                use_object = cmds.ls(f"{self.namespace}:*")[0]
+            self._ref_node = cmds.referenceQuery(use_object, referenceNode=True)
+        return self._ref_node
 
     @property
     def is_camera(self):
@@ -143,6 +158,12 @@ class SceneAsset(object):
         return cmds.getAttr(ftrack_ids[0])
 
     @property
+    def node(self):
+        ftrack_attr = cmds.ls(f"{self.namespace}:*.ftrackId")
+        if ftrack_attr:
+            return ftrack_attr[0].split(".")[0]
+
+    @property
     def asset_data_dict(self):
         # type: () -> dict
         """ The asset dictionary """
@@ -167,3 +188,51 @@ class SceneAsset(object):
         if self.namespace not in parent_node:
             return parent_node
 
+    def set_asset_version(self):
+        """
+        Set the asset version id from the asset in the scene
+        """
+        if self.ftrack_id:
+            self.ftver.asset_version_id = self.ftrack_id
+        else:
+            av = self.ftver.asset_version_from_path(self.reference_path)
+            self.ftver.asset_version_id = av["id"]
+            self._asset_version = av
+
+    @property
+    def is_loaded(self):
+        # type: () -> bool
+        """ Is the reference loaded """
+        return cmds.referenceQuery(self.reference_node, isLoaded=True)
+
+    def toggle_load(self):
+        """ Toggle the reference load state """
+        if self.is_loaded:
+            cmds.file(self.reference_path, unloadReference=self.reference_node)
+        else:
+            cmds.file(self.reference_path, loadReference=self.reference_node)
+
+    def update_to_version(self, new_version):
+        # type: (Any) -> None
+        """
+        Update the asset to a new version
+
+        Args:
+            new_version: Version to update to
+        """
+        self.ftver.asset_version_id = new_version['id']
+        ref_path = self.ftver.master_component_path
+        cmds.file(ref_path, loadReference=self.reference_node)
+
+    def remove_reference(self):
+        """
+        Remove the asset from the scene. Remove foster
+        node that gets created after removal
+        """
+        prev_foster_nodes = cmds.ls(self.namespace + "*", type="fosterParent")
+        cmds.file(removeReference=True, referenceNode=self.reference_node, type='mayaAscii')
+        for foster_node in cmds.ls(self.namespace + "*", type="fosterParent"):
+            if foster_node not in prev_foster_nodes:
+                cmds.delete(foster_node)
+        if self.alembic_path:
+            cmds.file(self.alembic_path, removeReference=True)

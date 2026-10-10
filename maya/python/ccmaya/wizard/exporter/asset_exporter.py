@@ -1,6 +1,7 @@
 """ Asset publisher in maya """
 import os
 import sys
+import shutil
 import tempfile
 import maya.cmds as cmds
 import cccore.utils.file_utils as file_utils
@@ -54,7 +55,17 @@ class AssetExporter(BaseExporter):
         """
         Save the work in progress file as a component
         """
-        component_dict = {"master_file_path": self.data['wip_file_path']}
+        self.ctx.use_username = "publish"
+        master_file_path = self.ctx.save_file_path
+        file_utils.create_directories(os.path.dirname(master_file_path))
+
+        # copy the wip file to publish file
+        wip_file_path = self.data["wip_file_path"]
+        self.logger.info(f"Copying... {wip_file_path} to {master_file_path}")
+        shutil.copy(wip_file_path, master_file_path)
+
+        # add to the dictionary to be published
+        component_dict = {"master_file_path": master_file_path}
         self.ftver.add_component_dict(component_dict)
 
     @BaseExporter.add_to_percentage(10)
