@@ -1035,7 +1035,7 @@ class FtBase(object):
         self.logger.info(f"Created component {component}")
         self.commit()
 
-    def get_asset_version_from_number(self, version_number):
+    def get_asset_version_from_number(self, version_number, category=None):
         # type: (str) -> ftrack_api.entity.asset_version
         """
         From a number get the asset version of the current task
@@ -1049,6 +1049,8 @@ class FtBase(object):
         task_id = self.task['id']
         query = (f'AssetVersion where task_id is "{task_id}" '
                  f'and version is {version_number}')
+        if category:
+            query += f' and asset.type.name is "{category}"'
         asset_version = self.session.query(query).one()
         return asset_version
 

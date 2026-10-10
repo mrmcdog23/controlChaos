@@ -42,22 +42,6 @@ class MayaAssetLoader(asset_loader.AssetLoaderBase):
         text = "Reference" if ref_checked else "Import"
         self.btn_load_asset.setText(f"{text} Asset")
 
-    @staticmethod
-    def filtered_component_paths(component_paths):
-        # type: (dict) -> dict
-        """
-        Filter the paths down to the ones to display
-        """
-        maya_files_dict = dict()
-        for component_name, component_path in component_paths.items():
-            print (component_name, component_path)
-            if component_path.endswith(".ma"):
-                maya_files_dict[component_name] = component_path
-
-        if maya_files_dict:
-            return maya_files_dict
-        return component_paths
-
     def load_selected_version(self):
         """
         Load the alembic asset

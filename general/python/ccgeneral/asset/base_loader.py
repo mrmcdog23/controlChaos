@@ -148,6 +148,7 @@ class LoaderBase(base_ui.WindowBase):
         self.tw_components_list.clear()
         ext_tuple = tuple(self.supported_ext)
         component_paths = self.ftver.get_component_path_dict(ext_tuple)
+        print (component_paths)
         filtered_paths = self.filtered_component_paths(component_paths)
 
         for component_path in list(filtered_paths.values()):

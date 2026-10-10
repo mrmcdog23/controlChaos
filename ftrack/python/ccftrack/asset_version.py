@@ -188,6 +188,12 @@ class FtAssetVersion(FtBase):
         return cache_path
 
     @property
+    def fbx_component_path(self):
+        # type: () -> str
+        """ Path of the fbx component """
+        return self.get_component_path("FBX")
+
+    @property
     def hda_path(self):
         # type: () -> str
         """ Path of the hda component """

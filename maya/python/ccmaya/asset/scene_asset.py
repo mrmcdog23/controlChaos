@@ -171,7 +171,8 @@ class SceneAsset(object):
             "is_camera": self.is_camera,
             "is_skeleton_mesh": self.is_skeleton_mesh,
             "namespace": self.namespace,
-            "asset_fbx_path": self.reference_path,
+            "reference_path": self.reference_path,
+            "asset_fbx_path": self.asset_fbx_path,
             "ftrack_id": self.ftrack_id
         }
         return file_data
@@ -236,3 +237,9 @@ class SceneAsset(object):
                 cmds.delete(foster_node)
         if self.alembic_path:
             cmds.file(self.alembic_path, removeReference=True)
+
+    @property
+    def asset_fbx_path(self):
+        # type: () -> str
+        """ Path of the fbx component """
+        return self.ftver.fbx_component_path

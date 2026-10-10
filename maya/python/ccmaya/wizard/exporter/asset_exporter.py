@@ -158,7 +158,7 @@ class AssetExporter(BaseExporter):
         fbx_asset_path = self.ctx.fbx_file_path
         self.ftver.add_component_dict({"FBX": fbx_asset_path})
         self.log(f"Export FBX path: {fbx_asset_path}")
-        fbx_asset_export.FbxAssetExport(fbx_asset_path)
+        fbx_asset_export.FbxAssetExport(fbx_asset_path, keep_constraints=True)
 
     @BaseExporter.add_to_percentage(10)
     def create_usd_component(self):

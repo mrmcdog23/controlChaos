@@ -170,6 +170,7 @@ class UELoadShot(object):
         if not actor:
             actor = api_wrap.spawn_actor_from_object(skeleton)
             actor.set_actor_label(asset_key)
+            ue.log_warning(f"Spawning actor to level: {skeleton}")
 
         # find the binding and use it to find the animation section
         actor_binding = sequencer_utils.find_binding_by_display_name(asset_key, self.ls)
@@ -205,6 +206,7 @@ class UELoadShot(object):
         """
         level_actors = ue.EditorLevelLibrary.get_all_level_actors()
         for actor in level_actors:
+            ue.log_warning(f"{actor.get_actor_label()} ... {actor_label}")
             if actor.get_actor_label() == actor_label:
                 return actor
 

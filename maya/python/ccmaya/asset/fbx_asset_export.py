@@ -12,13 +12,14 @@ class FbxAssetExport(object):
     """
     Export fbx asset to the given path
     """
-    def __init__(self, fbx_asset_path):
+    def __init__(self, fbx_asset_path, keep_constraints=False):
         # type: (str) -> None
         """
         Args:
             fbx_asset_path: Path to save asset to
         """
         self.fbx_asset_path = fbx_asset_path
+        self.keep_constraints = keep_constraints
         self.logger = cc_logging.cc_logger()
         self.export_asset()
 
@@ -64,7 +65,7 @@ class FbxAssetExport(object):
         pm.mel.FBXExportLights(v=True)
 
         # constraints
-        pm.mel.FBXExportConstraints(v=False)
+        pm.mel.FBXExportConstraints(v=self.keep_constraints)
         pm.mel.FBXExportSkeletonDefinitions(v=False)
 
         # deformed models

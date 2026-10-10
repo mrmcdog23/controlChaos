@@ -94,7 +94,7 @@ class LoadShotUI(base_ui.WidgetBase):
         if not version_num:
             return
 
-        asset_version = self.ftshot.get_asset_version_from_number(version_num)
+        asset_version = self.ftshot.get_asset_version_from_number(version_num, category="Scene")
         self.ftver.asset_version_id = asset_version["id"]
         for component_name, component_path in self.ftver.component_to_path.items():
             file_name = os.path.basename(component_path)
