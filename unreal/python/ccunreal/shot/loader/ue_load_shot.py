@@ -55,6 +55,7 @@ class UELoadShot(object):
         self.create_ls()
         self.open_sequence()
         self.animation_import()
+        self.set_camera_settings()
 
     def create_level(self):
         """
@@ -206,7 +207,6 @@ class UELoadShot(object):
         """
         level_actors = ue.EditorLevelLibrary.get_all_level_actors()
         for actor in level_actors:
-            ue.log_warning(f"{actor.get_actor_label()} ... {actor_label}")
             if actor.get_actor_label() == actor_label:
                 return actor
 
@@ -257,4 +257,17 @@ class UELoadShot(object):
         static_mesh = asset_importer.static_mesh
         ue.log_warning(f"Static mesh path: {static_mesh}")
 
-        #api_wrap.spawn_actor_from_object(static_mesh)
+    def set_camera_settings(self):
+        """
+        set the focus settings on the camera method
+        """
+        ls = ue.LevelSequenceEditorBlueprintLibrary.get_current_level_sequence()
+        binding_and_actor = sequencer_utils.find_binding_by_actor_class(ue.CineCameraActor, ls)
+        if not binding_and_actor:
+            ue.log_warning("No camera actor or binding found")
+            return
+
+        camera_actor = binding_and_actor[1]
+        comp = camera_actor.get_cine_camera_component()
+        focus = comp.get_editor_property("focus_settings")
+        focus.focus_method = ue.CameraFocusMethod.DISABLE

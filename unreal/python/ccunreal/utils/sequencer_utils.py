@@ -49,7 +49,7 @@ def find_binding_by_actor_class(actor_class, sequence):
         for bound_actor in bound_actors:
             # if there is an actor class and it matches current actor
             if actor_class and isinstance(bound_actor, actor_class):
-                return binding
+                return binding, bound_actor
 
 
 def find_sequence_actor(sequence, actor):

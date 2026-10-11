@@ -391,7 +391,6 @@ class Ui(object):
         for btn in self.findChildren(QtWidgets.QPushButton):
             if btn.property("btn_ss") is not None:
                 btn.setStyleSheet(btn_style_sheet)
-                print (btn.objectName())
 
     def save_previous_ui_settings(self):
         """
