@@ -335,8 +335,12 @@ def get_tag_values(asset_path):
 def get_metadata_tag_values(asset):
     # type: (ue.Object) -> dict
     """ Get the metadata tag values """
+    metadata_readable_dict = dict()
     subsys = _get_editor_asset_subsystem()
-    return subsys.get_metadata_tag_values(asset)
+    metadata_dict = subsys.get_metadata_tag_values(asset)
+    for key_name, value in metadata_dict.items():
+        metadata_readable_dict[str(key_name)] = value
+    return metadata_readable_dict
 
 
 def delete_asset(asset_path):

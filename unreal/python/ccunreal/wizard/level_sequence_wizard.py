@@ -2,7 +2,9 @@
 from typing import Any
 import unreal as ue
 import ccunreal.utils.unreal_utils as unreal_utils
+import ccunreal.utils.api_wrap as api_wrap
 import ccgeneral.wizard.base_wizard as base_wizard
+import cccore.file_env.context as context
 from ccgeneral.wizard.pages.complete_page import CompletePage
 from ccgeneral.wizard.pages.context_page import ShotContextPage
 from ccgeneral.wizard.pages.progress_page import ProgressPage
@@ -15,12 +17,15 @@ class LevelSequenceWizard(base_wizard.BaseWizard):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.exporter = level_sequence_exporter.LevelSequenceExporter()
-        self.ls_path = unreal_utils.current_ls_path()
-        self.map_path = unreal_utils.current_map_path()
-        self.ctx = unreal_utils.get_context_from_path(self.ls_path)
+
+        ls_path = unreal_utils.current_ls_path()
+        ls = ue.load_asset(ls_path)
+        metadata_dict = api_wrap.get_metadata_tag_values(ls)
+
+        self.ctx = context.Context(overrides=metadata_dict)
         self.data["local"] = True
-        self.data["level_sequence_paths"] = [self.ls_path]
-        self.data["map_path"] = self.map_path
+        self.data["ls_path"] = ls_path
+        self.data["map_path"] = unreal_utils.current_map_path()
 
     @property
     def wizard_pages(self):

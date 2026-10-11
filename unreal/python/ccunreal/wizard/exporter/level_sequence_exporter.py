@@ -1,4 +1,5 @@
 """ Export level sequence actors as fbx files """
+import os
 import unreal as ue
 #import cccore.folder.folder_creator as folder_creator
 import ccftrack.publish as publish
@@ -27,20 +28,40 @@ class LevelSequenceExporter(BaseExporter):
         Loop through the level sequence paths and
         """
         self.log("Exporting level sequences...")
-        level_sequence_paths = self.data["level_sequence_paths"]
-        map_path = self.data["map_path"]
-        self.map = ue.load_asset(map_path)
+        self.map = ue.load_asset(self.data["map_path"])
+        self.ls = ue.load_asset(self.data["ls_path"])
 
         # load each the level sequence and export
-        for ls_path in level_sequence_paths:
-            self.ls = ue.load_asset(ls_path)
-            self.set_export_context()
-            self.create_shot_folder()
-            self.export_sequence_level()
-            self.save_scene_metadata()
-            self.publish_fbx_files()
-            self.render_movie_queue()
+        self.set_export_context()
+        #self.create_shot_folder()
+        self.export_sequence_level()
+        #self.save_scene_metadata()
+        self.publish_fbx_files()
+        self.render_movie_queue()
         self.finish_exporter_process()
+
+    def set_export_context(self):
+        # type: () -> unreal_context.UnrealContext
+        """
+        Fron the level sequence path get an instance of
+        the context class to export the fbx paths
+
+        Returns:
+            ue_ctx: The level sequence context instance
+        """
+        self.output_name = self.ls.get_name()
+
+        # create overrides to get the unreal context
+        overrides = self.data.copy()
+        overrides["aov"] = "main"
+        overrides["ext"] = "fbx"
+        overrides["version"] = "1"
+
+        # set the next version for the exports
+        self.ctx = unreal_context.UnrealContext(overrides=overrides)
+        self.next_version = self.ftquery.next_version_from_ctx(self.ctx)
+        self.ctx.use_version = self.next_version
+        #self.data["version_num"] = use_version
 
     @BaseExporter.add_to_percentage(10)
     def export_sequence_level(self):
@@ -51,17 +72,21 @@ class LevelSequenceExporter(BaseExporter):
         bindings = self.ls.get_bindings()
         for binding in bindings:
             sequence_actor = self.get_level_sequence_actor(binding)
+            if not sequence_actor:
+                ue.log_warning(f"No binding found for binding {binding.get_display_name()}")
+                continue
 
-            # skip the camera component as its not needed
+            # skip the camera component as it's not needed
             if isinstance(sequence_actor, ue.CineCameraComponent):
                 ue.log_warning("Skipping ue.CineCameraComponent")
                 continue
 
             # get the fbx export path
             binding_name = binding.get_name()
-            self.ctx.use_aov = binding_name
-            self.ctx.use_subfolder = "cache"
-            fbx_path = self.ctx.win_sequence_path
+
+            self.ctx.use_suffix = binding_name
+            fbx_path = self.ctx.fbx_file_path
+            file_utils.create_directories(os.path.dirname(fbx_path))
 
             # export the fbx file to disk
             sequencer_utils.export_fbx_file(fbx_path, self.map, self.ls, [binding])
@@ -81,33 +106,6 @@ class LevelSequenceExporter(BaseExporter):
             self.scene_data[binding_name] = namespace_info
             self.additional_components[binding_name] = fbx_path
         self.data["additional_components"] = self.additional_components
-
-    def set_export_context(self):
-        # type: () -> unreal_context.UnrealContext
-        """
-        Fron the level sequence path get an instance of
-        the context class to export the fbx paths
-
-        Returns:
-            ue_ctx: The level sequence context instance
-        """
-        self.output_name = self.ls.get_name()
-
-        # create the initial context from the level sequence path
-        ls_path = self.ls.get_path_name()
-        ctx = unreal_utils.get_context_from_path(ls_path)
-
-        # create overrides to get the unreal context
-        overrides = ctx.as_dict().copy()
-        overrides["aov"] = "main"
-        overrides["ext"] = "fbx"
-        overrides["version"] = 1
-
-        # set the next version for the exports
-        self.ctx = unreal_context.UnrealContext(overrides=overrides)
-        use_version = self.ctx.next_sequence_version
-        self.ctx.use_version = use_version
-        self.data["version_num"] = use_version
 
     def create_shot_folder(self):
         """
@@ -148,9 +146,11 @@ class LevelSequenceExporter(BaseExporter):
         Returns:
             The level sequence actor
         """
+        ue.log_warning(f"binding....{binding}")
         binding_id = self.ls.get_portable_binding_id(self.ls, binding)
         bound_actors = ue.LevelSequenceEditorBlueprintLibrary.get_bound_objects(binding_id)
-        return bound_actors[0]
+        if bound_actors:
+            return bound_actors[0]
 
     def get_level_sequence_actor_ftrack_id(self, binding):
         # type: (ue.MovieSceneBindingProxy) -> str
