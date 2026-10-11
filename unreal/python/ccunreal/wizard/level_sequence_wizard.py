@@ -18,7 +18,6 @@ class LevelSequenceWizard(base_wizard.BaseWizard):
         self.ls_path = unreal_utils.current_ls_path()
         self.map_path = unreal_utils.current_map_path()
         self.ctx = unreal_utils.get_context_from_path(self.ls_path)
-        print (self.ctx.as_dict)
         self.data["local"] = True
         self.data["level_sequence_paths"] = [self.ls_path]
         self.data["map_path"] = self.map_path
