@@ -70,7 +70,7 @@ class BaseAssetImport(object):
         Add metadata to the asset
         """
         asset_data = self.ftver.as_dict
-        unreal_utils.apply_metadata(self._skeleton_mesh, asset_data)
+        unreal_utils.apply_metadata(asset_data, self._skeleton_mesh)
 
     def save_asset(self):
         """

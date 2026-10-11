@@ -173,12 +173,6 @@ class FtAssetVersion(FtBase):
         return self.metadata.get(SCENE_ASSETS, dict())
 
     @property
-    def locators(self):
-        # type: () -> list[str]
-        """ Get the locators dictionary """
-        return self.metadata.get(core_constants.LOCATOR_COMPONENT, list())
-
-    @property
     def cache_path(self):
         # type: () -> str
         """ Path of the cache component """
@@ -776,7 +770,7 @@ class FtAssetVersion(FtBase):
             ctx_dict = {
                 "entity": ctx_constants.ASSET,
                 "asset_build_type_name": self.asset_build_type_name,
-                "asset_name": self.asset_name,
+                "asset_name": self.asset_build_name,
                 "task_name": self.task_name,
                 "version_num": self.version_num
             }
@@ -790,4 +784,3 @@ class FtAssetVersion(FtBase):
                 "version_num": self.version_num
             }
         return ctx_dict
-
