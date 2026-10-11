@@ -4,7 +4,7 @@ import unreal as ue
 import ccunreal.utils.unreal_utils as unreal_utils
 import ccgeneral.wizard.base_wizard as base_wizard
 from ccgeneral.wizard.pages.complete_page import CompletePage
-from ccgeneral.wizard.pages.context_page import ShotContextPage, AssetContextPage
+from ccgeneral.wizard.pages.context_page import ShotContextPage
 from ccgeneral.wizard.pages.progress_page import ProgressPage
 import ccunreal.wizard.exporter.level_sequence_exporter as level_sequence_exporter
 
@@ -18,12 +18,10 @@ class LevelSequenceWizard(base_wizard.BaseWizard):
         self.ls_path = unreal_utils.current_ls_path()
         self.map_path = unreal_utils.current_map_path()
         self.ctx = unreal_utils.get_context_from_path(self.ls_path)
-
+        print (self.ctx.as_dict)
         self.data["local"] = True
         self.data["level_sequence_paths"] = [self.ls_path]
         self.data["map_path"] = self.map_path
-        self.data["task_name"] = "previz"
-        self.data["use_ffmpeg"] = True
 
     @property
     def wizard_pages(self):
@@ -31,11 +29,6 @@ class LevelSequenceWizard(base_wizard.BaseWizard):
         """ Add all the pages to the publishing wizard """
         pages = [ShotContextPage, ProgressPage, CompletePage]
         return pages
-
-    @staticmethod
-    def wip_file_path():
-        """ The current maya file path """
-        return str()
 
 
 def main():

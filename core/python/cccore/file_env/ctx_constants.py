@@ -22,7 +22,8 @@ ENTITY_DICT = {ASSET: ASSET_ORDER, SEQUENCE: SHOT_ORDER}
 APP_FILE_SUBFOLDER = {
     "maya": "scenes",
     "nuke": "scripts",
-    "houdini": "hip"
+    "houdini": "hip",
+    "unreal": "project"
 }
 
 SHOT_KEYS = [

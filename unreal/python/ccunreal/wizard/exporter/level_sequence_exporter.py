@@ -99,7 +99,6 @@ class LevelSequenceExporter(BaseExporter):
 
         # create overrides to get the unreal context
         overrides = ctx.as_dict().copy()
-        overrides["task_name"] = "previz"
         overrides["aov"] = "main"
         overrides["ext"] = "fbx"
         overrides["version"] = 1

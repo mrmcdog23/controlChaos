@@ -299,32 +299,15 @@ def context_dict_from_path(asset_path):
     """
     # set the root of the project
     path_split = asset_path.split("/")
-    if "Build" in asset_path:
-        asset_build_name = path_split[3]
-        prefix = asset_build_name[:2]
-        inv_map = {v: k for k, v in core_constants.BUILD_MAPPINGS.items()}
-        asset_build_type_name = inv_map[prefix]
-
-        context_dict = {
-            "entity": "build",
-            "asset_build_type_name": asset_build_type_name,
-            "asset_build_name": path_split[3],
-            "task_name": path_split[4]
-        }
-        # get the version of the shot
-        version_padded = path_split[5]
-        context_dict["version_padded"] = version_padded
-        context_dict["version_num"] = int(version_padded)
-
+    print (path_split)
+    context_dict = {"entity": "shot", "task_name": "previz"}
+    if len(path_split) == 7:
+        context_dict["episode_name"] = path_split[3]
+        context_dict["sequence_name"] = path_split[4]
+        context_dict["shot_name"] = path_split[5]
     else:
-        context_dict = {"entity": "shot", "task_name": "previz"}
-        if len(path_split) == 7:
-            context_dict["episode_name"] = path_split[3]
-            context_dict["sequence_name"] = path_split[4]
-            context_dict["shot_name"] = path_split[5]
-        else:
-            context_dict["sequence_name"] = path_split[3]
-            context_dict["shot_name"] = path_split[4]
+        context_dict["sequence_name"] = path_split[3]
+        context_dict["shot_name"] = path_split[4]
     return context_dict
 
 
@@ -343,3 +326,38 @@ def get_context_from_path(asset_path):
     overrides = context_dict_from_path(asset_path)
     ctx = unreal_context.UnrealContext(overrides=overrides)
     return ctx
+
+
+def apply_metadata(metadata_dict, asset, save=False):
+    # type: (dict, ue.Object, bool) -> None
+    """
+    Using the asset version class and is values
+
+    Args:
+        metadata_dict: No8 data to add
+        asset: The unreal asset to add metadata to
+        save: If True save the asset
+    """
+    for key, value in metadata_dict.items():
+        add_metadata_value(asset, key, value)
+    if save:
+        api_wrap.save_asset(asset.get_full_name())
+
+
+def add_metadata_value(asset, key, value, add_no_prefix=True):
+    # type: (ue.Object, str, str, Optional[bool]) -> None
+    """
+    Add the metadata values to the asset
+
+    Args:
+        asset: The unreal asset to add metadata to
+        key: Dictionary context key to add
+        value: Value of the context
+        add_no_prefix: Add a prefix to the tag
+    """
+    if not add_no_prefix:
+        api_wrap.set_metadata_tag(asset, key, str(value))
+    else:
+        no8_key = f"{unreal_constants.NO8_METADATA_PREFIX}.{key}"
+        api_wrap.set_metadata_tag(asset, no8_key, str(value))
+    api_wrap.save_asset(asset.get_full_name())
