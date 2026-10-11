@@ -29,11 +29,7 @@ class LevelSequenceWizard(base_wizard.BaseWizard):
     def wizard_pages(self):
         # type: () -> list[Any]
         """ Add all the pages to the publishing wizard """
-        if self.ctx.is_build:
-            context_page = AssetContextPage
-        else:
-            context_page = ShotContextPage
-        pages = [context_page, ProgressPage, CompletePage]
+        pages = [ShotContextPage, ProgressPage, CompletePage]
         return pages
 
     @staticmethod

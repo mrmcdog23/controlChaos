@@ -4,6 +4,7 @@ import unreal as ue
 from CCPySide import QtWidgets, QUiLoader
 from typing import Optional
 import ccunreal.utils.api_wrap as api_wrap
+import ccunreal.utils.unreal_context as unreal_context
 
 
 def launch_unreal_win(win_class):
@@ -269,3 +270,76 @@ def find_asset_of_type(directory, find_asset_type, assets_before=None):
 
     if all_assets_of_type:
         return all_assets_of_type[0]
+
+
+def current_map_path():
+    # type: () -> str
+    """ Get the current open map path """
+    return api_wrap.get_editor_world().get_path_name()
+
+
+def current_ls_path():
+    # type: () -> Optional[str]
+    """ Get the current open level sequence path """
+    current_sequence = api_wrap.get_current_level_sequence()
+    if current_sequence:
+        return current_sequence.get_path_name()
+
+
+def context_dict_from_path(asset_path):
+    # type: (str) -> dict
+    """
+    From a file path work out the context dictionary
+
+    Args:
+        asset_path: Path of the file to work out
+
+    Returns:
+        context_dict: Dictionary of the context
+    """
+    # set the root of the project
+    path_split = asset_path.split("/")
+    if "Build" in asset_path:
+        asset_build_name = path_split[3]
+        prefix = asset_build_name[:2]
+        inv_map = {v: k for k, v in core_constants.BUILD_MAPPINGS.items()}
+        asset_build_type_name = inv_map[prefix]
+
+        context_dict = {
+            "entity": "build",
+            "asset_build_type_name": asset_build_type_name,
+            "asset_build_name": path_split[3],
+            "task_name": path_split[4]
+        }
+        # get the version of the shot
+        version_padded = path_split[5]
+        context_dict["version_padded"] = version_padded
+        context_dict["version_num"] = int(version_padded)
+
+    else:
+        context_dict = {"entity": "shot", "task_name": "previz"}
+        if len(path_split) == 7:
+            context_dict["episode_name"] = path_split[3]
+            context_dict["sequence_name"] = path_split[4]
+            context_dict["shot_name"] = path_split[5]
+        else:
+            context_dict["sequence_name"] = path_split[3]
+            context_dict["shot_name"] = path_split[4]
+    return context_dict
+
+
+def get_context_from_path(asset_path):
+    # type: (str) -> unreal_context.UnrealContext
+    """
+    From the level sequence path get the shot context
+    class by reading the metadata values
+
+    Args:
+        asset_path: Asset sequence path
+
+    Returns:
+        ctx: Set context class
+    """
+    overrides = context_dict_from_path(asset_path)
+    ctx = unreal_context.UnrealContext(overrides=overrides)
+    return ctx

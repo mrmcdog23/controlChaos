@@ -1,14 +1,14 @@
 """ Export level sequence actors as fbx files """
 import unreal as ue
-import no8core.folder.folder_creator as folder_creator
-import no8ftrack.publish as publish
-import no8unreal.ue_no8 as ue_no8
-import no8core.utils.file_utils as file_utils
-import no8unreal.utils.unreal_utils as unreal_utils
-import no8unreal.utils.sequencer_utils as sequencer_utils
-import no8unreal.unreal_context as unreal_context
-import no8unreal.render.movie_render_queue as movie_render_queue
-from ccgeneral.exporter.base_exporter import BaseExporter
+#import cccore.folder.folder_creator as folder_creator
+import ccftrack.publish as publish
+#import ccunreal.ue_cc as ue_cc
+import cccore.utils.file_utils as file_utils
+import ccunreal.utils.unreal_utils as unreal_utils
+import ccunreal.utils.sequencer_utils as sequencer_utils
+import ccunreal.utils.unreal_context as unreal_context
+#import ccunreal.render.movie_render_queue as movie_render_queue
+from ccgeneral.wizard.exporter.base_exporter import BaseExporter
 
 
 class LevelSequenceExporter(BaseExporter):
@@ -76,7 +76,7 @@ class LevelSequenceExporter(BaseExporter):
             elif isinstance(sequence_actor, ue.SkeletalMeshActor):
                 ftrack_id = self.get_level_sequence_actor_ftrack_id(binding)
                 namespace_info["ftrack_id"] = ftrack_id
-                ue.log_warning(f"No8 ftrack asset version: {ftrack_id}")
+                ue.log_warning(f"cc ftrack asset version: {ftrack_id}")
 
             self.scene_data[binding_name] = namespace_info
             self.additional_components[binding_name] = fbx_path
@@ -169,7 +169,7 @@ class LevelSequenceExporter(BaseExporter):
             self.log(f"Not FTrack id found on {actor}")
             return str()
         skeletal_mesh_asset = actor[0].skeletal_mesh_component.skeletal_mesh
-        ftrack_id = ue_no8.get_ftrack_id(skeletal_mesh_asset.get_path_name())
+        ftrack_id = ue_cc.get_ftrack_id(skeletal_mesh_asset.get_path_name())
         self.log(f"FTrack id {ftrack_id}")
         return ftrack_id
 

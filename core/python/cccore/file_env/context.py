@@ -825,7 +825,7 @@ class Context(object):
         # type: () -> str
         """ Work out what the next wip file path will be """
         self.overrides["wip_or_pub"] = "wip"
-        return self.next_no8_save_path(self.wip_dir)
+        return self.next_cc_save_path(self.wip_dir)
 
     def next_pub_save_path(self):
         # type: () -> str
@@ -853,7 +853,7 @@ class Context(object):
 
         return filename
 
-    def next_no8_save_path(self, save_dir):
+    def next_cc_save_path(self, save_dir):
         # type: (str) -> Optional[str]
         """
         Get the next file path of the wip file

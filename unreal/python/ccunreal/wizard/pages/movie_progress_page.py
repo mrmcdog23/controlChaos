@@ -1,7 +1,7 @@
 """ Create a movie render """
 from ccgeneral.wizard.pages.progress_page import ProgressPage
-import no8unreal.render.movie_render_queue as mrq
-import no8core.utils.file_utils as file_utils
+import ccunreal.render.movie_render_queue as mrq
+import cccore.utils.file_utils as file_utils
 
 
 class MovieProgressPage(ProgressPage):
