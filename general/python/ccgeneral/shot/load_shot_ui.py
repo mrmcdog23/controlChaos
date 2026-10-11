@@ -110,6 +110,9 @@ class LoadShotUI(base_ui.WidgetBase):
                 self.all_usd = component_path
                 continue
 
+            # shot asset version id
+            self.data["shot_meta_data"] = self.cmb_shot.get_data()
+
             # get the icon path
             icon_name = file_utils.get_extension(component_path)
             icon_path = self.get_icon_path(icon_name)

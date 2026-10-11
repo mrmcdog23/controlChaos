@@ -328,7 +328,7 @@ def get_context_from_path(asset_path):
     return ctx
 
 
-def apply_metadata(metadata_dict, asset, save=False):
+def apply_metadata(metadata_dict, asset, save=True):
     # type: (dict, ue.Object, bool) -> None
     """
     Using the asset version class and is values
@@ -339,25 +339,6 @@ def apply_metadata(metadata_dict, asset, save=False):
         save: If True save the asset
     """
     for key, value in metadata_dict.items():
-        add_metadata_value(asset, key, value)
+        api_wrap.set_metadata_tag(asset, key, str(value))
     if save:
         api_wrap.save_asset(asset.get_full_name())
-
-
-def add_metadata_value(asset, key, value, add_no_prefix=True):
-    # type: (ue.Object, str, str, Optional[bool]) -> None
-    """
-    Add the metadata values to the asset
-
-    Args:
-        asset: The unreal asset to add metadata to
-        key: Dictionary context key to add
-        value: Value of the context
-        add_no_prefix: Add a prefix to the tag
-    """
-    if not add_no_prefix:
-        api_wrap.set_metadata_tag(asset, key, str(value))
-    else:
-        no8_key = f"{unreal_constants.NO8_METADATA_PREFIX}.{key}"
-        api_wrap.set_metadata_tag(asset, no8_key, str(value))
-    api_wrap.save_asset(asset.get_full_name())

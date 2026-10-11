@@ -32,6 +32,7 @@ class UELoadShot(object):
             start_frame: First frame of the sequence
             end_frame: Last frame of the sequence
         """
+        ue.log_warning(f"UELoadShot...{data}")
         self.import_file_list = import_file_list
         self.data = data
         self.level_path = level_path
@@ -86,8 +87,13 @@ class UELoadShot(object):
             subsys.save_asset(self.ls.get_full_name())
             ue.log(f"Level sequence path: {self.ls.get_full_name()}")
 
+        # set the sequence frame range
         sequencer_utils.set_level_sequence_view_range(
-            self.ls, self.start_frame, self.end_frame, self.fps)
+            self.ls, self.start_frame, self.end_frame, self.fps
+        )
+
+        # add metadata to the level sequence
+        unreal_utils.apply_metadata(self.data["shot_meta_data"], self.ls)
 
     def open_sequence(self):
         """
