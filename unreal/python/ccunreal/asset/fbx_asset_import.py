@@ -41,6 +41,7 @@ class FBXAssetImport(base_asset_import.BaseAssetImport):
 
         # run post import commands
         self.organize_asset()
+        self.add_metadata_to_asset()
         self.save_asset()
 
     @property
