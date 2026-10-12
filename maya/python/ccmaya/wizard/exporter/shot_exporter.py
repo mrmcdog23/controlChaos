@@ -206,18 +206,6 @@ class ShotExporter(BaseExporter):
     def master_scene(self):
         return cmds.file(q=True, sn=True)
 
-    @BaseExporter.add_to_percentage(10)
-    def publish_shot(self):
-        """
-        Publish the shot to ftrack
-        """
-        self.data["additional_components"] = self.additional_components
-        publish_inst = publish.FtrackPublish(self.data)
-        self.asset_version = publish_inst.asset_version
-        asset_version_id = self.asset_version["id"]
-        self.ftver.asset_version_id = asset_version_id
-        self.log(f"Asset Version: {asset_version_id}")
-
 
 if __name__ == "__main__":
     exporter = ShotExporter()

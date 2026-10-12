@@ -36,9 +36,8 @@ class LevelSequenceExporter(BaseExporter):
         self.set_export_context()
         #self.create_shot_folder()
         self.export_sequence_level()
-        #self.save_scene_metadata()
         self.write_metadata()
-        #self.publish_fbx_files()
+        self.publish_shot()
         #self.render_movie_queue()
         self.finish_exporter_process()
 
@@ -63,7 +62,6 @@ class LevelSequenceExporter(BaseExporter):
         self.ctx = unreal_context.UnrealContext(overrides=overrides)
         self.next_version = self.ftquery.next_version_from_ctx(self.ctx)
         self.ctx.use_version = self.next_version
-        #self.data["version_num"] = use_version
 
     @BaseExporter.add_to_percentage(10)
     def export_sequence_level(self):
@@ -151,24 +149,10 @@ class LevelSequenceExporter(BaseExporter):
         Returns:
             The level sequence actor
         """
-        ue.log_warning(f"binding....{binding}")
         binding_id = self.ls.get_portable_binding_id(self.ls, binding)
         bound_actors = ue.LevelSequenceEditorBlueprintLibrary.get_bound_objects(binding_id)
         if bound_actors:
             return bound_actors[0]
-
-    @BaseExporter.add_to_percentage(40)
-    def publish_fbx_files(self):
-        """
-        Publish the fbx files and data to ftrack
-        """
-        # add all additional components to the data
-        self.data["additional_components"] = self.additional_components
-
-        # publish to ftrack
-        ftrack_pub_inst = publish.FtrackPublish(self.data)
-        self.asset_version_id = ftrack_pub_inst.asset_version["id"]
-        self.log(f"Asset Version: {self.asset_version_id}")
 
     @BaseExporter.add_to_percentage(20)
     def render_movie_queue(self):

@@ -7,6 +7,7 @@ import ccftrack.asset_version as ft_version
 import ccftrack.asset as asset
 import ccftrack.shot as shot
 import ccftrack.query as query
+import ccftrack.publish as publish
 
 
 class BaseExporter(object):
@@ -156,3 +157,15 @@ class BaseExporter(object):
 
         # add the data to the dictionary
         self.additional_components["metadata"] = data_file_path
+
+    @add_to_percentage(10)
+    def publish_shot(self):
+        """
+        Publish the shot to ftrack
+        """
+        self.data["additional_components"] = self.additional_components
+        publish_inst = publish.FtrackPublish(self.data)
+        self.asset_version = publish_inst.asset_version
+        asset_version_id = self.asset_version["id"]
+        self.ftver.asset_version_id = asset_version_id
+        self.log(f"Asset Version: {asset_version_id}")
