@@ -6,6 +6,7 @@ import ccftrack.publish as publish
 #import ccunreal.ue_cc as ue_cc
 import cccore.utils.file_utils as file_utils
 import ccunreal.utils.unreal_utils as unreal_utils
+import ccunreal.utils.api_wrap as api_wrap
 import ccunreal.utils.sequencer_utils as sequencer_utils
 import ccunreal.utils.unreal_context as unreal_context
 #import ccunreal.render.movie_render_queue as movie_render_queue
@@ -36,8 +37,9 @@ class LevelSequenceExporter(BaseExporter):
         #self.create_shot_folder()
         self.export_sequence_level()
         #self.save_scene_metadata()
-        self.publish_fbx_files()
-        self.render_movie_queue()
+        self.write_metadata()
+        #self.publish_fbx_files()
+        #self.render_movie_queue()
         self.finish_exporter_process()
 
     def set_export_context(self):
@@ -91,19 +93,22 @@ class LevelSequenceExporter(BaseExporter):
             # export the fbx file to disk
             sequencer_utils.export_fbx_file(fbx_path, self.map, self.ls, [binding])
             self.log(f"FBX Path: {fbx_path}")
-            namespace_info = {"fbx_path": fbx_path}
+            asset_export_data = {"fbx_path": fbx_path}
+
+            metadata = api_wrap.get_metadata_tag_values(sequence_actor)
+            ue.log_warning(f"Storing camera metadata...{metadata}")
 
             # save the camera data as a camera only
             if isinstance(sequence_actor, ue.CineCameraActor):
                 ue.log_warning("Storing camera metadata...")
-                namespace_info["asset_type_name"] = "camera"
+                asset_export_data["asset_type_name"] = "camera"
 
             elif isinstance(sequence_actor, ue.SkeletalMeshActor):
-                ftrack_id = self.get_level_sequence_actor_ftrack_id(binding)
-                namespace_info["ftrack_id"] = ftrack_id
-                ue.log_warning(f"cc ftrack asset version: {ftrack_id}")
+                comp = sequence_actor.get_component_by_class(ue.SkeletalMeshComponent)
+                metadata = api_wrap.get_metadata_tag_values(comp.skeletal_mesh_asset)
+                asset_export_data.update(metadata)
 
-            self.scene_data[binding_name] = namespace_info
+            self.exported_files_to_data[fbx_path] = asset_export_data
             self.additional_components[binding_name] = fbx_path
         self.data["additional_components"] = self.additional_components
 
@@ -151,38 +156,6 @@ class LevelSequenceExporter(BaseExporter):
         bound_actors = ue.LevelSequenceEditorBlueprintLibrary.get_bound_objects(binding_id)
         if bound_actors:
             return bound_actors[0]
-
-    def get_level_sequence_actor_ftrack_id(self, binding):
-        # type: (ue.MovieSceneBindingProxy) -> str
-        """
-        From the binding get the actors ftrack rig id
-
-        Args:
-            binding: The binding to get the actor from
-
-        Returns:
-            ftrack_id: The rig asset version id
-        """
-        actor = binding.sequence.locate_bound_objects(binding, self.map)
-        if not actor:
-            self.log(f"Not FTrack id found on {actor}")
-            return str()
-        skeletal_mesh_asset = actor[0].skeletal_mesh_component.skeletal_mesh
-        ftrack_id = ue_cc.get_ftrack_id(skeletal_mesh_asset.get_path_name())
-        self.log(f"FTrack id {ftrack_id}")
-        return ftrack_id
-
-    def save_scene_metadata(self):
-        """
-        Save the scene data file in the same
-        place as the published scene
-        """
-        self.ctx.use_aov = "scene_data"
-        self.ctx.use_ext = "json"
-        scene_data_path = self.ctx.win_sequence_path
-        self.log(f"Saving metadata path: {scene_data_path}")
-        file_utils.write_json(scene_data_path, self.scene_data)
-        self.additional_components["Metadata"] = scene_data_path
 
     @BaseExporter.add_to_percentage(40)
     def publish_fbx_files(self):

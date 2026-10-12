@@ -772,7 +772,8 @@ class FtAssetVersion(FtBase):
                 "asset_build_type_name": self.asset_build_type_name,
                 "asset_name": self.asset_build_name,
                 "task_name": self.task_name,
-                "version_num": self.version_num
+                "version_num": self.version_num,
+                "ftrack_id": self.asset_version_id
             }
         else:
             ctx_dict = {
