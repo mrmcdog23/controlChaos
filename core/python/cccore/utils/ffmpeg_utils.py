@@ -14,7 +14,7 @@ GIF_ARGS = "fps=25,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse"
 CONVERT_IMAGE_TYPE = '{ffmpeg_exe} -i "{input_path}" {resize_cmd} "{output_path}"'
 
 
-def run_ffmpeg_hud_command(start, nuke_path, mov_path):
+def convert_sequence_to_movie(start, nuke_path, mov_path):
     # type: (int, str, str) -> bool
     """
     Build the hud command to go over the renders on shot publish

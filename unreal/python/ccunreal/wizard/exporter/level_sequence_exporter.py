@@ -158,11 +158,10 @@ class LevelSequenceExporter(BaseExporter):
         """
         Render the level via the movie render
         """
-        ue.log_warning(f"asset_version_id: {self.asset_version_id}")
+        ue.log_warning(f"asset_version_id: {self.ftver.asset_version_id}")
         add_to_queue = False
         self.ctx.use_ext = "exr"
         render_sequence_path = self.ctx.render_sequence_path
-
         ls_path = self.ls.get_path_name()
         map_path = self.map.get_path_name()
         job_cls = movie_render_queue.CreateMovieRenderQueueJob(
@@ -171,7 +170,7 @@ class LevelSequenceExporter(BaseExporter):
             ls_path,
             map_path,
             self.ftshot.resolution,
-            asset_version_id=self.asset_version_id,
+            asset_version_id=self.ftver.asset_version_id
         )
         job_cls.create_job()
         job_cls.run_render()

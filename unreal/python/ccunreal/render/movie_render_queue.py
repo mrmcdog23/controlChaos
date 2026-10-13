@@ -5,7 +5,7 @@ from typing import Optional
 import cccore.core_constants as core_constants
 import cccore.data.server_data as server_data
 import cccore.utils.file_utils as file_utils
-#import cccore.utils.ffmpeg_args as ffmpeg_args
+import cccore.utils.ffmpeg_utils as ffmpeg_utils
 import cccore.utils.sequence_utils as sequence_utils
 import ccunreal.utils.api_wrap as api_wrap
 import ccftrack.asset_version as asset_version
@@ -131,14 +131,13 @@ class CreateMovieRenderQueueJob(object):
         ftver.asset_version_id = self.asset_version_id
         ue.log_warning(f"Uploading: {self.sequence_path} to {self.asset_version_id}")
         ftver.add_component("MovieRender", self.sequence_path)
-        '''
+
         mov_path = file_utils.temp_file_path(self.output_name, "mov")
         seq_data = sequence_utils.get_sequence_data(self.sequence_path)
-        created = ffmpeg_args.run_ffmpeg_hud_command(seq_data.start, seq_data.nuke_path, mov_path)
+        created = ffmpeg_utils.convert_sequence_to_movie(seq_data.start, seq_data.nuke_path, mov_path)
         if not created:
             ue.log_warning("Failed to create movie file")
             return
 
         ue.log(f"Uploading movie file: {mov_path}")
         ftver.add_playable_component(mov_path)
-        '''
