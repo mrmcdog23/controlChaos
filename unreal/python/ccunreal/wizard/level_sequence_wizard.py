@@ -7,6 +7,7 @@ import ccgeneral.wizard.base_wizard as base_wizard
 import cccore.file_env.context as context
 from ccgeneral.wizard.pages.complete_page import CompletePage
 from ccgeneral.wizard.pages.context_page import ShotContextPage
+from ccunreal.wizard.pages.ls_context_page import LevelSequenceContextPage
 from ccgeneral.wizard.pages.progress_page import ProgressPage
 import ccunreal.wizard.exporter.level_sequence_exporter as level_sequence_exporter
 
@@ -31,7 +32,7 @@ class LevelSequenceWizard(base_wizard.BaseWizard):
     def wizard_pages(self):
         # type: () -> list[Any]
         """ Add all the pages to the publishing wizard """
-        pages = [ShotContextPage, ProgressPage, CompletePage]
+        pages = [LevelSequenceContextPage, ProgressPage, CompletePage]
         return pages
 
 

@@ -1,11 +1,8 @@
 """ Export level sequence actors as fbx files """
 import os
+import re
 import unreal as ue
-#import cccore.folder.folder_creator as folder_creator
-import ccftrack.publish as publish
-#import ccunreal.ue_cc as ue_cc
 import cccore.utils.file_utils as file_utils
-import ccunreal.utils.unreal_utils as unreal_utils
 import ccunreal.utils.api_wrap as api_wrap
 import ccunreal.utils.sequencer_utils as sequencer_utils
 import ccunreal.utils.unreal_context as unreal_context
@@ -82,18 +79,17 @@ class LevelSequenceExporter(BaseExporter):
 
             # get the fbx export path
             binding_name = binding.get_name()
+            match = re.match(r"(.*)_v\d+$", binding_name)
+            suffix = match.group(1) if match else binding_name
+            self.ctx.use_suffix = suffix
 
-            self.ctx.use_suffix = binding_name
             fbx_path = self.ctx.fbx_file_path
-            file_utils.create_directories(os.path.dirname(fbx_path))
+            self.log(f"FBX Path: {fbx_path}")
 
             # export the fbx file to disk
+            file_utils.create_directories(os.path.dirname(fbx_path))
             sequencer_utils.export_fbx_file(fbx_path, self.map, self.ls, [binding])
-            self.log(f"FBX Path: {fbx_path}")
             asset_export_data = {"fbx_path": fbx_path, "is_camera": False}
-
-            metadata = api_wrap.get_metadata_tag_values(sequence_actor)
-            ue.log_warning(f"Storing camera metadata...{metadata}")
 
             # save the camera data as a camera only
             if isinstance(sequence_actor, ue.CineCameraActor):
@@ -106,6 +102,12 @@ class LevelSequenceExporter(BaseExporter):
                 asset_export_data.update(metadata)
 
             self.exported_files_to_data[fbx_path] = asset_export_data
+
+            # remove log component name to a short one
+            version_match = re.match(r".*_(.+?)_v\d+$", binding_name)
+            if version_match:
+                binding_name = version_match.group(1)
+
             self.additional_components[binding_name] = fbx_path
         self.data["additional_components"] = self.additional_components
 
@@ -158,7 +160,10 @@ class LevelSequenceExporter(BaseExporter):
         """
         Render the level via the movie render
         """
-        ue.log_warning(f"asset_version_id: {self.ftver.asset_version_id}")
+        if not self.data["create_movie"]:
+            ue.log_warning(f"Skipping create movie")
+            return
+
         add_to_queue = False
         self.ctx.use_ext = "exr"
         render_sequence_path = self.ctx.render_sequence_path
