@@ -9,7 +9,7 @@ import ccunreal.utils.unreal_utils as unreal_utils
 import ccunreal.utils.api_wrap as api_wrap
 import ccunreal.utils.sequencer_utils as sequencer_utils
 import ccunreal.utils.unreal_context as unreal_context
-#import ccunreal.render.movie_render_queue as movie_render_queue
+import ccunreal.render.movie_render_queue as movie_render_queue
 from ccgeneral.wizard.exporter.base_exporter import BaseExporter
 
 
@@ -34,11 +34,10 @@ class LevelSequenceExporter(BaseExporter):
 
         # load each the level sequence and export
         self.set_export_context()
-        #self.create_shot_folder()
         self.export_sequence_level()
         self.write_metadata()
         self.publish_shot()
-        #self.render_movie_queue()
+        self.render_movie_queue()
         self.finish_exporter_process()
 
     def set_export_context(self):
@@ -91,15 +90,15 @@ class LevelSequenceExporter(BaseExporter):
             # export the fbx file to disk
             sequencer_utils.export_fbx_file(fbx_path, self.map, self.ls, [binding])
             self.log(f"FBX Path: {fbx_path}")
-            asset_export_data = {"fbx_path": fbx_path}
+            asset_export_data = {"fbx_path": fbx_path, "is_camera": False}
 
             metadata = api_wrap.get_metadata_tag_values(sequence_actor)
             ue.log_warning(f"Storing camera metadata...{metadata}")
 
             # save the camera data as a camera only
             if isinstance(sequence_actor, ue.CineCameraActor):
-                ue.log_warning("Storing camera metadata...")
                 asset_export_data["asset_type_name"] = "camera"
+                asset_export_data["is_camera"] = True
 
             elif isinstance(sequence_actor, ue.SkeletalMeshActor):
                 comp = sequence_actor.get_component_by_class(ue.SkeletalMeshComponent)
@@ -161,15 +160,14 @@ class LevelSequenceExporter(BaseExporter):
         """
         ue.log_warning(f"asset_version_id: {self.asset_version_id}")
         add_to_queue = False
-        self.ctx.use_subfolder = "render"
         self.ctx.use_ext = "exr"
-        sequence_path = self.ctx.sequence_path
+        render_sequence_path = self.ctx.render_sequence_path
 
         ls_path = self.ls.get_path_name()
         map_path = self.map.get_path_name()
         job_cls = movie_render_queue.CreateMovieRenderQueueJob(
             add_to_queue,
-            sequence_path,
+            render_sequence_path,
             ls_path,
             map_path,
             self.ftshot.resolution,
