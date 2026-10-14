@@ -245,7 +245,7 @@ class FtrackPublish(object):
             self.data["mov_path"] = temp_mov_path
 
         self.logger.info("Using FFMpeg to create movie file")
-        created = ffmpeg_utils.run_ffmpeg_hud_command(
+        created = ffmpeg_utils.convert_sequence_to_movie(
             seq_data.start,
             seq_data.nuke_path,
             temp_mov_path

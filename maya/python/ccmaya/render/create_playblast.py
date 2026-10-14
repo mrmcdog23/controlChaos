@@ -190,7 +190,7 @@ class PlayblastScene(object):
         image_path = self.completed_renders[0].replace("\\", "/")
         self.temp_mov_path = file_utils.temp_file_path(self.name, "mov")
         seq_data = sequence_utils.get_sequence_data(image_path)
-        created = ffmpeg_utils.run_ffmpeg_hud_command(
+        created = ffmpeg_utils.convert_sequence_to_movie(
             self.start_frame,
             seq_data.nuke_path,
             self.temp_mov_path

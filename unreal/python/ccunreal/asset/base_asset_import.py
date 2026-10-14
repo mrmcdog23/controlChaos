@@ -65,6 +65,13 @@ class BaseAssetImport(object):
             dest_path = f"{self.destination_dir}/{asset_type}/{asset.asset_name}"
             ue.EditorAssetLibrary.rename_asset(object_path, dest_path)
 
+    def add_metadata_to_asset(self):
+        """
+        Add metadata to the asset
+        """
+        asset_data = self.ftver.as_dict
+        unreal_utils.apply_metadata(asset_data, self._skeleton_mesh)
+
     def save_asset(self):
         """
         Save the imported assets

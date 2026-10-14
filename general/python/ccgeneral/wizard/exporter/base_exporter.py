@@ -1,4 +1,5 @@
 """ Base exporter to be subclassed with exporters """
+import os
 import logging
 import cccore.core_constants as core_constants
 import cccore.utils.file_utils as file_utils
@@ -6,6 +7,7 @@ import ccftrack.asset_version as ft_version
 import ccftrack.asset as asset
 import ccftrack.shot as shot
 import ccftrack.query as query
+import ccftrack.publish as publish
 
 
 class BaseExporter(object):
@@ -17,11 +19,21 @@ class BaseExporter(object):
         self._progress = 0
         self.ui = None
         self.data = None
+        self.ctx = None
+        self.start_frame = int()
+        self.end_frame = int()
+        self.namespace_to_data = dict()
+        self.exported_files_to_data = dict()
+        self.additional_components = dict()
         self.asset_version = None
         self.ftver = ft_version.FtAssetVersion()
         self.ftasset = asset.FtAsset(session=self.ftver.session)
         self.ftshot = shot.FtShot(session=self.ftver.session)
         self.ftquery = query.FtQuery(session=self.ftver.session)
+
+    @property
+    def master_scene(self):
+        pass
 
     def add_to_percentage(percentage):
         """
@@ -121,3 +133,39 @@ class BaseExporter(object):
 
         # run the export
         self.export()
+
+    def write_metadata(self):
+        """
+        Write the metadata json file
+        """
+        # update and save all metadata
+        data = {
+            "exported_files_to_data": self.exported_files_to_data,
+            "start_frame": self.start_frame,
+            "end_frame": self.end_frame,
+            "master_scene": self.master_scene
+        }
+        data.update(self.data)
+
+        # work out the data path to save
+        self.ctx.use_suffix = "metadata"
+        data_file_path = self.ctx.data_file_path
+        self.logger.info(f"Writing metadata: {data_file_path}")
+
+        file_utils.create_directories(os.path.dirname(data_file_path))
+        file_utils.write_file(data_file_path, data)
+
+        # add the data to the dictionary
+        self.additional_components["metadata"] = data_file_path
+
+    @add_to_percentage(10)
+    def publish_shot(self):
+        """
+        Publish the shot to ftrack
+        """
+        self.data["additional_components"] = self.additional_components
+        publish_inst = publish.FtrackPublish(self.data)
+        self.asset_version = publish_inst.asset_version
+        asset_version_id = self.asset_version["id"]
+        self.ftver.asset_version_id = asset_version_id
+        self.log(f"Asset Version: {asset_version_id}")

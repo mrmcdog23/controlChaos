@@ -3,10 +3,10 @@ import os
 import pdfplumber
 import subprocess
 import datetime
-import tempfile
 import logging
 from dataclasses import dataclass
 import cccore.core_constants as core_constants
+import cccore.utils.file_utils as file_utils
 
 
 # constants
@@ -172,7 +172,7 @@ class ExtractData(object):
 
         # define the movie file name
         thumbnail_name = f"{self.pdf_data.shot_name}_thumbnail.png"
-        thumbnail_path = self.get_temp_file_path(thumbnail_name)
+        thumbnail_path = file_utils.get_temp_file_path(thumbnail_name)
         self.logger.info(f"Saved: {thumbnail_path}")
 
         # extract the thumbnail from the movie file
@@ -199,19 +199,6 @@ class ExtractData(object):
         else:
             self.logger.error(f"Failed to create: {path}")
 
-    def get_temp_file_path(self, file_name):
-        # type: (str) -> str
-        """
-        Get a temp file path with the file name
-
-        Args:
-            file_name: Name of the file to create
-
-        Returns:
-            The full file path to create
-        """
-        return os.path.join(tempfile.gettempdir(), file_name)
-
     def create_slate(self, pdf_data, output_dir):
         # type: (str, str) -> None
         """
@@ -225,7 +212,7 @@ class ExtractData(object):
         self.logger.info(f"Shot name: {pdf_data.shot_name}")
 
         # create the overlay image
-        temp_image_overlay_path = self.get_temp_file_path(f"{pdf_data.shot_name}_slate.png")
+        temp_image_overlay_path = file_utils.get_temp_file_path(f"{pdf_data.shot_name}_slate.png")
         command = (f'{FFMPEG_EXE} -y -i {BLANK_SLATE} -i {pdf_data.thumbnail_path} '
                    f'-filter_complex "overlay=1100:170" {temp_image_overlay_path}')
         self.run_ffmpeg_command(command)

@@ -25,7 +25,7 @@ def find_binding_by_display_name(name, sequence):
     Returns:
         binding: The binding found matching the name
     """
-    #binding = ue_no8.find_binding_by_display_name(name, sequence)
+    #binding = ue_cc.find_binding_by_display_name(name, sequence)
     #if binding.get_name():
     #    return binding
     return

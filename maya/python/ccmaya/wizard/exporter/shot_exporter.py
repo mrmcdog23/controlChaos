@@ -23,12 +23,6 @@ except (TypeError, RuntimeError):
 class ShotExporter(BaseExporter):
     def __init__(self):
         super().__init__()
-        self.ctx = None
-        self.start_frame = int()
-        self.end_frame = int()
-        self.namespace_to_data = dict()
-        self.exported_files_to_data = dict()
-        self.additional_components = dict()
 
     @BaseExporter.add_to_percentage(10)
     def open_file(self):
@@ -208,39 +202,9 @@ class ShotExporter(BaseExporter):
                     maya_utils.bake_objects_in_world_space(transform)
                     return
 
-    def write_metadata(self):
-        """
-        Write the metadata json file
-        """
-        # update and save all metadata
-        data = {
-            "exported_files_to_data": self.exported_files_to_data,
-            "start_frame": self.start_frame,
-            "end_frame": self.end_frame,
-            "master_scene": cmds.file(q=True, sn=True)
-        }
-        data.update(self.data)
-
-        self.ctx.use_suffix = "metadata"
-        data_file_path = self.ctx.data_file_path
-        self.logger.info(f"Writing metadata: {data_file_path}")
-        file_utils.create_directories(os.path.dirname(data_file_path))
-        file_utils.write_file(data_file_path, data)
-
-        # add the data to the dictionary
-        self.additional_components["metadata"] = data_file_path
-
-    @BaseExporter.add_to_percentage(10)
-    def publish_shot(self):
-        """
-        Publish the shot to ftrack
-        """
-        self.data["additional_components"] = self.additional_components
-        publish_inst = publish.FtrackPublish(self.data)
-        self.asset_version = publish_inst.asset_version
-        asset_version_id = self.asset_version["id"]
-        self.ftver.asset_version_id = asset_version_id
-        self.log(f"Asset Version: {asset_version_id}")
+    @property
+    def master_scene(self):
+        return cmds.file(q=True, sn=True)
 
 
 if __name__ == "__main__":
