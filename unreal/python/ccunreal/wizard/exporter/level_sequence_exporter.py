@@ -164,18 +164,21 @@ class LevelSequenceExporter(BaseExporter):
             ue.log_warning(f"Skipping create movie")
             return
 
+        thumbnail_path = self.data["thumbnail_path"]
         add_to_queue = False
         self.ctx.use_ext = "exr"
         render_sequence_path = self.ctx.render_sequence_path
         ls_path = self.ls.get_path_name()
         map_path = self.map.get_path_name()
+
         job_cls = movie_render_queue.CreateMovieRenderQueueJob(
             add_to_queue,
             render_sequence_path,
             ls_path,
             map_path,
             self.ftshot.resolution,
-            asset_version_id=self.ftver.asset_version_id
+            asset_version_id=self.ftver.asset_version_id,
+            thumbnail_path=thumbnail_path
         )
         job_cls.create_job()
         job_cls.run_render()

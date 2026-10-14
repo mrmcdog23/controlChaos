@@ -1,6 +1,7 @@
 """ Publish and render an unreal """
 from typing import Any
 import unreal as ue
+import cccore.utils.file_utils as file_utils
 import ccunreal.utils.unreal_utils as unreal_utils
 import ccunreal.utils.api_wrap as api_wrap
 import ccgeneral.wizard.base_wizard as base_wizard
@@ -27,6 +28,8 @@ class LevelSequenceWizard(base_wizard.BaseWizard):
         self.data["local"] = True
         self.data["ls_path"] = ls_path
         self.data["map_path"] = unreal_utils.current_map_path()
+        self.data["thumbnail_path"] = file_utils.get_temp_file_path(
+            f"{self.ctx.shot}_thumbnail.png")
 
     @property
     def wizard_pages(self):

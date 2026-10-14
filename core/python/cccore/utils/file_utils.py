@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 import datetime
+import tempfile
 import cccore.utils.read_write as read_write
 import cccore.core_constants as core_constants
 
@@ -252,3 +253,17 @@ def get_component_path(component):
         return str()
     path = component['component_locations'][0]['resource_identifier'].replace("\\", "/")
     return path
+
+
+def get_temp_file_path(file_name):
+    # type: (str) -> str
+    """
+    Get a temp file path with the file name
+
+    Args:
+        file_name: Name of the file to create
+
+    Returns:
+        The full file path to create
+    """
+    return os.path.join(tempfile.gettempdir(), file_name)

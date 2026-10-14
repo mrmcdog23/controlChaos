@@ -15,8 +15,8 @@ class CreateMovieRenderQueueJob(object):
     """
     Create a movie render queue job and render  option also
     """
-    def __init__(self, add_to_queue, sequence_path, ls_path, map_path, resolution, asset_version_id=None):
-        # type: (bool, str, str, str, list[int], Optional[str]) -> None
+    def __init__(self, add_to_queue, sequence_path, ls_path, map_path, resolution, asset_version_id=None, thumbnail_path=None):
+        # type: (bool, str, str, str, list[int], Optional[str], Optional[str])) -> None
         """
         Args:
             add_to_queue: If true add to queue else render
@@ -25,12 +25,14 @@ class CreateMovieRenderQueueJob(object):
             map_path: Map path to render
             resolution: The output size. e.g. [1280, 720]
             asset_version_id: The asset version to upload to
+            thumbnail_path: Path of the thumbnail to generate
         """
         self.sequence_path = sequence_path
         self.ls_path = ls_path
         self.map_path = map_path
         self.resolution = resolution
         self.asset_version_id = asset_version_id
+        self.thumbnail_path = thumbnail_path
 
         self.output_name = file_utils.get_file_name(sequence_path)
         self.output_dir = os.path.dirname(sequence_path)
@@ -141,3 +143,11 @@ class CreateMovieRenderQueueJob(object):
 
         ue.log(f"Uploading movie file: {mov_path}")
         ftver.add_playable_component(mov_path)
+
+        # generate the thumbnail
+        if not self.thumbnail_path:
+            ue.log_warning("No thumbnail path given")
+            return
+
+        ue.log_warning(f"Creating thumbnail: {self.thumbnail_path}")
+        ffmpeg_utils.convert_image_type(self.thumbnail_path, seq_data.first_frame_path, low_res=True)
