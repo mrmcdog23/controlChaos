@@ -173,8 +173,14 @@ def get_top_level_nodes():
     """
     Get a list of top level nodes in the scene
     """
-    return [x for x in cmds.ls(assemblies=True)
-            if x not in maya_constants.DEFAULT_CAMERAS]
+    top_level_nodes = list()
+    for node in cmds.ls(assemblies=True):
+        if node in maya_constants.DEFAULT_CAMERAS:
+            continue
+        if cmds.getAttr(f"{node}.hiddenInOutliner"):
+            continue
+        top_level_nodes.append(node)
+    return top_level_nodes
 
 
 def get_asset_top_node():
