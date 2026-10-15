@@ -68,6 +68,9 @@ def main():
     command = "import ccunreal.shot.loader.ue_load_shot_ui as ue_load_shot_ui;ue_load_shot_ui.main()"
     create_command(shot_menu, "Import Unreal Shot", command)
 
+    command = "import ccunreal.wizard.level_sequence_wizard as lsw;lsw.main()"
+    create_command(shot_menu, "Publish Level Sequence", command)
+
     # lighting menu
     lighting_menu = create_submenu(control_chaos_menu, "Lighting")
     command = "import ccunreal.utils.unreal_utils as uu;uu.create_sky_and_lights()"
