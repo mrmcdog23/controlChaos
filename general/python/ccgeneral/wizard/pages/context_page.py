@@ -145,7 +145,7 @@ class AssetCmbContextPage(ContextPage):
         if self.cmb_asset:
             return
         self.cmb_asset = asset_cmb.AssetCmb(
-            ftasset=self.wizard().ftasset, hide_cat=False)
+            ftasset=self.wizard().ftasset, hide_cat=True, hide_ver=True)
         self.context_layout.addWidget(self.cmb_asset)
 
     def validatePage(self):

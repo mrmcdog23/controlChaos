@@ -342,3 +342,4 @@ def apply_metadata(metadata_dict, asset, save=True):
         api_wrap.set_metadata_tag(asset, key, str(value))
     if save:
         api_wrap.save_asset(asset.get_full_name())
+
