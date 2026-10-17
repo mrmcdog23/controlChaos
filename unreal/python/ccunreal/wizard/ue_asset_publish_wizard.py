@@ -2,6 +2,7 @@
 import unreal as ue
 from ccgeneral.wizard.pages.complete_page import CompletePage
 from ccgeneral.wizard.pages.context_page import AssetCmbContextPage
+from ccunreal.wizard.pages.ue_asset_progress_page import UEAssetProgressPage
 import ccgeneral.wizard.base_wizard as base_wizard
 import ccunreal.utils.unreal_utils as unreal_utils
 import ccunreal.wizard.exporter.ue_asset_exporter as ue_asset_exporter
@@ -13,6 +14,7 @@ class UEAssetWizard(base_wizard.BaseWizard):
     def __init__(self, parent=None):
         super(UEAssetWizard, self).__init__(parent)
         self.exporter = ue_asset_exporter.UEAssetExporter()
+        self.selected = ue.EditorUtilityLibrary.get_selected_assets()
 
     @staticmethod
     def entity_type():
@@ -30,6 +32,7 @@ class UEAssetWizard(base_wizard.BaseWizard):
         """
         pages = [
             AssetCmbContextPage,
+            UEAssetProgressPage,
             CompletePage
         ]
         return pages
