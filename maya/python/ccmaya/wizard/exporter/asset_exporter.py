@@ -98,7 +98,7 @@ class AssetExporter(BaseExporter):
     def is_camera(self):
         # type: () -> str
         """ Is it a camera publish asset """
-        return self.data["asset_build_type_name"] == "camera"
+        return self.data["asset_type"] == "camera"
 
     @BaseExporter.add_to_percentage(10)
     def tag_and_copy_asset_version(self):
@@ -219,7 +219,7 @@ class AssetExporter(BaseExporter):
             return
         cmds.select(maya_constants.GEO_GRP)
         materialx_path = self.get_save_file_path("mtlx")
-        look_name = self.data["asset_build_name"]
+        look_name = self.data["asset_name"]
         cmds.arnoldExportToMaterialX(
             filename=materialx_path,
             look=look_name,

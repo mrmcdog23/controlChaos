@@ -416,8 +416,8 @@ class FtAsset(FtBase):
             asset_version: Published asset version
         """
         self.logger.info("Publishing to Ftrack...")
-        self.asset_build_type_name = data["asset_build_type_name"]
-        self.asset_build_name = data["asset_build_name"]
+        self.asset_build_type_name = data["asset_type"]
+        self.asset_build_name = data["asset_name"]
         self.task_name = data["task_name"]
         self.status_name = data["status_name"]
         self.category = data.get("category", "Scene")

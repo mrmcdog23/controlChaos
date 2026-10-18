@@ -250,7 +250,7 @@ class ValidatePage(BasePublishPage):
                 continue
 
             # check if the asset type is to be ignored
-            asset_type = data.get("asset_build_type_name", "none")
+            asset_type = data.get("asset_type", "none")
             if asset_type in valid_cls.ignore_types:
                 continue
 

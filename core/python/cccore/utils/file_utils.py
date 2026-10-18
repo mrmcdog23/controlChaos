@@ -111,6 +111,8 @@ def create_directories(directory):
     Args:
         directory: Path to the directory to create
     """
+    if "." in directory:
+        directory = os.path.dirname(directory)
     if not os.path.exists(directory):
         logging.info(f"Creating directory: {directory}")
         os.makedirs(directory, exist_ok=True)

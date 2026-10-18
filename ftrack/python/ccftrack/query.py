@@ -316,30 +316,29 @@ class FtQuery(FtShot, FtAsset):
         next_version += 1
         return next_version
 
-    def get_correct_version(self, write_path):
-        # type: (str) -> int
+    def get_correct_version(self, ctx):
+        # type: (Any) -> int
         """
         From the write path get the version and compare if
         to the ftrack version and if it's not the same then
         use the highest for the version and write path
 
         Args:
-            write_path: Current write path
+            ctx: Current context
 
         Returns:
             use_version: The next version number to use
         """
         self.logger.info("Confirm the version is correct...")
-        ctx = context_utils.get_context_from_path(write_path)
 
         # compare the next ftrack version with the set version
         next_ftrack_version = self.next_version_from_ctx(ctx)
-        if ctx.next_sequence_version == next_ftrack_version:
+        if ctx.next_save_version == next_ftrack_version:
             self.logger.info(f"Correct version {next_ftrack_version}")
             return next_ftrack_version
 
         # set the next ftrack version
-        use_version = max(next_ftrack_version, ctx.next_sequence_version)
+        use_version = max(next_ftrack_version, ctx.next_save_version)
         self.logger.info(f"Updated version sequence path to use {use_version}")
         return use_version
 

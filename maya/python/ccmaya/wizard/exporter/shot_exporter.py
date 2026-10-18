@@ -8,7 +8,6 @@ import ccmaya.maya_constants as maya_constants
 import ccmaya.asset.scene_asset as scene_asset
 import ccmaya.utils.maya_utils as maya_utils
 import cccore.file_env.context as context
-import ccftrack.publish as publish
 import ccmaya.shot.fbx_anim_export as fbx_anim_export
 from ccgeneral.wizard.exporter.base_exporter import BaseExporter
 

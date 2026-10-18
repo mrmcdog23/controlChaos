@@ -143,9 +143,9 @@ class FtrackPublish(object):
             self.data["pub_file_path"] = self.image_sequence
 
         # create and set the asset version
-        if self.data.get("asset_build_name"):
+        if self.data.get("asset_name"):
             ftrack_class = self.ftasset
-            self.movie_name = self.data["asset_build_name"]
+            self.movie_name = self.data["asset_name"]
         else:
             ftrack_class = self.ftshot
             self.movie_name = self.data["shot_name"]

@@ -273,7 +273,15 @@ class Context(object):
     def next_save_path(self):
         # type: () -> str
         """ Work out what the next wip file path will be """
-        return self.get_next_save_path(self.user_dir)
+        file_path, _ = self.get_next_save_path(self.user_dir)
+        return file_path
+
+    @property
+    def next_save_version(self):
+        # type: () -> int
+        """ Get the next save version on disk """
+        _, version_num = self.get_next_save_path(self.user_dir)
+        return version_num
 
     def get_next_save_path(self, save_dir):
         # type: (str) -> Optional[str]
@@ -297,8 +305,8 @@ class Context(object):
             file_exists = os.path.exists(file_path)
             version_num += 1
             if version_num == 200:
-                return None
-        return file_path
+                return None, None
+        return file_path, version_num
 
     @property
     def save_file_path(self):
@@ -429,8 +437,8 @@ class Context(object):
             "suffix": self.suffix
         }
         if self.entity == ctx_constants.ASSET:
-            context_dict["asset_build_type_name"] = self.asset_type
-            context_dict["asset_build_name"] = self.asset_name
+            context_dict["asset_type"] = self.asset_type
+            context_dict["asset_name"] = self.asset_name
         else:
             context_dict["sequence_name"] = self.sequence
             context_dict["shot_name"] = self.shot

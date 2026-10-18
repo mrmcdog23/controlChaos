@@ -31,7 +31,7 @@ class MovieProgressPage(ProgressPage):
         ctx.use_aov = "main"
         ctx.use_ext = "exr"
         ctx.use_next_sequence_version()
-        use_version = ftquery.get_correct_version(ctx.sequence_path)
+        use_version = ftquery.get_correct_version(ctx)
         ctx.use_version = use_version
 
         sequence_path_linux = ctx.sequence_path

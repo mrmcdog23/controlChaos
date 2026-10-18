@@ -118,12 +118,12 @@ class BuildHoudiniScene(object):
             return
 
         # if it is a camera then there is no lookdev
-        if asset_data["asset_build_type_name"] == "Camera":
+        if asset_data["asset_type"] == "Camera":
             self.logger.warning(f"Asset type is camera so no lookdev")
             return
 
         # set the new version to find
-        asset_build_name = asset_data["asset_build_name"]
+        asset_build_name = asset_data["asset_name"]
         self.ftasset.asset_build_name = asset_build_name
         self.ftasset.task_name = "lookdev"
         self.ftasset.category = "HDA"
@@ -188,7 +188,7 @@ class BuildHoudiniScene(object):
             filename = os.path.basename(source_path)
             is_camera = "cam" in filename.lower()
         else:
-            is_camera = asset_data.get("asset_build_type_name") == "Camera"
+            is_camera = asset_data.get("asset_type") == "Camera"
 
         if is_camera:
             self.logger.info(f"Loading alembic the camera...")
@@ -216,8 +216,8 @@ class BuildHoudiniScene(object):
         ftnode.version_padded = self.ftver.version_padded
 
         if asset_data:
-            ftnode.asset_build_type_name = asset_data["asset_build_type_name"]
-            ftnode.asset_build_name = asset_data["asset_build_name"]
+            ftnode.asset_build_type_name = asset_data["asset_type"]
+            ftnode.asset_build_name = asset_data["asset_name"]
             ftnode.asset_version_id = asset_data["ftrack_id"]
 
         ftnode.shot_version_ftrack_id = self.ftver.asset_version_id

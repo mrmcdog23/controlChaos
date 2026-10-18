@@ -60,6 +60,10 @@ def main():
     command = "import ccunreal.asset.ue_asset_loader as ue_asset_loader;ue_asset_loader.launch()"
     create_command(asset_menu, "Asset Loader", command)
 
+    # asset menu
+    command = "import ccunreal.wizard.ue_asset_publish_wizard as uapw;uapw.main()"
+    create_command(asset_menu, "Asset Publisher", command)
+
     # shot menu
     shot_menu = create_submenu(control_chaos_menu, "Shot")
     command = "import ccunreal.shot.import_fbx_cam as ifc;ifc.launch()"

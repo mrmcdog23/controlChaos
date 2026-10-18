@@ -201,7 +201,7 @@ class MakeTurntableRender(object):
         render_data = {
             "start_frame": OBJ_START,
             "end_frame": OBJ_END,
-            "name": self.data["asset_build_name"],
+            "name": self.data["asset_name"],
             "height": HEIGHT,
             "width": WIDTH,
             "renderer": self.data["renderer"]
