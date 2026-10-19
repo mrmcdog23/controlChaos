@@ -97,18 +97,18 @@ class ContextPage(BasePublishPage):
         Store the selected options in the wizard data
         """
         if self.ctx.is_asset:
-            self.data['entity'] = ctx_constants.ASSET
-            self.data['asset_build_type_name'] = self.ctx.asset_type
-            self.data['asset_build_name'] = self.ctx.asset_name
+            self.data["entity"] = ctx_constants.ASSET
+            self.data["asset_type"] = self.ctx.asset_type
+            self.data["asset_name"] = self.ctx.asset_name
         else:
-            self.data['entity'] = "shot"
-            self.data['sequence_name'] = self.ctx.sequence
-            self.data['shot_name'] = self.ctx.shot
+            self.data["entity"] = "shot"
+            self.data["sequence_name"] = self.ctx.sequence
+            self.data["shot_name"] = self.ctx.shot
             if self.ctx.episode:
-                self.data['episode_name'] = self.ctx.episode
+                self.data["episode_name"] = self.ctx.episode
 
-        self.data['task_name'] = self.ctx.task
-        self.data['comment'] = self.pte_comment.toPlainText()
+        self.data["task_name"] = self.ctx.task
+        self.data["comment"] = self.pte_comment.toPlainText()
         self.data["status_name"] = self.cmb_status.currentText()
         return True
 
