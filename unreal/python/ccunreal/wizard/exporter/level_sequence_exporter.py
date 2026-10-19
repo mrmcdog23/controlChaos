@@ -3,6 +3,7 @@ import os
 import re
 import unreal as ue
 import cccore.utils.file_utils as file_utils
+import cccore.file_env.context_utils as context_utils
 import ccunreal.utils.api_wrap as api_wrap
 import ccunreal.utils.sequencer_utils as sequencer_utils
 import ccunreal.utils.unreal_context as unreal_context
@@ -182,3 +183,55 @@ class LevelSequenceExporter(BaseExporter):
         )
         job_cls.create_job()
         job_cls.run_render()
+
+
+
+class USDLevelSequenceExporter(LevelSequenceExporter):
+    def __init__(self):
+        super().__init__()
+
+    def export(self):
+        """
+        Export the level as all usd file
+        """
+        self.export_usd_file()
+        self.publish_shot()
+        self.render_movie_queue()
+        self.finish_exporter_process()
+
+    def export_usd_file(self):
+        """
+        Export the usd file as a stage all file
+        """
+        ue.log("Exporting usd file...")
+
+        usd_stage_path = self.data["usd_stage_path"]
+        self.ctx = context_utils.get_context_from_path(usd_stage_path)
+        self.ctx.use_suffix = "all"
+        self.ctx.set_next_save_version()
+
+        # create the usd file directory
+        usd_path = self.ctx.usd_file_path
+        file_utils.create_directories(usd_path)
+
+        # load the map to export
+        map = ue.load_asset(self.data["map_path"])
+
+        # create the usd file directory
+        options = ue.LevelExporterUSDOptions()
+        options.stage_options.meters_per_unit = 0.01       # Unreal units are cm
+        options.stage_options.up_axis = ue.UsdUpAxis.Z_AXIS
+
+        # run the asset export task
+        task = ue.AssetExportTask()
+        task.object = map
+        task.filename = usd_path                            # .usda / .usdc / .usd
+        task.automated = True                               # suppress dialogs
+        task.prompt = False
+        task.replace_identical = True
+        task.options = options
+        ue.Exporter.run_asset_export_task(task)
+
+        # create the usd file directory
+        ue.log(f"USD level export succeeded: {usd_path}")
+        self.additional_components["usd_all"] = usd_path

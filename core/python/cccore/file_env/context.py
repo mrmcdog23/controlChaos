@@ -283,6 +283,9 @@ class Context(object):
         _, version_num = self.get_next_save_path(self.user_dir)
         return version_num
 
+    def set_next_save_version(self):
+        self.use_version = self.next_save_version
+
     def get_next_save_path(self, save_dir):
         # type: (str) -> Optional[str]
         """
@@ -330,7 +333,10 @@ class Context(object):
     def new_filename(self):
         # type: () -> str
         """ Get the new file name including the extension """
-        version_padded = str(self.use_version).zfill(3)
+        if self.version_padded:
+            version_padded = self.version_padded
+        else:
+            version_padded = str(self.use_version).zfill(3)
         if self.is_sequence and not self.is_single_frame_sequence:
             sequence_file_name = f"{self.file_name}_v{version_padded}.####.{self.ext}"
         else:
@@ -347,11 +353,11 @@ class Context(object):
     def version_padded(self):
         # type: () -> str
         """ Version number as a padded string """
+        if self.use_version:
+            return str(self.use_version).zfill(3)
         version_padded = self.get_value("version_padded")
         if version_padded:
             return version_padded
-        if self.use_version:
-            return str(self.use_version).zfill(3)
 
     @property
     def version_int(self):

@@ -55,8 +55,7 @@ class UEAssetProgressPage(ProgressPage):
         # build the relevant temp file paths
         temp_json_path = file_utils.temp_file_path("asset_export", "json")
         fbx_file_path = temp_json_path.replace(".json", ".fbx")
-        #output_path = temp_json_path.replace(".json", ".txt")
-        output_path = "C:/Users/joele/Downloads/rlling.txt"
+        output_path = temp_json_path.replace(".json", ".txt")
 
         # export the skeletal mesh as an fbx file
         self.export_skeletal_mesh(asset_path, fbx_file_path)
