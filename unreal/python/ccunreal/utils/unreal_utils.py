@@ -71,7 +71,7 @@ def get_path_to_type_dict(directory):
     return path_to_type
 
 
-def get_object_path(directory, find_asset_type, ignore_paths=None):
+def get_objects_of_type_from_dir(directory, find_asset_type, ignore_paths=None):
     # type: (str, str, Optional[list[str]]) -> Optional[str]
     """
     In a directory get an object path of a type
@@ -84,12 +84,14 @@ def get_object_path(directory, find_asset_type, ignore_paths=None):
     Returns:
         object_path: The found object path
     """
+    objects = list()
     path_to_type = get_path_to_type_dict(directory)
     for object_path, asset_type in path_to_type.items():
         if ignore_paths and object_path in ignore_paths:
             continue
         if asset_type == find_asset_type:
-            return object_path
+            objects.append(object_path)
+    return objects
 
 
 def get_objects_from_list(object_paths, find_asset_type):
@@ -99,7 +101,6 @@ def get_objects_from_list(object_paths, find_asset_type):
         asset_type = asset.get_class().get_fname()
         if asset_type == find_asset_type:
             return object_path
-
 
 
 def actor_type_on_level(actor_type):

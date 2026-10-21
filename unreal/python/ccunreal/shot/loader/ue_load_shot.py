@@ -43,6 +43,7 @@ class UELoadShot(object):
 
         self.ls = None
         self.imported_obj_paths = list()
+        self.imported_anim_sequences = list()
         self.asset_registry = ue.AssetRegistryHelpers.get_asset_registry()
         self.ftver = asset_version.FtAssetVersion()
         self.run_import()
@@ -143,23 +144,37 @@ class UELoadShot(object):
             fbx_path: Path of the fbx file to import
         """
         # import the actor and its fbx path
-        ue.log_warning(f"file_data: {file_data}")
         skeleton, skeleton_mesh = self.import_skeleton_asset(file_data)
-        ue.log_warning(f"Skeleton: {skeleton}")
+        if not skeleton:
+            raise Exception(f"No skeleton found for {file_data}")
 
         ue.log_warning(f"Importing animation path: {fbx_path}")
         anim_importer = cache_importer.CacheImporter(self.version_dir, fbx_path)
-        anim_importer.import_animation(skeleton=skeleton)
+        try:
+            anim_importer.import_animation(skeleton=skeleton)
+        except RuntimeError:
+            pass
 
         # get the object path to its type and remove the other asset types
-        object_paths = anim_importer.imported_object_paths
-        anim_sequence_path = unreal_utils.get_objects_from_list(
-            object_paths, unreal_constants.ANIM_SEQUENCE)
-        ue.log_warning(f"Animation sequence path: {anim_sequence_path}")
+        anim_sequence_path = None
+        anim_sequences = unreal_utils.get_objects_of_type_from_dir(
+            self.version_dir, unreal_constants.ANIM_SEQUENCE)
+
+        # get the import animation sequence path
+        for anim_sequence in anim_sequences:
+            if anim_sequence not in self.imported_anim_sequences:
+                anim_sequence_path = anim_sequence
+                self.imported_anim_sequences.append(anim_sequence)
+                break
+
+        if not anim_sequence_path:
+            raise Exception(f"No animation found for {fbx_path}")
+
+        ue.log(f"Animation sequence path: {anim_sequence_path}")
 
         # add the actor to the level
         actor_name = file_utils.get_file_name(fbx_path)
-        self.spawn_actor_to_level(skeleton_mesh, anim_sequence_path, actor_name)
+        self.spawn_actor_to_level(skeleton, anim_sequence_path, actor_name)
 
     def spawn_actor_to_level(self, skeleton, anim_sequence_path, asset_key):
         # type: (ue.Object, str, str) -> None
@@ -174,21 +189,14 @@ class UELoadShot(object):
         actor = self.find_actor_with_label(asset_key)
         ue.log_warning(f"Found actor: {actor}")
         if not actor:
+            ue.log_warning(f"Skeleton to spawn: {skeleton}")
             actor = api_wrap.spawn_actor_from_object(skeleton)
             actor.set_actor_label(asset_key)
-            ue.log_warning(f"Spawning actor to level: {skeleton}")
 
-        # find the binding and use it to find the animation section
-        actor_binding = sequencer_utils.find_binding_by_display_name(asset_key, self.ls)
-        ue.log_warning(f"Actor binding: {actor_binding}")
-        if actor_binding:
-            anim_track = actor_binding.get_tracks()[0]
-            anim_section = anim_track.get_sections()[0]
-        else:
-            # add the actor and create the track and the section
-            actor_binding = self.ls.add_possessable(actor)
-            anim_track = actor_binding.add_track(ue.MovieSceneSkeletalAnimationTrack)
-            anim_section = anim_track.add_section()
+        # add the actor and create the track and the section
+        actor_binding = self.ls.add_possessable(actor)
+        anim_track = actor_binding.add_track(ue.MovieSceneSkeletalAnimationTrack)
+        anim_section = anim_track.add_section()
 
         # Get level sequence start and end frame
         # Set section range to level sequence start and end frame

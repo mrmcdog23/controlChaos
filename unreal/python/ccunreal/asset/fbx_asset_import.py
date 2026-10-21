@@ -89,6 +89,5 @@ class FBXAssetImport(base_asset_import.BaseAssetImport):
         """
         # check the fbx path exists on disk
         if not os.path.exists(self.source_asset_path):
-            ue.log_warning(f"Fbx path does not exist for {self.source_asset_path}")
-            return False
+            raise Exception(f"Fbx path does not exist for {self.source_asset_path}")
         return True
