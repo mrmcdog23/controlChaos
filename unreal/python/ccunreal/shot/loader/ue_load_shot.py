@@ -156,12 +156,16 @@ class UELoadShot(object):
             pass
 
         # get the object path to its type and remove the other asset types
+        ue.log_warning(f"Searching for sequence: {self.version_dir}")
         anim_sequence_path = None
         anim_sequences = unreal_utils.get_objects_of_type_from_dir(
             self.version_dir, unreal_constants.ANIM_SEQUENCE)
+        ue.log_warning(f"Found sequences: {anim_sequences}")
 
         # get the import animation sequence path
         for anim_sequence in anim_sequences:
+            ue.log_warning(f"Checking sequence: {anim_sequence}")
+            ue.log_warning(f"Imported sequence: {self.imported_anim_sequences}")
             if anim_sequence not in self.imported_anim_sequences:
                 anim_sequence_path = anim_sequence
                 self.imported_anim_sequences.append(anim_sequence)
