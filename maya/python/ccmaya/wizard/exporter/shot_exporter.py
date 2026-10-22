@@ -86,7 +86,10 @@ class ShotExporter(BaseExporter):
             self.exported_files_to_data[usd_path] = scene_asset_inst.asset_data_dict
 
         # select all nodes and export all
-        self.usd_export(namespace="all", export_all=True)
+        try:
+            self.usd_export(namespace="all", export_all=True)
+        except RuntimeError:
+            pass
 
     def usd_export(self, namespace=None, export_all=False):
         # type: (str) -> str
