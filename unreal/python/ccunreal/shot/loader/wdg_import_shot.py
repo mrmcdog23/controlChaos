@@ -30,7 +30,7 @@ class UEWidgetImportShot(base_ui.WidgetBase):
             level_path = self.cmb_existing.currentText()
         else:
             map_name = self.le_new.text()
-            level_path = f"/Game/Level/{map_name}"
+            level_path = f"/Game/ControlChaos/Level/{map_name}"
         return level_path
 
     def populate_levels(self):

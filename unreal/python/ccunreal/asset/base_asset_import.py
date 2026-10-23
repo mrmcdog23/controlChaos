@@ -51,10 +51,14 @@ class BaseAssetImport(object):
         Organise the assets into subfolders
         """
         # move assets to their respective folders
+        ue.log_warning(f"Organizing assets into subfolders: {self.destination_dir}")
         path_to_type = unreal_utils.get_path_to_type_dict(self.destination_dir)
         for object_path, asset_type in path_to_type.items():
             if asset_type == unreal_constants.SKELETON_MESH:
                 self._skeleton_mesh = ue.load_asset(object_path)
+
+            elif asset_type == unreal_constants.STATIC_MESH:
+                self._static_mesh = ue.load_asset(object_path)
 
             # if it's a type to ignore then continue
             if asset_type in unreal_constants.IGNORE_IMPORT_TYPES:
@@ -70,7 +74,13 @@ class BaseAssetImport(object):
         Add metadata to the asset
         """
         asset_data = self.ftver.as_dict
-        unreal_utils.apply_metadata(asset_data, self._skeleton_mesh)
+        for asset in [self._static_mesh, self._skeleton_mesh]:
+            if not asset:
+                continue
+            ue.log_warning(f"Applying metadata to: {asset}. Asset data: {asset_data}")
+            unreal_utils.apply_metadata(asset_data, asset)
+            return
+        raise Exception("No skeleton or static asset found")
 
     def save_asset(self):
         """

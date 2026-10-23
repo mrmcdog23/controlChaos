@@ -164,8 +164,6 @@ class UELoadShot(object):
 
         # get the import animation sequence path
         for anim_sequence in anim_sequences:
-            ue.log_warning(f"Checking sequence: {anim_sequence}")
-            ue.log_warning(f"Imported sequence: {self.imported_anim_sequences}")
             if anim_sequence not in self.imported_anim_sequences:
                 anim_sequence_path = anim_sequence
                 self.imported_anim_sequences.append(anim_sequence)
@@ -268,11 +266,16 @@ class UELoadShot(object):
         """
         # import the actor and its fbx path
         self.ftver.asset_version_id = file_data["ftrack_id"]
-        asset_importer = fbx_asset_import.FBXAssetImport(
-            file_data["asset_fbx_path"], self.ftver, False)
+        asset_fbx_path = file_data["asset_fbx_path"]
+        asset_importer = fbx_asset_import.FBXAssetImport(asset_fbx_path, self.ftver, False)
         asset_importer.import_asset()
         static_mesh = asset_importer.static_mesh
         ue.log_warning(f"Static mesh path: {static_mesh}")
+
+        # add the static mesh to the map
+        asset_key = file_utils.get_file_name(asset_fbx_path)
+        actor = api_wrap.spawn_actor_from_object(static_mesh)
+        actor.set_actor_label(asset_key)
 
     def set_camera_settings(self):
         """
