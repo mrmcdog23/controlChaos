@@ -276,7 +276,7 @@ def set_level_sequence_view_range(sequence, start, end, fps):
     sequence.set_view_range_end(end_in_seconds)
 
 
-def export_fbx_file(fbx_file_path, world, level_sequence, bindings):
+def export_sequencer_fbx_file(fbx_file_path, world, level_sequence, bindings):
     # type: (str, ue.World, ue.LevelSequence,list[ue.MovieSceneBindingProxy]) -> None
     """
     Export fbx file of the actor from the level sequence
@@ -311,3 +311,46 @@ def export_fbx_file(fbx_file_path, world, level_sequence, bindings):
         fbx_file_name=fbx_file_path,
     )
     ue.SequencerTools.export_level_sequence_fbx(params)
+
+
+def export_static_actor_fbx_file(fbx_file_path, actor):
+    ue.log_warning(f"FBX Export path: {fbx_file_path}")
+    file_utils.create_directories(os.path.dirname(fbx_file_path))
+
+    # Editor actor subsystem
+    editor = ue.get_editor_subsystem(ue.EditorActorSubsystem)
+
+    # Select only this actor
+    editor.set_selected_level_actors([actor])
+
+    # Create export task
+    task = ue.AssetExportTask()
+    task.object = ue.EditorLevelLibrary.get_editor_world()
+    task.filename = fbx_file_path
+    task.exporter = ue.LevelExporterFBX()
+    task.selected = True
+    task.automated = True
+    task.prompt = False
+    task.replace_identical = True
+    task.options = ue.FbxExportOption()
+
+    # Export
+    ue.Exporter.run_asset_export_task(task)
+
+
+def get_level_sequence_actor(ls, binding):
+    # type: (ue.LevelSequence, ue.MovieSceneBindingProxy) -> ue.Actor
+    """
+    Get the bound actor from the binding
+
+    Args:
+        ls: The current level sequence
+        binding: The binding to get the actor from
+
+    Returns:
+        The level sequence actor
+    """
+    binding_id = ls.get_portable_binding_id(ls, binding)
+    bound_actors = ue.LevelSequenceEditorBlueprintLibrary.get_bound_objects(binding_id)
+    if bound_actors:
+        return bound_actors[0]

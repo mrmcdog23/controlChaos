@@ -118,9 +118,9 @@ class FbxAnimExport(object):
         Loop through the namespaces and export each fbx file
         """
         for namespace in self.namespaces:
-            self.export_fbx_file(namespace)
+            self.export_sequencer_fbx_file(namespace)
 
-    def export_fbx_file(self, namespace):
+    def export_sequencer_fbx_file(self, namespace):
         # type: (str) -> None
         """
         Export the fbx file from its namespace

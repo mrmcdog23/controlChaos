@@ -88,7 +88,7 @@ class UEAssetExporter(BaseExporter):
 
             # export the fbx file to disk
             file_utils.create_directories(os.path.dirname(fbx_path))
-            sequencer_utils.export_fbx_file(fbx_path, self.map, self.ls, [binding])
+            sequencer_utils.export_sequencer_fbx_file(fbx_path, self.map, self.ls, [binding])
             asset_export_data = {"fbx_path": fbx_path, "is_camera": False}
 
             # save the camera data as a camera only

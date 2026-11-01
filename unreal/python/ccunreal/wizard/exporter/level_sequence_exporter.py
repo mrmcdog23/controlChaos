@@ -4,6 +4,7 @@ import re
 import unreal as ue
 import cccore.utils.file_utils as file_utils
 import cccore.file_env.context_utils as context_utils
+import ccunreal.unreal_constants as unreal_constants
 import ccunreal.utils.api_wrap as api_wrap
 import ccunreal.utils.sequencer_utils as sequencer_utils
 import ccunreal.utils.unreal_context as unreal_context
@@ -29,10 +30,13 @@ class LevelSequenceExporter(BaseExporter):
         self.log("Exporting level sequences...")
         self.map = ue.load_asset(self.data["map_path"])
         self.ls = ue.load_asset(self.data["ls_path"])
+        self.publish_assets = self.data["publish_assets"]
+        ue.LevelSequenceEditorBlueprintLibrary.open_level_sequence(self.ls)
 
         # load each the level sequence and export
         self.set_export_context()
-        self.export_sequence_level()
+        self.export_animated_actors()
+        self.export_static_actors()
         self.write_metadata()
         self.publish_shot()
         self.render_movie_queue()
@@ -60,57 +64,115 @@ class LevelSequenceExporter(BaseExporter):
         self.next_version = self.ftquery.next_version_from_ctx(self.ctx)
         self.ctx.use_version = self.next_version
 
+    def get_actor_name(self, sequence_actor):
+        # type: (ue.Actor) -> Optiona[str]
+        """
+        From the actor get the label to use to export.
+
+        Args:
+            sequence_actor: The unreal actor to get the name for
+
+        Returns:
+            actor_name_clean: The clean name to export
+        """
+        # get the fbx export path
+        actor_name = sequence_actor.get_actor_label()
+        if actor_name not in self.publish_assets:
+            self.log(f"Skipping actor {actor_name} not set to export")
+            return
+
+        match = re.match(r"(.*)_v\d+$", actor_name)
+        actor_name_clean = match.group(1) if match else actor_name
+
+        if actor_name_clean in self.additional_components:
+            self.log(f"Actor {actor_name_clean} has already been exported")
+            return
+
+        return actor_name_clean
+
     @BaseExporter.add_to_percentage(10)
-    def export_sequence_level(self):
+    def export_animated_actors(self):
         """
-        Get the characters to export and create a fbx export
+        Export the actors bind to the level sequence
         """
-        self.log(f"Level name: {self.ls.get_name()}")
         bindings = self.ls.get_bindings()
         for binding in bindings:
-            sequence_actor = self.get_level_sequence_actor(binding)
+            sequence_actor = sequencer_utils.get_level_sequence_actor(self.ls, binding)
             if not sequence_actor:
                 ue.log_warning(f"No binding found for binding {binding.get_display_name()}")
                 continue
-
-            # skip the camera component as it's not needed
-            if isinstance(sequence_actor, ue.CineCameraComponent):
-                ue.log_warning("Skipping ue.CineCameraComponent")
-                continue
-
-            # get the fbx export path
-            binding_name = binding.get_name()
-            match = re.match(r"(.*)_v\d+$", binding_name)
-            suffix = match.group(1) if match else binding_name
-            self.ctx.use_suffix = suffix
-
-            fbx_path = self.ctx.fbx_file_path
-            self.log(f"FBX Path: {fbx_path}")
-
-            # export the fbx file to disk
-            file_utils.create_directories(os.path.dirname(fbx_path))
-            sequencer_utils.export_fbx_file(fbx_path, self.map, self.ls, [binding])
-            asset_export_data = {"fbx_path": fbx_path, "is_camera": False}
-
-            # save the camera data as a camera only
-            if isinstance(sequence_actor, ue.CineCameraActor):
-                asset_export_data["asset_type_name"] = "camera"
-                asset_export_data["is_camera"] = True
-
-            elif isinstance(sequence_actor, ue.SkeletalMeshActor):
-                comp = sequence_actor.get_component_by_class(ue.SkeletalMeshComponent)
-                metadata = api_wrap.get_metadata_tag_values(comp.skeletal_mesh_asset)
-                asset_export_data.update(metadata)
-
-            self.exported_files_to_data[fbx_path] = asset_export_data
-
-            # remove log component name to a short one
-            version_match = re.match(r".*_(.+?)_v\d+$", binding_name)
-            if version_match:
-                binding_name = version_match.group(1)
-
-            self.additional_components[binding_name] = fbx_path
+            self.export_actor_fbx(sequence_actor, binding=binding)
         self.data["additional_components"] = self.additional_components
+
+    @BaseExporter.add_to_percentage(10)
+    def export_static_actors(self):
+        """
+        Export the static mesh level actors
+        """
+        level_actors = api_wrap.get_all_level_actors()
+        for sequence_actor in level_actors:
+            self.export_actor_fbx(sequence_actor)
+
+    def export_actor_fbx(self, sequence_actor, binding=None):
+        # type: (ue.Actor, Optional[ue.MovieSceneBindingProxy]) -> None
+        """
+        Export the actor as a fbx be it an actor that has a
+        binding to the level sequence or static on the level
+
+        Args:
+            sequence_actor: The sequence actor to export as a fbx
+            binding: The binding to the level sequence
+        """
+        supported_cls_tuple = tuple(unreal_constants.SUPPORTED_EXPORT_CLASSES)
+        if not isinstance(sequence_actor, supported_cls_tuple):
+            ue.log_warning(f"Skipping {sequence_actor}")
+            return
+
+        # skip the camera component as it's not needed
+        actor_name = self.get_actor_name(sequence_actor)
+        if not actor_name:
+            return
+
+        # set the fbx export file path
+        self.ctx.use_suffix = actor_name
+        fbx_path = self.ctx.fbx_file_path
+        self.log(f"FBX Path: {fbx_path}")
+
+        # export the fbx file to disk
+        if binding:
+            sequencer_utils.export_sequencer_fbx_file(
+                fbx_path, self.map, self.ls, [binding])
+        else:
+            sequencer_utils.export_static_actor_fbx_file(
+                fbx_path, sequence_actor)
+
+        # build a dictionary of the asset export data
+        asset_export_data = {
+            "fbx_path": fbx_path,
+            "is_camera": False,
+            "namespace": actor_name
+        }
+
+        # save the camera data as a camera only
+        if isinstance(sequence_actor, ue.CineCameraActor):
+            asset_export_data["asset_type_name"] = "camera"
+            asset_export_data["is_camera"] = True
+
+        elif isinstance(sequence_actor, ue.SkeletalMeshActor):
+            comp = sequence_actor.get_component_by_class(ue.SkeletalMeshComponent)
+            metadata = api_wrap.get_metadata_tag_values(comp.skeletal_mesh_asset)
+            asset_export_data.update(metadata)
+
+        elif isinstance(sequence_actor, ue.StaticMeshActor):
+            comp = sequence_actor.get_component_by_class(ue.StaticMeshComponent)
+            metadata = api_wrap.get_metadata_tag_values(comp.static_mesh)
+            asset_export_data.update(metadata)
+
+        # add the data to the export data
+        self.exported_files_to_data[fbx_path] = asset_export_data
+
+        # add the actor to the additional components to publish
+        self.additional_components[actor_name] = fbx_path
 
     def create_shot_folder(self):
         """
@@ -140,22 +202,6 @@ class LevelSequenceExporter(BaseExporter):
         self.create_folders.create_all_shot_folders()
         self.ftshot.commit()
 
-    def get_level_sequence_actor(self, binding):
-        # type: (ue.MovieSceneBindingProxy) -> ue.Actor
-        """
-        Get the bound actor from the binding
-
-        Args:
-            binding: The binding to get the actor from
-
-        Returns:
-            The level sequence actor
-        """
-        binding_id = self.ls.get_portable_binding_id(self.ls, binding)
-        bound_actors = ue.LevelSequenceEditorBlueprintLibrary.get_bound_objects(binding_id)
-        if bound_actors:
-            return bound_actors[0]
-
     @BaseExporter.add_to_percentage(20)
     def render_movie_queue(self):
         """
@@ -183,7 +229,6 @@ class LevelSequenceExporter(BaseExporter):
         )
         job_cls.create_job()
         job_cls.run_render()
-
 
 
 class USDLevelSequenceExporter(LevelSequenceExporter):

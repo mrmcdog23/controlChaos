@@ -3,12 +3,11 @@ from typing import Any
 import unreal as ue
 import cccore.utils.file_utils as file_utils
 import ccunreal.utils.unreal_utils as unreal_utils
-import ccunreal.utils.api_wrap as api_wrap
 import ccgeneral.wizard.base_wizard as base_wizard
-import cccore.file_env.context as context
 import cccore.file_env.context_utils as context_utils
 from ccgeneral.wizard.pages.complete_page import CompletePage
 from ccunreal.wizard.pages.ls_context_page import LevelSequenceContextPage
+from ccunreal.wizard.pages.export_selection_page import ExportSelectionPage
 from ccgeneral.wizard.pages.progress_page import ProgressPage
 import ccunreal.wizard.exporter.level_sequence_exporter as level_sequence_exporter
 
@@ -26,12 +25,8 @@ class LevelSequenceWizard(base_wizard.BaseWizard):
             self.ctx = context_utils.get_context_from_path(usd_stage_path)
         else:
             self.exporter = level_sequence_exporter.LevelSequenceExporter()
-            ls = ue.load_asset(ls_path)
-            metadata_dict = api_wrap.get_metadata_tag_values(ls)
-            self.ctx = context.Context(overrides=metadata_dict)
 
         self.data["local"] = True
-        self.data["ls_path"] = ls_path
         self.data["usd_stage_path"] = usd_stage_path
         self.data["map_path"] = unreal_utils.current_map_path()
         self.data["thumbnail_path"] = file_utils.get_temp_file_path(
@@ -41,7 +36,7 @@ class LevelSequenceWizard(base_wizard.BaseWizard):
     def wizard_pages(self):
         # type: () -> list[Any]
         """ Add all the pages to the publishing wizard """
-        pages = [LevelSequenceContextPage, ProgressPage, CompletePage]
+        pages = [ExportSelectionPage, LevelSequenceContextPage, ProgressPage, CompletePage]
         return pages
 
     def get_open_usd_stage_path(self):

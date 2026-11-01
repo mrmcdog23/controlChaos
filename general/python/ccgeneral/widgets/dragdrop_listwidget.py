@@ -11,6 +11,7 @@ class DragDropListWidget(QtWidgets.QListWidget):
         super(DragDropListWidget, self).__init__(parent)
         self.setIconSize(QtCore.QSize(124, 124))
         self.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.setDefaultDropAction(QtCore.Qt.MoveAction)
         self.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.setAcceptDrops(True)
 
@@ -29,6 +30,13 @@ class DragDropListWidget(QtWidgets.QListWidget):
             super(DragDropListWidget, self).dragMoveEvent(event)
         for item in items:
             self.takeItem(self.row(item))
+
+    def dropEvent(self, event):
+        if isinstance(event.source(), DragDropListWidget):
+            event.setDropAction(QtCore.Qt.MoveAction)
+            super(DragDropListWidget, self).dropEvent(event)
+        else:
+            event.ignore()
 
     @property
     def list_names(self):

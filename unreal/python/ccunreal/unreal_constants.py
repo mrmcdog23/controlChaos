@@ -1,4 +1,7 @@
 """ Unreal constants """
+import unreal as ue
+
+
 MATERIAL = "Material"
 SKELETON = "Skeleton"
 SKELETON_MESH = "SkeletalMesh"
@@ -14,3 +17,9 @@ IGNORE_IMPORT_TYPES = [
 
 LS_PREFIX = "LS"
 MP_PREFIX = "MP"
+
+SUPPORTED_EXPORT_CLASSES = [
+    ue.SkeletalMeshActor,
+    ue.StaticMeshActor,
+    ue.CineCameraActor
+]

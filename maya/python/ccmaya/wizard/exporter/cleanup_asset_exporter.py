@@ -33,7 +33,7 @@ class CleanupAssetExporter(BaseExporter):
         self.create_joints_group()
         self.remove_redundant_top_level_nodes()
         self.save_master_file()
-        self.export_fbx_file()
+        self.export_sequencer_fbx_file()
         self.publish_shot()
 
     @property
@@ -133,7 +133,7 @@ class CleanupAssetExporter(BaseExporter):
         self.additional_components["master_file_path"] = master_file_path
         self.data["version_num"] = next_version
 
-    def export_fbx_file(self):
+    def export_sequencer_fbx_file(self):
         """
         Export the asset and publish it to FTrack
         """
