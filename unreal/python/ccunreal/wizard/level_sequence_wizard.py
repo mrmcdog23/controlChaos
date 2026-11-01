@@ -17,8 +17,6 @@ class LevelSequenceWizard(base_wizard.BaseWizard):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-
-        ls_path = unreal_utils.current_ls_path()
         usd_stage_path = self.get_open_usd_stage_path()
         if usd_stage_path:
             self.exporter = level_sequence_exporter.USDLevelSequenceExporter()
