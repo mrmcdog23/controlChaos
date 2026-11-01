@@ -10,14 +10,15 @@ from ccgeneral.widgets.dragdrop_listwidget import DragDropListWidget
 
 
 class ContextItem(QtWidgets.QListWidgetItem):
-    def __init__(self, text, new_entity):
+    def __init__(self, text, is_new):
         super().__init__()
         # set variables
-        self.new_entity = new_entity
+        self.new_sub_text = list()
+        self.is_new = is_new
         self.setText(text)
 
         # if new set the colour to green
-        if new_entity:
+        if is_new:
             self.setForeground(QtCore.Qt.green)
         self.setFlags(self.flags() | QtCore.Qt.ItemIsEditable)
 
@@ -48,6 +49,9 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         self.connect_signals()
 
     def create_layout(self):
+        """
+        Add the list widgets to the ui
+        """
         self.lw_sequence = DragDropListWidget()
         self.lyt_sequence.addWidget(self.lw_sequence)
         self.lw_shot = DragDropListWidget()
@@ -86,7 +90,7 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         if not selected_items:
             return
 
-        if selected_items[0].new_entity:
+        if selected_items[0].is_new:
             return
 
         action_save = QtWidgets.QAction(self)
@@ -132,6 +136,7 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         """
         Add shot in frame range
         """
+        seq_item = self.get_selected_sequence()
         new_shot_list = list()
         if self.rbn_suffix_in_range.isChecked():
             start_range = self.sb_start_range.value()
@@ -154,6 +159,8 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         for new_shot_name in new_shot_list:
             item = ContextItem(new_shot_name, True)
             self.lw_shot.addItem(item)
+            seq_item.new_sub_text.append(new_shot_name)
+
         self.enabled_create_button()
 
     @property
@@ -241,7 +248,7 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         """
         new_items_dict = dict()
         for item in list_widget.list_items:
-            if item.new_entity:
+            if item.is_new:
                 new_items_dict[item.text()] = item
         return new_items_dict
 
@@ -303,32 +310,41 @@ class ShotCreator(base_ui.StandaloneWindowBase):
             new_shot_list.append(new_shot_name)
         return new_shot_list
 
+    def get_selected_sequence(self):
+        items = self.lw_sequence.selectedItems()
+        if not items:
+            self.grp_shot.setEnabled(False)
+            return
+
+        seq_item = items[0]
+        try:
+            seq_item.is_new
+        except AttributeError:
+            return
+
+        self.grp_shot.setEnabled(True)
+        return seq_item
+
     def populate_shots(self):
         """
         Populate the list of shots from ftrack
         based on the episode selection
         """
         self.lw_shot.clear()
-        items = self.lw_sequence.selectedItems()
-        if not items:
-            self.grp_shot.setEnabled(False)
+        seq_item = self.get_selected_sequence()
+        if not seq_item:
             return
-
-        self.grp_shot.setEnabled(True)
-        seq_item = items[0]
-        try:
-            seq_item.new_entity
-        except AttributeError:
-            return
-
-        if not seq_item.new_entity:
+        if not seq_item.is_new:
             sequence_name = seq_item.text()
 
             shot_names = self.ftshot.get_shot_names(sequence_name)
             for shot_name in shot_names:
                 item = ContextItem(shot_name, False)
                 self.lw_shot.addItem(item)
-            seq_item.child_names = shot_names
+
+        for shot_name in seq_item.new_sub_text:
+            item = ContextItem(shot_name, True)
+            self.lw_shot.addItem(item)
 
     def enabled_create_button(self):
         """
@@ -380,6 +396,9 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         """
         Remove the selected shots
         """
+        seq_item = self.get_selected_sequence()
+        for item in self.lw_shot.selectedItems():
+            seq_item.new_sub_text.remove(item.text())
         self.remove_items(self.lw_shot)
 
     def remove_items(self, list_widget):
@@ -388,27 +407,26 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         """
         for item in list_widget.selectedItems():
             try:
-                is_new = item.new_entity
+                is_new = item.is_new
             except AttributeError:
                 is_new = True
             if is_new:
                 list_widget.takeItem(list_widget.row(item))
-
 
     def create_context(self):
         """
         Create all episodes, sequences and shots
         """
         # create sequences
-        for sequence_name in self.lw_sequence.items_text:
-            self.ftshot.create_sequence(sequence_name)
+        for sequence_item in self.lw_sequence.list_items:
+            sequence_name = sequence_item.text()
+            if sequence_item.is_new:
+                self.logger.info(f"Creating new sequence: {sequence_name}")
+                self.ftshot.create_sequence(sequence_name)
 
-        # build a dictionary of what to create
-        shots_to_create = self.get_entity_list_to_create(self.lw_shot)
-
-        # add new episodes to dictionary
-        for shot_name in shots_to_create:
-            self.ftshot.create_shot(shot_name, self.sequence_name)
+            for shot_name in sequence_item.new_sub_text:
+                self.logger.info(f"Creating new shot: {shot_name}")
+                self.ftshot.create_shot(shot_name, sequence_name)
 
         self.populate_sequences()
         self.logger.info("Shot creation complete")
