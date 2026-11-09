@@ -3,6 +3,7 @@ import os
 import unreal as ue
 import cccore.file_env.context as context
 import ccunreal.utils.unreal_utils as unreal_utils
+import ccunreal.utils.cc_wrap as cc_wrap
 import ccunreal.shot.loader.import_all_usd as import_all_usd
 import ccunreal.shot.loader.ue_load_shot as ue_load_shot
 import ccunreal.shot.loader.wdg_import_shot as wdg_import_shot
@@ -72,7 +73,7 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
         """
         Import cameras into unreal
         """
-        # hide or show the usd checkobox and enable options
+        # hide or show the usd checkbox and enable options
         if self.all_usd and self.chk_all_usd.isChecked():
             import_all_usd.import_all_usd_as_stage(self.all_usd)
         else:
@@ -87,6 +88,7 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
                 self.end_frame,
                 self.ftshot.fps
             )
+        cc_wrap.notification("Shot successfully built", "shot_built")
 
 
 def main():
