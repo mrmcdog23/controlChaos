@@ -54,6 +54,7 @@ class ShotExporter(BaseExporter):
         # set the next version number
         self.ctx = context.Context(self.data)
         self.next_version = self.ftquery.next_version_from_ctx(self.ctx)
+        self.data["version_num"] = self.next_version
         self.logger.info(f"Using next version number: {self.next_version}")
 
         self.ctx.use_version = self.next_version

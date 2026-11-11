@@ -142,6 +142,9 @@ class LoadShotUI(base_ui.WidgetBase):
         else:
             enable_files = True
         self.lw_import_files.setEnabled(enable_files)
+        for radio in [self.rbn_all, self.rbn_usd, self.rbn_fbx, self.rbn_alembic]:
+            if radio.isChecked():
+                self.filter_files(radio)
 
     @property
     def start_frame(self):

@@ -6,7 +6,6 @@ import ccunreal.utils.unreal_utils as unreal_utils
 import ccunreal.unreal_constants as unreal_constants
 import ccunreal.shot.cache_importer as cache_importer
 import ccunreal.utils.api_wrap as api_wrap
-import cccore.utils.file_utils as file_utils
 import ccunreal.asset.fbx_asset_import as fbx_asset_import
 import ccftrack.asset_version as asset_version
 
@@ -57,6 +56,7 @@ class UELoadShot(object):
         self.open_sequence()
         self.animation_import()
         self.set_camera_settings()
+        self.save_level_and_ls()
 
     def create_level(self):
         """
@@ -109,7 +109,7 @@ class UELoadShot(object):
             file_data = self.data["exported_files_to_data"][fbx_path]
 
             if file_data["is_camera"]:
-                self.import_camera_animation(fbx_path)
+                self.import_camera_animation(fbx_path, file_data["namespace"])
 
             elif file_data["is_skeleton_mesh"]:
                 self.import_skeleton_mesh_animation(fbx_path, file_data)
@@ -143,6 +143,7 @@ class UELoadShot(object):
         Args:
             fbx_path: Path of the fbx file to import
         """
+        ue.log_warning(f"Importing animation path: {file_data}")
         # import the actor and its fbx path
         skeleton, skeleton_mesh = self.import_skeleton_asset(file_data)
         if not skeleton:
@@ -154,7 +155,7 @@ class UELoadShot(object):
             anim_importer.import_animation(skeleton=skeleton)
         except RuntimeError:
             pass
-
+        
         # get the object path to its type and remove the other asset types
         ue.log_warning(f"Searching for sequence: {self.version_dir}")
         anim_sequence_path = None
@@ -162,9 +163,12 @@ class UELoadShot(object):
             self.version_dir, unreal_constants.ANIM_SEQUENCE)
         ue.log_warning(f"Found sequences: {anim_sequences}")
 
+        actor_name = file_data["namespace"]
         # get the import animation sequence path
         for anim_sequence in anim_sequences:
-            if anim_sequence not in self.imported_anim_sequences:
+            if anim_sequence in self.imported_anim_sequences:
+                continue
+            if actor_name in anim_sequence:
                 anim_sequence_path = anim_sequence
                 self.imported_anim_sequences.append(anim_sequence)
                 break
@@ -175,7 +179,7 @@ class UELoadShot(object):
         ue.log(f"Animation sequence path: {anim_sequence_path}")
 
         # add the actor to the level
-        actor_name = file_utils.get_file_name(fbx_path)
+        ue.log_warning(self.ftver.asset_build_name)
         self.spawn_actor_to_level(skeleton, anim_sequence_path, actor_name)
 
     def spawn_actor_to_level(self, skeleton, anim_sequence_path, asset_key):
@@ -188,15 +192,25 @@ class UELoadShot(object):
             anim_sequence_path: Path of the new animation sequence
             asset_key: Name of the actor component
         """
+        ue.log_warning(f"Loading {anim_sequence_path} on {asset_key}")
         actor = self.find_actor_with_label(asset_key)
-        ue.log_warning(f"Found actor: {actor}")
         if not actor:
-            ue.log_warning(f"Skeleton to spawn: {skeleton}")
+            ue.log_warning(f"Actor {asset_key} not found. Spawning {skeleton}")
             actor = api_wrap.spawn_actor_from_object(skeleton)
             actor.set_actor_label(asset_key)
 
-        # add the actor and create the track and the section
-        actor_binding = self.ls.add_possessable(actor)
+        actor_binding = self.ls.find_binding_by_name(asset_key)
+        if ue.MovieSceneBindingExtensions.is_valid(actor_binding):
+            ue.log_warning(f"Actor binding {asset_key} found. Removing...")
+            for track in actor_binding.find_tracks_by_type(ue.MovieSceneSkeletalAnimationTrack):
+                actor_binding.remove_track(track)
+                # clear the previous bindings
+        else:
+            # add the actor and create the track and the section
+            actor_binding = self.ls.add_possessable(actor)
+            ue.log_warning(f"Created actor binding {actor}")
+
+        self.add_binding_version_tag(actor_binding)
         anim_track = actor_binding.add_track(ue.MovieSceneSkeletalAnimationTrack)
         anim_section = anim_track.add_section()
 
@@ -225,7 +239,7 @@ class UELoadShot(object):
             if actor.get_actor_label() == actor_label:
                 return actor
 
-    def import_camera_animation(self, fbx_path):
+    def import_camera_animation(self, fbx_path, camera_name):
         # type: (str) -> None
         """
         Import a camera into the level sequence by
@@ -237,16 +251,13 @@ class UELoadShot(object):
         editor_subsys = ue.get_editor_subsystem(ue.LevelSequenceEditorSubsystem)
 
         # check for existing camera first
-        camera_actor = unreal_utils.actor_type_on_level(ue.CineCameraActor)
-        if camera_actor:
-            # try to find binding and if one isn't found create one
-            binding = self.find_camera_binding()
-            if not binding:
-                binding = self.ls.add_possessable(camera_actor)
+        binding = self.ls.find_binding_by_name(camera_name)
+        if ue.MovieSceneBindingExtensions.is_valid(binding):
+            ue.log_warning(f"Found camera binding {camera_name} -> {binding}")
         else:
             # if no binding found spawn one
+            ue.log_warning("Creating camera...")
             binding, camera_actor = editor_subsys.create_camera(spawnable=False)
-            camera_name = file_utils.get_file_name(fbx_path)
             camera_actor.set_actor_label(camera_name)
 
         # apply the sequence animation
@@ -254,6 +265,18 @@ class UELoadShot(object):
         ue.SequencerTools.import_level_sequence_fbx(
             world, self.ls, [binding], unreal_utils.camera_ue_options(), fbx_path
         )
+        self.add_binding_version_tag(binding)
+
+    def add_binding_version_tag(self, binding):
+        '''
+        #for tag in ue.MovieSceneSequenceExtensions.get_binding_tags(self.ls, binding):  # name unverified
+        #    ue.MovieSceneSequenceExtensions.remove_binding_tag(self.ls, binding, tag)
+
+        version_num = self.data["version_num"]
+        tag_text = f"Version: {version_num}"
+        ue.MovieSceneSequenceExtensions.add_binding_tag(self.ls, binding, tag_text)
+        '''
+        return
 
     def import_static_mesh(self, file_data):
         # type: (Any, dict, str) -> None
@@ -267,15 +290,15 @@ class UELoadShot(object):
         # import the actor and its fbx path
         self.ftver.asset_version_id = file_data["ftrack_id"]
         asset_fbx_path = file_data["asset_fbx_path"]
+        asset_name = file_data["namespace"]
         asset_importer = fbx_asset_import.FBXAssetImport(asset_fbx_path, self.ftver, False)
         asset_importer.import_asset()
         static_mesh = asset_importer.static_mesh
         ue.log_warning(f"Static mesh path: {static_mesh}")
 
         # add the static mesh to the map
-        asset_key = file_utils.get_file_name(asset_fbx_path)
         actor = api_wrap.spawn_actor_from_object(static_mesh)
-        actor.set_actor_label(asset_key)
+        actor.set_actor_label(asset_name)
 
     def set_camera_settings(self):
         """
@@ -291,3 +314,10 @@ class UELoadShot(object):
         comp = camera_actor.get_cine_camera_component()
         focus = comp.get_editor_property("focus_settings")
         focus.focus_method = ue.CameraFocusMethod.DISABLE
+
+    def save_level_and_ls(self):
+
+        ue.EditorAssetLibrary.save_loaded_asset(self.ls)
+
+        # Save the currently open map
+        ue.EditorLoadingAndSavingUtils.save_current_level()
