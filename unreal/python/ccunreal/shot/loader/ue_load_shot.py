@@ -268,15 +268,19 @@ class UELoadShot(object):
         self.add_binding_version_tag(binding)
 
     def add_binding_version_tag(self, binding):
-        '''
-        #for tag in ue.MovieSceneSequenceExtensions.get_binding_tags(self.ls, binding):  # name unverified
-        #    ue.MovieSceneSequenceExtensions.remove_binding_tag(self.ls, binding, tag)
+        # type: (ue.MovieSceneBindingProxy) -> None
+        """
+        Tag the binding version to see clearly which version it is
+
+        Args:
+            binding: The actor bin ding to the level sequence
+        """
+        for tag in ue.MovieSceneBindingTagExtensions.get_binding_tags(binding):
+            ue.MovieSceneBindingTagExtensions.untag_binding(binding, tag)
 
         version_num = self.data["version_num"]
-        tag_text = f"Version: {version_num}"
-        ue.MovieSceneSequenceExtensions.add_binding_tag(self.ls, binding, tag_text)
-        '''
-        return
+        tag_text = f"Version:{version_num}"
+        ue.MovieSceneBindingTagExtensions.tag_binding(binding, tag_text)
 
     def import_static_mesh(self, file_data):
         # type: (Any, dict, str) -> None
