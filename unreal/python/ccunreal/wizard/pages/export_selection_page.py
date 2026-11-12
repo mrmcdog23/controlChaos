@@ -2,6 +2,7 @@
 import unreal as ue
 import ccunreal.utils.api_wrap as api_wrap
 import ccunreal.unreal_constants as unreal_constants
+import ccunreal.utils.actors_from_bindings as actors_from_bindings
 import cccore.file_env.context as context
 import cccore.utils.file_utils as file_utils
 from ccgeneral.widgets.dragdrop_listwidget import DragDropListWidget
@@ -18,6 +19,7 @@ class ExportSelectionPage(BasePublishPage):
         self.lw_scene_assets = None
         self.lw_publish_assets = None
         self.wdg_save_dir = None
+        self.all_actor_names = list()
 
     def initializePage(self):
         # type: () -> bool
@@ -46,6 +48,9 @@ class ExportSelectionPage(BasePublishPage):
         self.lw_layout.addWidget(self.lw_publish_assets, 1, 2)
 
     def load_data_assets(self):
+        """
+        Load the list of level sequences
+        """
         seq_name_path = dict()
         ls = api_wrap.get_current_level_sequence()
         for track in ls.get_tracks():
@@ -73,36 +78,53 @@ class ExportSelectionPage(BasePublishPage):
         self.lw_publish_assets.model().rowsInserted.connect(self.check_complete)
         self.lw_publish_assets.model().rowsRemoved.connect(self.check_complete)
 
+    def create_actor_item(self, actor):
+        # type: (ue.Actor) -> None
+        """
+        Create a list widget item of the given actor
+
+        Args:
+            actor: The actor to add to the list
+        """
+        actor_cls = actor.__class__
+        if actor_cls not in unreal_constants.SUPPORTED_EXPORT_CLASSES:
+            ue.log_warning(f"Unsupported actor type: {actor_cls}")
+            return
+
+        # get the actor label and skip if it is already added
+        actor_name = sequence_actor.get_actor_label()
+        if actor_name in self.all_actor_names:
+            return
+
+        # get the icon to set on the list widget
+        icon_name = actor_cls.__name__
+        item = QtWidgets.QListWidgetItem(actor_name)
+        icon_path = self.get_icon_path(icon_name)
+        item.setIcon(QtGui.QIcon(icon_path))
+        self.lw_level_assets.addItem(item)
+
+        # add to the list to not be added twice
+        self.all_actor_names.append(actor_name)
+
     def populate_assets(self):
         """
         Populate the map assets then the spawnable assets
         """
+        self.all_actor_names = list()
         item = self.lw_level_sequence.currentItem()
         ls_path = item.data(QtCore.Qt.UserRole)
         self.lw_level_assets.clear()
 
         # get the level actors
         level_actors = api_wrap.get_all_level_actors()
-        for sequence_actor in level_actors:
-
-            sequence_actor_cls = sequence_actor.__class__
-            if sequence_actor_cls not in unreal_constants.SUPPORTED_EXPORT_CLASSES:
-                ue.log_warning(f"Unsupported actor type: {sequence_actor_cls}")
-                continue
-
-            actor_name = sequence_actor.get_actor_label()
-            icon_name = sequence_actor_cls.__name__
-            item = QtWidgets.QListWidgetItem(actor_name)
-            icon_path = self.get_icon_path(icon_name)
-            item.setIcon(QtGui.QIcon(icon_path))
-            self.lw_level_assets.addItem(item)
+        for level_actor in level_actors:
+            self.create_actor_item(level_actor)
 
         # get the spawnable actors
         ls = ue.load_asset(ls_path)
-        for spawnable_actor in ls.get_spawnables():          # MovieSceneBindingProxy
-            spawnable_name = spawnable_actor.get_name()
-            item = QtWidgets.QListWidgetItem(spawnable_name)
-            self.lw_level_assets.addItem(item)
+        for binding in ls.get_bindings():
+            sequence_actor = actors_from_bindings.get_actor_from_binding(ls, binding)
+            self.create_actor_item(sequence_actor)
 
     def load_scene_assets(self):
         """
