@@ -83,21 +83,32 @@ class MayaLoadShotUI(load_shot_ui.LoadShotUI):
         fbx_import_settings.run_temp_fbx_data(namespace, "camera")
 
     def reference_asset(self, fbx_path, file_data):
+        # type: (str, dict) -> None
+        """
+        Reference the maya asset and load the fbx data on to it
+
+        Args:
+            fbx_path: The animation file to import on to the asset
+            file_data: Full data of the asset being imported
+        """
         namespace = file_data["namespace"]
         if file_data["is_camera"]:
             self.load_camera(fbx_path, namespace)
             return
 
+        # reference the maya asset into the scene
         self.ftver.asset_version_id = file_data["ftrack_id"]
         cmds.file(
             self.ftver.master_component_path,
             namespace=namespace,
             reference=True
         )
+
+        # if it is a static asset then not animation applied
         if not file_data.get("is_skeleton_mesh"):
-            print ("Static mesh")
             return
 
+        # apply the fbx animation
         fbx_import_settings.create_joint_data(fbx_path, namespace)
 
     def import_files(self):
