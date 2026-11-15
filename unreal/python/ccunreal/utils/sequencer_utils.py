@@ -294,7 +294,7 @@ def export_sequencer_fbx_file(fbx_file_path, world, level_sequence, bindings):
     override_options.ascii = False
     override_options.collision = False
     override_options.export_local_time = False
-    override_options.export_preview_mesh = True
+    override_options.export_preview_mesh = False
     override_options.export_source_mesh = False
     override_options.fbx_export_compatibility = ue.FbxExportCompatibility.FBX_2020
     override_options.force_front_x_axis = False

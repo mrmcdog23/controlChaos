@@ -92,7 +92,7 @@ class ExportSelectionPage(BasePublishPage):
             return
 
         # get the actor label and skip if it is already added
-        actor_name = sequence_actor.get_actor_label()
+        actor_name = actor.get_actor_label()
         if actor_name in self.all_actor_names:
             return
 

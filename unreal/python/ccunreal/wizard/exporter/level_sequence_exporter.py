@@ -28,9 +28,12 @@ class LevelSequenceExporter(BaseExporter):
         Loop through the level sequence paths and
         """
         self.log("Exporting level sequences...")
+        self.publish_assets = self.data["publish_assets"]
         self.map = ue.load_asset(self.data["map_path"])
         self.ls = ue.load_asset(self.data["ls_path"])
-        self.publish_assets = self.data["publish_assets"]
+        self.start_frame = self.ls.get_playback_start()
+        self.end_frame = self.ls.get_playback_end()
+
         ue.LevelSequenceEditorBlueprintLibrary.open_level_sequence(self.ls)
 
         # load each the level sequence and export
@@ -152,21 +155,27 @@ class LevelSequenceExporter(BaseExporter):
             "is_camera": False,
             "namespace": actor_name
         }
+        is_camera = False
+        is_skeleton_mesh = False
 
         # save the camera data as a camera only
         if isinstance(sequence_actor, ue.CineCameraActor):
             asset_export_data["asset_type_name"] = "camera"
-            asset_export_data["is_camera"] = True
+            is_camera = True
 
         elif isinstance(sequence_actor, ue.SkeletalMeshActor):
             comp = sequence_actor.get_component_by_class(ue.SkeletalMeshComponent)
             metadata = api_wrap.get_metadata_tag_values(comp.skeletal_mesh_asset)
             asset_export_data.update(metadata)
+            is_skeleton_mesh = True
 
         elif isinstance(sequence_actor, ue.StaticMeshActor):
             comp = sequence_actor.get_component_by_class(ue.StaticMeshComponent)
             metadata = api_wrap.get_metadata_tag_values(comp.static_mesh)
             asset_export_data.update(metadata)
+
+        asset_export_data["is_camera"] = is_camera
+        asset_export_data["is_skeleton_mesh"] = is_skeleton_mesh
 
         # add the data to the export data
         self.exported_files_to_data[fbx_path] = asset_export_data

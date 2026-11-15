@@ -175,7 +175,24 @@ class SceneAsset(object):
             "asset_fbx_path": self.asset_fbx_path,
             "ftrack_id": self.ftrack_id
         }
+        if self.is_camera:
+            file_data.update(self.camera_data)
         return file_data
+
+    @property
+    def camera_data(self):
+        # type: () -> dict
+        """ Get the camera data """
+        cam = cmds.listRelatives(self.cam_grp)[0]
+        shape = cmds.listRelatives(cam, shapes=True, type="camera")[0]
+        data = {
+            "sensor_width_mm":  cmds.getAttr(shape + ".horizontalFilmAperture") * 25.4,
+            "sensor_height_mm": cmds.getAttr(shape + ".verticalFilmAperture") * 25.4,
+            "focal_length":     cmds.getAttr(shape + ".focalLength"),
+            "film_fit":         cmds.getAttr(shape + ".filmFit"),  # 0 fill, 1 horiz, 2 vert, 3 overscan
+        }
+        return data
+
 
     @property
     def asset_top_node(self):
@@ -197,8 +214,9 @@ class SceneAsset(object):
             self.ftver.asset_version_id = self.ftrack_id
         else:
             av = self.ftver.asset_version_from_path(self.reference_path)
-            self.ftver.asset_version_id = av["id"]
-            self._asset_version = av
+            if av:
+                self.ftver.asset_version_id = av["id"]
+                self._asset_version = av
 
     @property
     def is_loaded(self):

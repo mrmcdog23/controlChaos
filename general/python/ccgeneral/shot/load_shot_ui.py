@@ -2,9 +2,9 @@
 import os
 import cccore.base_ui as base_ui
 import cccore.utils.file_utils as file_utils
-import cccore.file_env.context as context
 import cccore.utils.cc_logging as cc_logging
 import ccftrack.shot as shot
+import ccftrack.asset as asset
 import ccftrack.asset_version as ft_version
 from CCPySide import QtWidgets, QtCore, QtGui
 from ccgeneral.widgets.shot_combobox import ShotComboBox
@@ -25,6 +25,7 @@ class LoadShotUI(base_ui.WidgetBase):
         super().__init__(parent=parent)
         self.ui_settings = QtCore.QSettings('controlChaos', 'ue_load_shot')
         self.ftshot = shot.FtShot()
+        self.ftasset = asset.FtAsset(session=self.ftshot.session)
         self.ftver = ft_version.FtAssetVersion(session=self.ftshot.session)
         self.logger = cc_logging.cc_logger()
         self.ctx = None

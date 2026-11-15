@@ -6,6 +6,7 @@ import ccunreal.utils.unreal_utils as unreal_utils
 import ccunreal.unreal_constants as unreal_constants
 import ccunreal.shot.cache_importer as cache_importer
 import ccunreal.utils.api_wrap as api_wrap
+import ccunreal.utils.actors_from_bindings as actors_from_bindings
 import ccunreal.asset.fbx_asset_import as fbx_asset_import
 import ccftrack.asset_version as asset_version
 
@@ -14,7 +15,6 @@ import ccftrack.asset_version as asset_version
 MATERIAL = unreal_constants.MATERIAL
 LS_PREFIX = unreal_constants.LS_PREFIX
 MP_PREFIX = unreal_constants.MP_PREFIX
-
 
 
 class UELoadShot(object):
@@ -39,7 +39,7 @@ class UELoadShot(object):
         self.start_frame = start_frame
         self.end_frame = end_frame
         self.fps = fps
-
+        self.cam_data = dict()
         self.ls = None
         self.imported_obj_paths = list()
         self.imported_anim_sequences = list()
@@ -55,8 +55,8 @@ class UELoadShot(object):
         self.create_ls()
         self.open_sequence()
         self.animation_import()
-        self.set_camera_settings()
         self.save_level_and_ls()
+        self.set_camera_settings()
 
     def create_level(self):
         """
@@ -93,7 +93,7 @@ class UELoadShot(object):
         )
 
         # add metadata to the level sequence
-        unreal_utils.apply_metadata(self.data["shot_meta_data"], self.ls)
+        #unreal_utils.apply_metadata(self.data["shot_meta_data"], self.ls)
 
     def open_sequence(self):
         """
@@ -109,7 +109,8 @@ class UELoadShot(object):
             file_data = self.data["exported_files_to_data"][fbx_path]
 
             if file_data["is_camera"]:
-                self.import_camera_animation(fbx_path, file_data["namespace"])
+                self.import_camera_animation(fbx_path, file_data)
+                self.cam_data = file_data
 
             elif file_data["is_skeleton_mesh"]:
                 self.import_skeleton_mesh_animation(fbx_path, file_data)
@@ -239,7 +240,25 @@ class UELoadShot(object):
             if actor.get_actor_label() == actor_label:
                 return actor
 
-    def import_camera_animation(self, fbx_path, camera_name):
+    def add_float_track(self, binding, prop_name, prop_path, value):
+        # type: (ue.MovieSceneBindingProxy, str, str, float) -> None
+        """
+        Add a float track to the camera binding and set the value
+
+        Args:
+            binding: the camera component binding
+            prop_name: Name of the property to set
+            prop_path: Path of the property to set
+            value: The value to set on the property
+        """
+        track = binding.add_track(ue.MovieSceneFloatTrack)
+        track.set_property_name_and_path(prop_name, prop_path)
+        section = track.add_section()
+        section.set_range(self.ls.get_playback_start(), self.ls.get_playback_end())
+        channel = section.get_all_channels()[0]
+        channel.set_default(value)    # constant value for the whole section
+
+    def import_camera_animation(self, fbx_path, file_data):
         # type: (str) -> None
         """
         Import a camera into the level sequence by
@@ -248,6 +267,7 @@ class UELoadShot(object):
         Args:
             fbx_path: Path of the camera fbx file
         """
+        camera_name = file_data["namespace"]
         editor_subsys = ue.get_editor_subsystem(ue.LevelSequenceEditorSubsystem)
 
         # check for existing camera first
@@ -266,6 +286,10 @@ class UELoadShot(object):
             world, self.ls, [binding], unreal_utils.camera_ue_options(), fbx_path
         )
         self.add_binding_version_tag(binding)
+
+        comp_binding = binding.get_child_possessables()[0]
+        self.add_float_track(comp_binding, "SensorWidth",  "Filmback.SensorWidth", file_data["sensor_width_mm"])
+        self.add_float_track(comp_binding, "SensorHeight", "Filmback.SensorHeight", file_data["sensor_height_mm"])
 
     def add_binding_version_tag(self, binding):
         # type: (ue.MovieSceneBindingProxy) -> None
@@ -291,6 +315,7 @@ class UELoadShot(object):
         Args:
             fbx_path: Path of the environment fbx file
         """
+        ue.log_warning(f"file_data: {file_data}")
         # import the actor and its fbx path
         self.ftver.asset_version_id = file_data["ftrack_id"]
         asset_fbx_path = file_data["asset_fbx_path"]
@@ -318,6 +343,14 @@ class UELoadShot(object):
         comp = camera_actor.get_cine_camera_component()
         focus = comp.get_editor_property("focus_settings")
         focus.focus_method = ue.CameraFocusMethod.DISABLE
+
+        # create the film back
+        filmback = comp.get_editor_property("filmback")
+        filmback.sensor_width = file_data["sensor_width_mm"]
+        filmback.sensor_height = file_data["sensor_height_mm"]
+
+        comp.set_editor_property("filmback", filmback)
+        comp.set_editor_property("current_focal_length", file_data["focal_length"])
 
     def save_level_and_ls(self):
 
