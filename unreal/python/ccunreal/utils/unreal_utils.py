@@ -5,6 +5,7 @@ from CCPySide import QtWidgets, QUiLoader
 from typing import Optional
 import ccunreal.utils.api_wrap as api_wrap
 import ccunreal.utils.unreal_context as unreal_context
+import cccore.utils.ui_utils as ui_utils
 
 
 def launch_unreal_win(win_class):
@@ -344,3 +345,27 @@ def apply_metadata(metadata_dict, asset, save=True):
     if save:
         api_wrap.save_asset(asset.get_full_name())
 
+
+def unreal_messagebox(title, message, msg_type, buttons=None, parent=None):
+    # type: (str, str, str, Optional[list], Optional[QtWidgets]) -> str
+    """
+    Create and display a QMessageBox for Unreal
+
+    Args:
+        title: The tile of the message box
+        message: Message to display
+        msg_type: Type of message (warning, info or critical)
+        buttons: List of button to display
+        parent: The parent widget for the asset
+
+    Returns:
+        response: The clicked button text
+    """
+    response = ui_utils.messagebox(
+        title,
+        message,
+        msg_type,
+        buttons=buttons,
+        parent=parent
+    )
+    return response

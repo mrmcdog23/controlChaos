@@ -93,7 +93,10 @@ class UELoadShot(object):
         )
 
         # add metadata to the level sequence
-        #unreal_utils.apply_metadata(self.data["shot_meta_data"], self.ls)
+        metadata_dict = dict()
+        for key in ["sequence_name", "shot_name", "task_name"]:
+            metadata_dict[key] = self.data[key]
+        unreal_utils.apply_metadata(metadata_dict, self.ls)
 
     def open_sequence(self):
         """
@@ -343,14 +346,6 @@ class UELoadShot(object):
         comp = camera_actor.get_cine_camera_component()
         focus = comp.get_editor_property("focus_settings")
         focus.focus_method = ue.CameraFocusMethod.DISABLE
-
-        # create the film back
-        filmback = comp.get_editor_property("filmback")
-        filmback.sensor_width = file_data["sensor_width_mm"]
-        filmback.sensor_height = file_data["sensor_height_mm"]
-
-        comp.set_editor_property("filmback", filmback)
-        comp.set_editor_property("current_focal_length", file_data["focal_length"])
 
     def save_level_and_ls(self):
 

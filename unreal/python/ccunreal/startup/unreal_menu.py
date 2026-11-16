@@ -68,7 +68,10 @@ def main():
     shot_menu = create_submenu(control_chaos_menu, "Shot")
     command = "import ccunreal.shot.import_fbx_cam as ifc;ifc.launch()"
     create_command(shot_menu, "Load FBX Cameras", command)
-    
+
+    command = "import ccunreal.shot.convert_sequence as cseq;cseq.main()"
+    create_command(shot_menu, "Convert Level Sequence", command)
+
     command = "import ccunreal.shot.loader.ue_load_shot_ui as ue_load_shot_ui;ue_load_shot_ui.main()"
     create_command(shot_menu, "Import Unreal Shot", command)
 
