@@ -93,7 +93,7 @@ class ConvertLevelSequence(base_ui.WidgetBase):
 
         # move the asset to the new location
         ls_path = level_sequences[0].get_path_name()
-        ue.EditorAssetLibrary.rename_asset(ls_path, new_ls_path)
+        ue.EditorAssetLibrary.duplicate_asset(ls_path, new_ls_path)
 
         # add metadata to the level sequence
         new_ls = ue.load_asset(new_ls_path)
