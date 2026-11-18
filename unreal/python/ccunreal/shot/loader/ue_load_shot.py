@@ -3,10 +3,9 @@ import os
 import unreal as ue
 import ccunreal.utils.sequencer_utils as sequencer_utils
 import ccunreal.utils.unreal_utils as unreal_utils
+import ccunreal.utils.api_wrap as api_wrap
 import ccunreal.unreal_constants as unreal_constants
 import ccunreal.shot.cache_importer as cache_importer
-import ccunreal.utils.api_wrap as api_wrap
-import ccunreal.utils.actors_from_bindings as actors_from_bindings
 import ccunreal.asset.fbx_asset_import as fbx_asset_import
 import ccftrack.asset_version as asset_version
 
@@ -21,7 +20,7 @@ class UELoadShot(object):
     """
     Load the shot into unreal from its selected asset version
     """
-    def __init__(self, import_file_list, data, level_path, ls_path, version_dir, start_frame, end_frame, fps):
+    def __init__(self, import_file_list, data, level_path, ls_path, anim_dir, start_frame, end_frame, fps):
         # type: (list[str], str, str, str, int, int) -> None
         """
         Args:
@@ -35,7 +34,7 @@ class UELoadShot(object):
         self.data = data
         self.level_path = level_path
         self.ls_path = ls_path
-        self.version_dir = version_dir
+        self.anim_dir = anim_dir
         self.start_frame = start_frame
         self.end_frame = end_frame
         self.fps = fps
@@ -53,6 +52,7 @@ class UELoadShot(object):
         """
         self.create_level()
         self.create_ls()
+        self.create_master_ls()
         self.open_sequence()
         self.animation_import()
         self.save_level_and_ls()
@@ -97,6 +97,19 @@ class UELoadShot(object):
         for key in ["sequence_name", "shot_name", "task_name"]:
             metadata_dict[key] = self.data[key]
         unreal_utils.apply_metadata(metadata_dict, self.ls)
+
+    def create_master_ls(self):
+        """
+        Create a master level sequence
+        """
+        sequence_name = self.data["sequence_name"]
+        ls_master_path = f"/Game/ControlChaos/Sequence/{sequence_name}/Master_{sequence_name}_01"
+        ue.log_warning(f"ls_master_path: {ls_master_path}")
+
+        if not ue.EditorAssetLibrary.does_asset_exist(ls_master_path):
+            sequencer_utils.create_level_sequence(ls_master_path, self.fps)
+            subsys = ue.get_editor_subsystem(ue.EditorAssetSubsystem)
+            subsys.save_asset(ls_master_path)
 
     def open_sequence(self):
         """
@@ -154,37 +167,46 @@ class UELoadShot(object):
             raise Exception(f"No skeleton found for {file_data}")
 
         ue.log_warning(f"Importing animation path: {fbx_path}")
-        anim_importer = cache_importer.CacheImporter(self.version_dir, fbx_path)
+        anim_importer = cache_importer.CacheImporter(self.anim_dir, fbx_path)
         try:
             anim_importer.import_animation(skeleton=skeleton)
         except RuntimeError:
             pass
         
         # get the object path to its type and remove the other asset types
-        ue.log_warning(f"Searching for sequence: {self.version_dir}")
-        anim_sequence_path = None
+        ue.log_warning(f"Searching for sequence: {self.anim_dir}")
         anim_sequences = unreal_utils.get_objects_of_type_from_dir(
-            self.version_dir, unreal_constants.ANIM_SEQUENCE)
+            self.anim_dir, unreal_constants.ANIM_SEQUENCE)
         ue.log_warning(f"Found sequences: {anim_sequences}")
 
+        # get the actor name and version
         actor_name = file_data["namespace"]
+        version_num = self.data["version_num"]
+
         # get the import animation sequence path
+        new_name_clip_path = None
         for anim_sequence in anim_sequences:
             if anim_sequence in self.imported_anim_sequences:
                 continue
             if actor_name in anim_sequence:
-                anim_sequence_path = anim_sequence
-                self.imported_anim_sequences.append(anim_sequence)
+                # rename the clip to make it clean
+                clip_name = f"{actor_name}_v{str(version_num).zfill(3)}"
+                new_name_clip_path = ue.Paths.combine([self.anim_dir, clip_name])
+                ue.log_warning(f"Renamed: {anim_sequence} -> {new_name_clip_path}")
+
+                # rename clip
+                ue.EditorAssetLibrary.rename_asset(anim_sequence, new_name_clip_path)
+                self.imported_anim_sequences.append(new_name_clip_path)
                 break
 
-        if not anim_sequence_path:
+        if not new_name_clip_path:
             raise Exception(f"No animation found for {fbx_path}")
 
-        ue.log(f"Animation sequence path: {anim_sequence_path}")
+        ue.log(f"Animation sequence path: {new_name_clip_path}")
 
         # add the actor to the level
         ue.log_warning(self.ftver.asset_build_name)
-        self.spawn_actor_to_level(skeleton, anim_sequence_path, actor_name)
+        self.spawn_actor_to_level(skeleton, new_name_clip_path, actor_name)
 
     def spawn_actor_to_level(self, skeleton, anim_sequence_path, asset_key):
         # type: (ue.Object, str, str) -> None
@@ -348,8 +370,9 @@ class UELoadShot(object):
         focus.focus_method = ue.CameraFocusMethod.DISABLE
 
     def save_level_and_ls(self):
-
+        """
+        Save the level sequence and level
+        """
         ue.EditorAssetLibrary.save_loaded_asset(self.ls)
-
-        # Save the currently open map
         ue.EditorLoadingAndSavingUtils.save_current_level()
+        ue.EditorAssetLibrary.sync_browser_to_objects([self.ls.get_full_name()])

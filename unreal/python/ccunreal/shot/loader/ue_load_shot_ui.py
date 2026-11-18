@@ -58,12 +58,12 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
 
     @property
     def ls_path(self):
-        ls_name = f"{self.cmb_shot.sequence_name}_{self.cmb_shot.shot_name}_{self.cmb_shot.task_name}"
+        ls_name = f"{self.cmb_shot.sequence_name}_{self.cmb_shot.shot_name}_{self.cmb_shot.task_name}_01"
         return ue.Paths.combine([self.ls_dir, ls_name])
 
     @property
-    def version_dir(self):
-        return ue.Paths.combine([self.ls_dir, self.version_str])
+    def anim_dir(self):
+        return ue.Paths.combine([self.ls_dir, "Anim"])
 
     def closeEvent(self, event):
         for key, value in self.cmb_shot.get_data().items():
@@ -83,7 +83,7 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
                 self.data,
                 level_path,
                 self.ls_path,
-                self.version_dir,
+                self.anim_dir,
                 self.start_frame,
                 self.end_frame,
                 self.ftshot.fps

@@ -11,6 +11,7 @@ class UEWidgetImportShot(base_ui.WidgetBase):
 
     def __init__(self, parent):
         super().__init__(parent=parent)
+        self.pw = parent
         self.populate_levels()
         self.connect_signals()
 
@@ -18,7 +19,7 @@ class UEWidgetImportShot(base_ui.WidgetBase):
         """
         Connect the signals to the widgets
         """
-        self.rbn_existing.toggled.connect(self.enable_existing_level)
+        self.rbn_existing.group().buttonClicked.connect(self.enable_existing_level)
 
     @property
     def level_path(self):
@@ -26,11 +27,15 @@ class UEWidgetImportShot(base_ui.WidgetBase):
         """
         Work out the level to create path
         """
-        if self.rbn_existing.isChecked():
+        level_root = "/Game/ControlChaos/Level"
+        sequence_name = self.pw.cmb_shot.sequence_name
+        if self.rbn_sequence.isChecked():
+            level_path = f"{level_root}/{sequence_name}/{sequence_name}"
+        elif self.rbn_existing.isChecked():
             level_path = self.cmb_existing.currentText()
         else:
             map_name = self.le_new.text()
-            level_path = f"/Game/ControlChaos/Level/{map_name}"
+            level_path = f"{level_root}/Custom/{map_name}"
         return level_path
 
     def populate_levels(self):
@@ -55,7 +60,7 @@ class UEWidgetImportShot(base_ui.WidgetBase):
         level_paths.sort()
         self.cmb_existing.addItems(level_paths)
 
-    def enable_existing_level(self, enable):
+    def enable_existing_level(self, radio):
         # type: (bool) -> None
         """
         Enable the existing level widgets
@@ -63,10 +68,20 @@ class UEWidgetImportShot(base_ui.WidgetBase):
         Args:
             enable: Whether to enable the widgets
         """
-        self.lbl_existing.setEnabled(enable)
-        self.cmb_existing.setEnabled(enable)
-        self.lbl_new.setEnabled(not enable)
-        self.le_new.setEnabled(not enable)
+        if radio.objectName() == "rbn_sequence":
+            enable_existing = False
+            enable_new = False
+        elif radio.objectName() == "rbn_existing":
+            enable_existing = True
+            enable_new = False
+        else:
+            enable_existing = False
+            enable_new = True
+
+        self.lbl_existing.setEnabled(enable_existing)
+        self.cmb_existing.setEnabled(enable_existing)
+        self.lbl_new.setEnabled(enable_new)
+        self.le_new.setEnabled(enable_new)
 
     @property
     def import_files_list(self):

@@ -7,7 +7,7 @@ class CacheImporter(object):
     """
     Import fbx files into the Unreal project
     """
-    def __init__(self, directory, fbx_path):
+    def __init__(self, directory, fbx_path, namespace=None):
         # type: (str, str) -> None
         """
         Args:
