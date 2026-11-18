@@ -23,3 +23,5 @@ SUPPORTED_EXPORT_CLASSES = [
     ue.StaticMeshActor,
     ue.CineCameraActor
 ]
+
+CC_SEQUENCE_DIR = "/Game/ControlChaos/Sequence"

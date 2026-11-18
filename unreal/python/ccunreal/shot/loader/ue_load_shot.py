@@ -103,7 +103,7 @@ class UELoadShot(object):
         Create a master level sequence
         """
         sequence_name = self.data["sequence_name"]
-        ls_master_path = f"/Game/ControlChaos/Sequence/{sequence_name}/Master_{sequence_name}_01"
+        ls_master_path = f"{unreal_constants.CC_SEQUENCE_DIR}/{sequence_name}/Master_{sequence_name}_01"
         ue.log_warning(f"ls_master_path: {ls_master_path}")
 
         if not ue.EditorAssetLibrary.does_asset_exist(ls_master_path):

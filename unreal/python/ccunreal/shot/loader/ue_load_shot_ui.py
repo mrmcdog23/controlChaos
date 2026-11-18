@@ -7,6 +7,7 @@ import ccunreal.utils.cc_wrap as cc_wrap
 import ccunreal.shot.loader.import_all_usd as import_all_usd
 import ccunreal.shot.loader.ue_load_shot as ue_load_shot
 import ccunreal.shot.loader.wdg_import_shot as wdg_import_shot
+import ccunreal.unreal_constants as unreal_constants
 from CCPySide import QtWidgets, QtCore
 import ccgeneral.shot.load_shot_ui as load_shot_ui
 
@@ -45,7 +46,7 @@ class UELoadShotUI(load_shot_ui.LoadShotUI):
         # type: () -> str
         """ Get the level sequence path """
         ls_dir = ue.Paths.combine([
-            "/Game/ControlChaos/Sequence",
+            unreal_constants.CC_SEQUENCE_DIR,
             self.cmb_shot.sequence_name,
             self.cmb_shot.shot_name,
         ])
