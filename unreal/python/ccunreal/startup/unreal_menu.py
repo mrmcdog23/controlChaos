@@ -83,6 +83,11 @@ def main():
     command = "import ccunreal.utils.unreal_utils as uu;uu.create_sky_and_lights()"
     create_command(lighting_menu, "Create Sky and Lights", command)
 
+    # utilities menu
+    utilities_menu = create_submenu(control_chaos_menu, "Utilities")
+    command = "import ccunreal.utils.project_folders as pf;pf.create_project_folders()"
+    create_command(utilities_menu, "Build Project Folders", command)
+
     add_separator(control_chaos_menu)
 
     # pipeline menu

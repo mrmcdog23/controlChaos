@@ -149,9 +149,7 @@ class FtAsset(FtBase):
         Returns:
             List of the asset build names
         """
-        query = f'AssetBuild where project.id is {self.project_id}'
-        asset_builds = self.session.query(query).all()
-        return self.get_names(asset_builds)
+        return self.get_asset_build_names(asset_type=self.asset_build_type_name)
 
     def asset_build_type_id(self, asset_type):
         # type: (str) -> Optional[str]
