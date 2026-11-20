@@ -51,6 +51,10 @@ def create_project_folders():
             ue_shot_folder = ue.Paths.combine([ue_sequence_folder, shot_name])
             create_folder(ue_shot_folder)
 
+            # create anim folder
+            ue_anim_folder = ue.Paths.combine([ue_shot_folder, "Anim"])
+            create_folder(ue_anim_folder)
+
         # create the asset build types folders
         for asset_type in ftasset.asset_build_types_names:
             ue_asset_type_folder = ue.Paths.combine([unreal_constants.CC_ASSET_DIR, asset_type])
