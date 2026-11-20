@@ -23,7 +23,7 @@ class ContextItem(QtWidgets.QListWidgetItem):
         self.setFlags(self.flags() | QtCore.Qt.ItemIsEditable)
 
 
-class ShotCreator(base_ui.StandaloneWindowBase):
+class ShotCreator(base_ui.WindowBase):
     title = "Shot Creator"
     window_icon = "shot_creator"
     widget_to_icon = {
@@ -37,8 +37,8 @@ class ShotCreator(base_ui.StandaloneWindowBase):
         "btn_remove_shots": "remove"
     }
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
         self.project_data = server_data.ProjectData()
         self.ftshot = shot.FtShot()
         self.logger = cc_logging.cc_logger()

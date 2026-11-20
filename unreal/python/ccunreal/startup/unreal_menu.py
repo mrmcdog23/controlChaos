@@ -64,6 +64,10 @@ def main():
     command = "import ccunreal.wizard.ue_asset_publish_wizard as uapw;uapw.main()"
     create_command(asset_menu, "Asset Publisher", command)
 
+    # shot creator
+    command = "import ccunreal.utils.launch_creators as lc;lc.launch_asset_creator()"
+    create_command(asset_menu, "Asset Creator", command)
+
     # shot menu
     shot_menu = create_submenu(control_chaos_menu, "Shot")
     command = "import ccunreal.shot.import_fbx_cam as ifc;ifc.launch()"
@@ -77,6 +81,10 @@ def main():
 
     command = "import ccunreal.wizard.level_sequence_wizard as lsw;lsw.main()"
     create_command(shot_menu, "Publish Level Sequence", command)
+
+    # shot creator
+    command = "import ccunreal.utils.launch_creators as lc;lc.launch_shot_creator()"
+    create_command(shot_menu, "Shot Creator", command)
 
     # lighting menu
     lighting_menu = create_submenu(control_chaos_menu, "Lighting")

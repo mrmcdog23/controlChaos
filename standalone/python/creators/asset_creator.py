@@ -8,13 +8,13 @@ import cccore.utils.cc_logging as cc_logging
 IGNORE_ASSET_BUILDS = ["Lighting", "Rendering"]
 
 
-class AssetCreator(base_ui.StandaloneWindowBase):
+class AssetCreator(base_ui.WindowBase):
     title = "Asset Creator"
     window_icon = "asset"
     widget_to_icon = {"lbl_project_icon": "project"}
 
-    def __init__(self):
-        super(AssetCreator, self).__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
         self.project_data = server_data.ProjectData()
         self.ftasset = asset.FtAsset()
         self.logger = cc_logging.cc_logger()
