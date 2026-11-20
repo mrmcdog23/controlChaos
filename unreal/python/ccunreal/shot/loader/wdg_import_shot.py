@@ -2,12 +2,11 @@
 import os
 import unreal as ue
 import cccore.base_ui as base_ui
-import ccunreal.utils.unreal_utils as unreal_utils
+import ccunreal.unreal_constants as unreal_constants
 from CCPySide import QtWidgets, QtCore
 
 
 class UEWidgetImportShot(base_ui.WidgetBase):
-    sequence_root = "/Game/ControlChaos/Sequence"
 
     def __init__(self, parent):
         super().__init__(parent=parent)
@@ -27,7 +26,7 @@ class UEWidgetImportShot(base_ui.WidgetBase):
         """
         Work out the level to create path
         """
-        level_root = "/Game/ControlChaos/Level"
+        level_root = unreal_constants.CC_LEVEL_DIR
         sequence_name = self.pw.cmb_shot.sequence_name
         if self.rbn_sequence.isChecked():
             level_path = f"{level_root}/{sequence_name}/{sequence_name}"

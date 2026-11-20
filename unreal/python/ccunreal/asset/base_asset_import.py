@@ -11,8 +11,6 @@ class BaseAssetImport(object):
     """
     Import a cache asset into the scene
     """
-    asset_root = "/Game/ControlChaos/Asset"
-
     def __init__(self, source_asset_path, ftver, is_skeleton_mesh):
         # type: (str, str) -> None
         """
@@ -39,7 +37,7 @@ class BaseAssetImport(object):
         """
         extension = file_utils.get_extension(self.source_asset_path)
         self.destination_dir = ue.Paths.combine(
-            [self.asset_root,
+            [unreal_constants.CC_ASSET_DIR,
              self.ftver.asset_build_type_name,
              self.ftver.asset_build_name,
              self.ftver.version_padded,

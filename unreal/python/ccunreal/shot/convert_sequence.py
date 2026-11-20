@@ -4,6 +4,7 @@ import unreal as ue
 import cccore.base_ui as base_ui
 import ccftrack.shot as shot
 import ccunreal.utils.unreal_utils as unreal_utils
+import ccunreal.unreal_constants as unreal_constants
 from CCPySide import QtWidgets, QtCore, QtGui
 from ccgeneral.widgets.shot_combobox import ShotComboBox
 
@@ -44,7 +45,7 @@ class ConvertLevelSequence(base_ui.WidgetBase):
         """
         ls_name = f"{self.cmb_shot.sequence_name}_{self.cmb_shot.shot_name}_{self.cmb_shot.task_name}"
         new_ls_path = ue.Paths.combine([
-            "/Game/ControlChaos/Sequence",
+            unreal_constants.CC_LEVEL_DIR,
             self.cmb_shot.sequence_name,
             self.cmb_shot.shot_name,
             ls_name

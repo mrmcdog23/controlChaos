@@ -25,3 +25,5 @@ SUPPORTED_EXPORT_CLASSES = [
 ]
 
 CC_SEQUENCE_DIR = "/Game/ControlChaos/Sequence"
+CC_LEVEL_DIR = "/Game/ControlChaos/Level"
+CC_ASSET_DIR = "/Game/ControlChaos/Asset"
