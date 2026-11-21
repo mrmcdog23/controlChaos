@@ -17,16 +17,40 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
             self.on_individual_job_finished_delegate.add_callable(self.on_job)
             self._bound = True
 
+    @staticmethod
+    def child_sequences(master):
+        """Return {shot_name: sequence_path} for every shot under the master's Shot Track."""
+        result = {}
+        tracks = master.find_tracks_by_exact_type(ue.MovieSceneCinematicShotTrack)
+        for track in tracks:
+            for section in track.get_sections():
+                seq = section.get_sequence()
+                if seq:
+                    result[section.get_shot_display_name()] = seq
+        return result
+
     def on_job(self, job, success):
+        ue.log_warning(f"[PostProcess] finished: job={job} success={success}")
+        if not success:
+            return
+        # The delegate passes None, so use the snapshot. With several jobs this
+        # fires once per job, so pop them in queue order.
+        if job is None:
+            job = self._jobs.pop(0) if self._jobs else None
+        if job is None:
+            return
 
-        for job in queue.get_jobs():
-            print("Job:", job.job_name, "|", job.sequence)
-            for shot in job.shot_info:
-                print("  Shot:", shot.outer_name, "/", shot.inner_name,
-                      "| enabled:", shot.enabled)
+        master = ue.load_asset(job.sequence.export_text())
+        children = self.child_sequences(master)
 
+        # Only the shots ticked in the queue
+        rendered = {s.outer_name for s in job.shot_info if s.enabled}
 
-
+        for name, seq in children.items():
+            if name in rendered:
+                metadata_dict = api_wrap.get_metadata_tag_values(seq)
+                ue.log_warning(f"[PostProcess] metadata_dict: {metadata_dict}")
+        '''
         ue.log_warning(f"[PostProcess] finished: job={job} success={success}")
         if not success:
             return
@@ -39,10 +63,11 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
         out = job.get_configuration().find_setting_by_class(ue.MoviePipelineOutputSetting)
         ue.log_warning(f"[PostProcess] {job.job_name} -> {out.output_directory.path}")
 
-        soft_path = job.sequence  # unreal.SoftObjectPath
+        soft_path = job.sequence  # ue.SoftObjectPath
         seq_path = soft_path.export_text()
         ue.log_warning(f"[PostProcess] sequence: {seq_path}")
 
         ls = ue.load_asset(seq_path)
         metadata_dict = api_wrap.get_metadata_tag_values(ls)
         ue.log_warning(f"[PostProcess] metadata_dict: {metadata_dict}")
+        '''
