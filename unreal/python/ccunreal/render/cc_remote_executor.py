@@ -1,4 +1,5 @@
 import unreal as ue
+import ccunreal.utils.api_wrap as api_wrap
 
 
 @ue.uclass()
@@ -17,6 +18,15 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
             self._bound = True
 
     def on_job(self, job, success):
+
+        for job in queue.get_jobs():
+            print("Job:", job.job_name, "|", job.sequence)
+            for shot in job.shot_info:
+                print("  Shot:", shot.outer_name, "/", shot.inner_name,
+                      "| enabled:", shot.enabled)
+
+
+
         ue.log_warning(f"[PostProcess] finished: job={job} success={success}")
         if not success:
             return
@@ -28,3 +38,11 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
             return
         out = job.get_configuration().find_setting_by_class(ue.MoviePipelineOutputSetting)
         ue.log_warning(f"[PostProcess] {job.job_name} -> {out.output_directory.path}")
+
+        soft_path = job.sequence  # unreal.SoftObjectPath
+        seq_path = soft_path.export_text()
+        ue.log_warning(f"[PostProcess] sequence: {seq_path}")
+
+        ls = ue.load_asset(seq_path)
+        metadata_dict = api_wrap.get_metadata_tag_values(ls)
+        ue.log_warning(f"[PostProcess] metadata_dict: {metadata_dict}")
