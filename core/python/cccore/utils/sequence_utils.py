@@ -9,7 +9,6 @@ import cccore.utils.sequence_data as sequence_data
 import cccore.utils.file_utils as file_utils
 import cccore.utils.cc_logging as cc_logging
 import cccore.data.server_data as server_data
-#import cccore.utils.apply_hud as apply_hud
 import cccore.file_env.context_utils as context_utils
 import cccore.core_constants as core_constants
 
@@ -186,6 +185,22 @@ def get_most_recent_padded_path(directory_path):
     latest_file = max(frame_paths, key=os.path.getctime)
     seq_data = get_sequence_data(latest_file)
     return seq_data.padded_path
+
+
+def get_first_sequence_from_dir(directory_path):
+    # type: (str) -> Optional[sequence_data.SequenceData]
+    """
+    From the directory get the first sequence
+
+    Args:
+        directory_path: Path of the directory with the sequences
+
+    Returns:
+        First sequence data instance
+    """
+    sequences_data = sequences_data_from_dir(directory_path)
+    if sequences_data:
+        return sequences_data[0]
 
 
 def convert_frame_to_sequence(frame_path):
