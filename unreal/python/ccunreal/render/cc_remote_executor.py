@@ -44,9 +44,6 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
         if job is None:
             return
 
-        out = job.get_configuration().find_setting_by_class(ue.MoviePipelineOutputSetting)
-        ue.log_warning(f"[PostProcess] out: {dir(out)}")
-
         master = ue.load_asset(job.sequence.export_text())
         children = self.child_sequences(master)
 
