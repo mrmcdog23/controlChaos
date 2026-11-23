@@ -19,6 +19,10 @@ def build_cc_menu():
                   command="import ccmaya.asset.asset_loader as al;al.main()",
                   parent=asset_menu
                   )
+    cmds.menuItem(label="Create Project Camera",
+                  command="import ccmaya.asset.create_project_cam as cpc;cpc.create_camera()",
+                  parent=asset_menu
+                  )
 
     # shot menu
     shot_menu = cmds.menuItem(label="Shot", subMenu=True, parent=cc_menu)

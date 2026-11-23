@@ -454,10 +454,17 @@ class FtBase(object):
         message = f"Creating task {task_type_name} for {entity_name}..."
         self.logger.info(message)
 
+        name_id = self.asset_build_name_id(entity_name)
+        query = f'Task where parent.id is "{name_id}" and name is "{task_type_name}"'
+        if self.session.query(query).first():
+            self.logger.warning(f"Task {task_type_name} already exists on {entity_name}")
+            return
+
         task_create_dict = {'name': task_type_name,
                             'parent': entity,
                             'type': task_type
                             }
+
         task_created = self.session.create('Task', task_create_dict)
         return task_created
 

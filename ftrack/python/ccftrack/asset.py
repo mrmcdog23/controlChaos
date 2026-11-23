@@ -391,6 +391,10 @@ class FtAsset(FtBase):
             self.logger.info(f"Folder {asset_build_type_name} not found. Creating...")
             asset_type_folder = self.create_folder(asset_build_type_name, self.asset_folder)
 
+        query = f'AssetBuild where project.id is {self.project_id} and name is "cccamera"'
+        if self.session.query(query).first():
+            return
+
         custom = {"created_by": core_constants.USERNAME}
         new_asset_build = self.session.create(
             "AssetBuild", {"name": asset_name,
@@ -398,7 +402,7 @@ class FtAsset(FtBase):
                            "parent": asset_type_folder,
                            "custom_attributes": custom
                            }
-        )
+            )
         self.create_task_template_for_entity(asset_build_type_name, new_asset_build)
         self.session.commit()
 
