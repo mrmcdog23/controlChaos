@@ -71,6 +71,7 @@ class MayaLoadShotUI(load_shot_ui.LoadShotUI):
 
         # import the fbx camera animation
         camera_nodes = cmds.file(fbx_path, i=True, rnn=True)
+        found_camera = False
         for camera_node in camera_nodes:
 
             # get the camera and rename the cam node
@@ -78,9 +79,11 @@ class MayaLoadShotUI(load_shot_ui.LoadShotUI):
             if cmds.objectType(camera_node) == "camera":
                 cam = cmds.listRelatives(camera_node, p=True)[0]
                 cmds.rename(cam, "camera")
+                found_camera = True
 
         # import the fbx data onto the camera
-        fbx_import_settings.run_temp_fbx_data(namespace, "camera")
+        if found_camera:
+            fbx_import_settings.run_temp_fbx_data(namespace, "camera")
 
     def reference_asset(self, fbx_path, file_data):
         # type: (str, dict) -> None
