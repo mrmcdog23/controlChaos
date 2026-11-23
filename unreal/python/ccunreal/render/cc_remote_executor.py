@@ -1,9 +1,11 @@
+import os
 import unreal as ue
 import ccunreal.utils.api_wrap as api_wrap
 import cccore.file_env.context as context
 import cccore.utils.sequence_utils as sequence_utils
 import ccftrack.publish as publish
 import ccunreal.utils.cc_wrap as cc_wrap
+from cccore.utils import file_utils
 
 
 @ue.uclass()
@@ -61,7 +63,12 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
             ctx = context.Context(overrides=data)
             ue.log_warning(f"[PostProcess] render_dir: {ctx.render_dir}")
 
-            seq_data = sequence_utils.get_first_sequence_from_dir(ctx.render_dir)
+            versions_dir = os.listdir(ctx.render_dir)
+            versions_dir.sort()
+            render_version_dir = file_utils.join_file_names(ctx.render_dir, versions_dir[-1])
+            ue.log_warning(f"[PostProcess] Latest version: {render_version_dir}")
+
+            seq_data = sequence_utils.get_first_sequence_from_dir(render_version_dir)
             data["file_sequences"] = [seq_data.padded_path]
             data["status_name"] = "WIP"
             data["comment"] = job.comment
@@ -71,4 +78,4 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
             publish_inst = publish.FtrackPublish(data)
             asset_version_id = publish_inst.asset_version["id"]
             ue.log_warning(f"[PostProcess] asset_version_id: {asset_version_id}")
-            cc_wrap.notification(f"Movie successfully published {shot_name}", "shot_built")
+            cc_wrap.notification(f"Movie successfully published {shot_name}", "shot_built", duration=3)
