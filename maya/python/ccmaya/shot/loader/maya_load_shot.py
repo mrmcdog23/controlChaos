@@ -63,7 +63,33 @@ class MayaLoadShotUI(load_shot_ui.LoadShotUI):
         ftver_inst = ft_version.FtAssetVersion(session=self.ftasset.session)
         ftver_inst.asset_version_id = self.ftasset.latest_asset_version["id"]
         master_camera_path = ftver_inst.master_component_path
-        maya_import_cameras_json.import_camera(fbx_path, master_camera_path, namespace)
+
+        if fbx_path.endswith(".json"):
+            maya_import_cameras_json.import_camera(fbx_path, master_camera_path, namespace)
+            return
+
+        # reference the latest camera
+        cmds.file(
+            master_component_path,
+            namespace=namespace,
+            reference=True
+        )
+
+        # import the fbx camera animation
+        camera_nodes = cmds.file(fbx_path, i=True, rnn=True)
+        found_camera = False
+        for camera_node in camera_nodes:
+
+            # get the camera and rename the cam node
+            # to camera to match the fbx name
+            if cmds.objectType(camera_node) == "camera":
+                cam = cmds.listRelatives(camera_node, p=True)[0]
+                cmds.rename(cam, "camera")
+                found_camera = True
+
+        # import the fbx data onto the camera
+        if found_camera:
+            fbx_import_settings.run_temp_fbx_data(namespace, "camera")
 
     def reference_asset(self, fbx_path, file_data):
         # type: (str, dict) -> None
