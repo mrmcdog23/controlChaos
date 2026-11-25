@@ -148,7 +148,7 @@ class LevelSequenceExporter(BaseExporter):
         if binding:
             if is_camera:
                 fbx_path = fbx_path.replace(".fbx", ".json")
-                export_camera_json.export_camera(binding, fbx_path, actor_name)
+                export_camera_json.export_camera(fbx_path, actor_name, sequence_actor, self.ls)
             else:
                 sequencer_utils.export_sequencer_fbx_file(
                     fbx_path, self.map, self.ls, [binding])
@@ -159,16 +159,14 @@ class LevelSequenceExporter(BaseExporter):
         # build a dictionary of the asset export data
         asset_export_data = {
             "fbx_path": fbx_path,
-            "is_camera": False,
+            "is_camera": is_camera,
             "namespace": actor_name
         }
-        is_camera = False
         is_skeleton_mesh = False
 
         # save the camera data as a camera only
         if is_camera:
             asset_export_data["asset_type_name"] = "camera"
-            is_camera = is_camera
 
         elif isinstance(sequence_actor, ue.SkeletalMeshActor):
             comp = sequence_actor.get_component_by_class(ue.SkeletalMeshComponent)
@@ -181,7 +179,6 @@ class LevelSequenceExporter(BaseExporter):
             metadata = api_wrap.get_metadata_tag_values(comp.static_mesh)
             asset_export_data.update(metadata)
 
-        asset_export_data["is_camera"] = is_camera
         asset_export_data["is_skeleton_mesh"] = is_skeleton_mesh
 
         # add the data to the export data

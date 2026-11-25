@@ -8,6 +8,7 @@ import ccmaya.utils.maya_utils as maya_utils
 import cccore.file_env.context as context
 import ccftrack.asset_version as ft_version
 import ccmaya.shot.loader.fbx_import_settings as fbx_import_settings
+import ccmaya.shot.loader.maya_import_cameras_json as maya_import_cameras_json
 
 
 class MayaLoadShotUI(load_shot_ui.LoadShotUI):
@@ -61,29 +62,8 @@ class MayaLoadShotUI(load_shot_ui.LoadShotUI):
         # set the latest version to load
         ftver_inst = ft_version.FtAssetVersion(session=self.ftasset.session)
         ftver_inst.asset_version_id = self.ftasset.latest_asset_version["id"]
-
-        # reference the latest camera
-        cmds.file(
-            ftver_inst.master_component_path,
-            namespace=namespace,
-            reference=True
-        )
-
-        # import the fbx camera animation
-        camera_nodes = cmds.file(fbx_path, i=True, rnn=True)
-        found_camera = False
-        for camera_node in camera_nodes:
-
-            # get the camera and rename the cam node
-            # to camera to match the fbx name
-            if cmds.objectType(camera_node) == "camera":
-                cam = cmds.listRelatives(camera_node, p=True)[0]
-                cmds.rename(cam, "camera")
-                found_camera = True
-
-        # import the fbx data onto the camera
-        if found_camera:
-            fbx_import_settings.run_temp_fbx_data(namespace, "camera")
+        master_camera_path = ftver_inst.master_component_path
+        maya_import_cameras_json.import_camera(fbx_path, master_camera_path, namespace)
 
     def reference_asset(self, fbx_path, file_data):
         # type: (str, dict) -> None
@@ -122,6 +102,7 @@ class MayaLoadShotUI(load_shot_ui.LoadShotUI):
             self.import_usd_file_as_stage(self.all_usd, "all")
         else:
             for fbx_path in self.import_files_list:
+                print (fbx_path)
                 file_data = self.data["exported_files_to_data"][fbx_path]
                 namespace = file_data["namespace"]
 

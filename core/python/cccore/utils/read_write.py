@@ -1,6 +1,7 @@
 import os
 import yaml
 import json
+import cccore.utils.cc_logging as cc_logging
 
 
 def read_yaml(file_path):
@@ -44,6 +45,8 @@ def read_json(json_path):
         data: Information from the json
     """
     if not os.path.exists(json_path):
+        logger = cc_logging.cc_logger()
+        logger.error(f"The json file does not exist: {json_path}")
         return None
 
     with open(json_path, 'r') as f:

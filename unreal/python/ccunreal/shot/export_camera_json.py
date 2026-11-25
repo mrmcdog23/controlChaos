@@ -10,6 +10,7 @@ and records world transform + lens data per frame.
 import json
 import os
 import unreal
+import cccore.utils.file_utils as file_utils
 
 
 def vec(v):
@@ -34,7 +35,6 @@ def read_camera_frame(actor, frame):
         "frame": frame,
         "location": vec(loc),                                  # cm, UE space
         "rotation": [rot.roll, rot.pitch, rot.yaw],            # degrees, UE space
-        # World axes in UE space: lets Maya rebuild orientation without Euler headaches
         "forward": vec(unreal.MathLibrary.get_forward_vector(rot)),
         "right": vec(unreal.MathLibrary.get_right_vector(rot)),
         "up": vec(unreal.MathLibrary.get_up_vector(rot)),
@@ -54,12 +54,17 @@ def read_camera_frame(actor, frame):
     return data
 
 
-def export_camera(binding, json_path, actor_name):
-    seq = unreal.LevelSequenceEditorBlueprintLibrary.get_current_level_sequence()
-    if not seq:
-        unreal.log_error("No Level Sequence is open in Sequencer.")
-        return
+def export_camera(json_path, actor_name, sequence_actor, seq):
+    # type: (str, str, unreal.Actor, unreal.LevelSequence) -> None
+    """
+    Export a level sequence camera as a json file and store the settings
 
+    Args:
+        json_path: Path of the json file to save
+        actor_name: Name of the camera to save
+        sequence_actor: Unreal camera to export
+        seq: The level sequence the camera is on
+    """
     rate = seq.get_display_rate()
     fps = rate.numerator / float(rate.denominator)
     start = int(round(seq.get_playback_start_seconds() * fps))
@@ -67,46 +72,27 @@ def export_camera(binding, json_path, actor_name):
 
     original_time = unreal.LevelSequenceEditorBlueprintLibrary.get_current_time()
 
-    cameras = {}
+    frames_list = list()
 
-    total = (end - start + 1)
-    with unreal.ScopedSlowTask(total, "Exporting cameras...") as task:
-        task.make_dialog(True)
-        for frame in range(start, end + 1):
-            if task.should_cancel():
-                break
-            task.enter_progress_frame(1)
-
-            unreal.LevelSequenceEditorBlueprintLibrary.set_current_time(frame)
-            unreal.LevelSequenceEditorBlueprintLibrary.refresh_current_level_sequence()
-
-            binding_id = seq.get_binding_id(binding)
-            objs = unreal.LevelSequenceEditorBlueprintLibrary.get_bound_objects(binding_id)
-            for obj in objs:
-                if not isinstance(obj, unreal.CameraActor):
-                    continue
-                entry = cameras.setdefault(actor_name, {
-                    "name": actor_name,
-                    "is_cine": isinstance(obj, unreal.CineCameraActor),
-                    "frames": [],
-                })
-                entry["frames"].append(read_camera_frame(obj, frame))
+    for frame in range(start, end + 1):
+        unreal.LevelSequenceEditorBlueprintLibrary.set_current_time(frame)
+        unreal.LevelSequenceEditorBlueprintLibrary.refresh_current_level_sequence()
+        frames_list.append(read_camera_frame(sequence_actor, frame))
 
     # Put the playhead back where the user left it
     unreal.LevelSequenceEditorBlueprintLibrary.set_current_time(original_time)
 
-    out = {
+    data = {
         "source": "unreal",
         "sequence": seq.get_name(),
         "fps": fps,
         "start_frame": start,
         "end_frame": end,
         "units": "cm",
-        "cameras": list(cameras.values()),
+        "frames": frames_list,
+        "actor_name": actor_name
     }
-    os.makedirs(os.path.dirname(json_path), exist_ok=True)
-    with open(json_path, "w") as f:
-        json.dump(out, f, indent=2)
-
-    unreal.log("Exported {} camera(s) to {}".format(len(cameras), json_path))
+    file_utils.create_directories(json_path)
+    file_utils.write_file(json_path, data)
+    unreal.log(f"Exported camera to {json_path}")
 
