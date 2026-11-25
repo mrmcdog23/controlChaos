@@ -2,11 +2,11 @@
 import os
 import unreal as ue
 import ccunreal.utils.api_wrap as api_wrap
+import ccunreal.utils.cc_wrap as cc_wrap
 import cccore.file_env.context as context
 import cccore.utils.sequence_utils as sequence_utils
+import cccore.utils.file_utils as file_utils
 import ccftrack.publish as publish
-import ccunreal.utils.cc_wrap as cc_wrap
-from cccore.utils import file_utils
 from typing import Any
 
 
@@ -91,6 +91,7 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
             seq_data = sequence_utils.get_first_sequence_from_dir(render_version_dir)
             data["file_sequences"] = [seq_data.padded_path]
             data["status_name"] = "WIP"
+            data["category"] = "Image Sequence"
             data["comment"] = job.comment
 
             # publish the sequence to ftrack

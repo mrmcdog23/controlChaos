@@ -9,6 +9,7 @@ import ccunreal.utils.api_wrap as api_wrap
 import ccunreal.utils.sequencer_utils as sequencer_utils
 import ccunreal.utils.unreal_context as unreal_context
 import ccunreal.render.movie_render_queue as movie_render_queue
+import ccunreal.shot.export_camera_json as export_camera_json
 from ccgeneral.wizard.exporter.base_exporter import BaseExporter
 
 
@@ -141,10 +142,16 @@ class LevelSequenceExporter(BaseExporter):
         fbx_path = self.ctx.fbx_file_path
         self.log(f"FBX Path: {fbx_path}")
 
+        is_camera = isinstance(sequence_actor, ue.CineCameraActor)
+
         # export the fbx file to disk
         if binding:
-            sequencer_utils.export_sequencer_fbx_file(
-                fbx_path, self.map, self.ls, [binding])
+            if is_camera:
+                fbx_path = fbx_path.replace(".fbx", ".json")
+                export_camera_json.export_camera(binding, fbx_path, actor_name)
+            else:
+                sequencer_utils.export_sequencer_fbx_file(
+                    fbx_path, self.map, self.ls, [binding])
         else:
             sequencer_utils.export_static_actor_fbx_file(
                 fbx_path, sequence_actor)
@@ -159,9 +166,9 @@ class LevelSequenceExporter(BaseExporter):
         is_skeleton_mesh = False
 
         # save the camera data as a camera only
-        if isinstance(sequence_actor, ue.CineCameraActor):
+        if is_camera:
             asset_export_data["asset_type_name"] = "camera"
-            is_camera = True
+            is_camera = is_camera
 
         elif isinstance(sequence_actor, ue.SkeletalMeshActor):
             comp = sequence_actor.get_component_by_class(ue.SkeletalMeshComponent)
