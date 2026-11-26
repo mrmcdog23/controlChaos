@@ -64,6 +64,19 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
         if job is None:
             return
 
+        # get the settings
+        config = job.get_configuration()
+        setting = config.find_setting_by_class(ue.CCMoviePipelineSettings)
+
+        # if publish is not checked then skip
+        publish_to_ftrack = setting.get_editor_property("bPublishToFTrack")
+        if not publish_to_ftrack:
+            ue.log_warning("Skipping the publish to FTrack")
+            return
+
+        task_name = setting.get_editor_property("Task").name.lower()
+        ue.log_warning(f"Publishing to tasks name {task_name}")
+
         master = ue.load_asset(job.sequence.export_text())
         children = self.child_sequences(master)
 
@@ -90,6 +103,7 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
             # add additional data to the dictionary to publish
             seq_data = sequence_utils.get_first_sequence_from_dir(render_version_dir)
             data["file_sequences"] = [seq_data.padded_path]
+            data["task_name"] = task_name
             data["status_name"] = "WIP"
             data["category"] = "Image Sequence"
             data["comment"] = job.comment
