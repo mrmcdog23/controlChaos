@@ -96,8 +96,9 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
         output_setting = config.find_setting_by_class(ue.MoviePipelineOutputSetting)
         output_dir_raw = output_setting.output_directory.path
         output_dir = output_dir_raw.replace("{project_dir}", ue.Paths.project_dir())
-        ue.log_warning(f"Render directory {output_dir}")
+        ue.log_warning(f"Render directory {output_setting.file_name_format}")
 
+        ue.log_warning(f"Format {output_dir}")
         # if publish is not checked then skip
         publish_to_ftrack = setting.get_editor_property("bPublishToFTrack")
         if not publish_to_ftrack:
@@ -123,22 +124,23 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
             data["task_name"] = task_name
             ue.log_warning(f"Rendering level sequence: {seq.get_path_name()}")
 
-            ctx = context.Context(overrides=data)
-            ue.log_warning(f"Root render directory {ctx.render_dir}")
-
             # get the latest directory just rendered
-            seq_data = sequence_utils.get_first_sequence_from_dir(output_dir)
-            file_utils.create_directories(ctx.render_dir)
-            next_version = len(os.listdir(ctx.render_dir)) + 1
-            version_padded = str(next_version).zfill(3)
-            next_version_dir = f"v{version_padded}"
+            found_file_name = None
+            for file_name in os.listdir(output_dir):
+                if data["shot_name"] in file_name:
+                    ue.log_warning(f"Found: {file_name}")
+                    found_file_name = file_name
+                    break
 
-            render_version_dir = file_utils.join_file_names(ctx.render_dir, next_version_dir)
-            file_utils.create_directories(render_version_dir)
-            ue.log_warning(f"Latest version directory {render_version_dir}")
+            full_path = file_utils.join_file_names(output_dir, found_file_name)
+            if not file_name.endswith(".mov"):
+                seq_data = sequence_utils.get_sequence_data(full_path)
+                full_path = seq_data.padded_path
+            else:
+                data["mov_path"] = full_path
 
             # add additional data to the dictionary to publish
-            data["file_sequences"] = [seq_data.padded_path]
+            data["file_sequences"] = [full_path]
             data["status_name"] = "WIP"
             data["category"] = "Image Sequence"
             data["comment"] = job.comment
