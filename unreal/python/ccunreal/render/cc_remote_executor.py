@@ -7,6 +7,7 @@ import cccore.file_env.context as context
 import cccore.utils.sequence_utils as sequence_utils
 import cccore.utils.file_utils as file_utils
 import ccftrack.publish as publish
+import ccftrack.shot as shot
 from typing import Any
 
 
@@ -45,6 +46,30 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
                     result[section.get_shot_display_name()] = seq
         return result
 
+    def get_shot_and_sequence(self, ftshot, seq):
+        ls_name = seq.get_name()
+        use_sequence_name = None
+        for sequence_name in ftshot.sequence_names:
+            if ls_name.startswith(sequence_name):
+                use_sequence_name = sequence_name
+                break
+
+        if not use_sequence_name:
+            raise Exception("Can't find sequence name")
+
+        use_shot_name = None
+        ftshot.sequence_name = use_sequence_name
+        for shot_name in ftshot.shot_names:
+            if shot_name in ls_name:
+                use_shot_name = shot_name
+                break
+        if not use_shot_name:
+            raise Exception("Can't find shot name")
+
+        data = {"sequence_name": use_sequence_name, "shot_name": use_shot_name}
+        ue.log_warning(f"Level sequence data: {data}")
+        return data
+
     def on_job_finish(self, job, success):
         # type: (Any, bool) -> None
         """
@@ -68,6 +93,11 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
         config = job.get_configuration()
         setting = config.find_setting_by_class(ue.CCMoviePipelineSettings)
 
+        output_setting = config.find_setting_by_class(ue.MoviePipelineOutputSetting)
+        output_dir_raw = output_setting.output_directory.path
+        output_dir = output_dir_raw.replace("{project_dir}", ue.Paths.project_dir())
+        ue.log_warning(f"Render directory {output_dir}")
+
         # if publish is not checked then skip
         publish_to_ftrack = setting.get_editor_property("bPublishToFTrack")
         if not publish_to_ftrack:
@@ -83,27 +113,32 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
         # Filter to only the shots ticked in the queue
         rendered = {s.outer_name for s in job.shot_info if s.enabled}
 
+        ftshot = shot.FtShot()
         for shot_name, seq in children.items():
             if shot_name not in rendered:
                 continue
 
             # get the level sequence metadata
-            data = api_wrap.get_metadata_tag_values(seq)
+            data = self.get_shot_and_sequence(ftshot, seq)
+            data["task_name"] = task_name
             ue.log_warning(f"Rendering level sequence: {seq.get_path_name()}")
 
             ctx = context.Context(overrides=data)
             ue.log_warning(f"Root render directory {ctx.render_dir}")
 
             # get the latest directory just rendered
-            versions_dir = os.listdir(ctx.render_dir)
-            versions_dir.sort()
-            render_version_dir = file_utils.join_file_names(ctx.render_dir, versions_dir[-1])
+            seq_data = sequence_utils.get_first_sequence_from_dir(output_dir)
+            file_utils.create_directories(ctx.render_dir)
+            next_version = len(os.listdir(ctx.render_dir)) + 1
+            version_padded = str(next_version).zfill(3)
+            next_version_dir = f"v{version_padded}"
+
+            render_version_dir = file_utils.join_file_names(ctx.render_dir, next_version_dir)
+            file_utils.create_directories(render_version_dir)
             ue.log_warning(f"Latest version directory {render_version_dir}")
 
             # add additional data to the dictionary to publish
-            seq_data = sequence_utils.get_first_sequence_from_dir(render_version_dir)
             data["file_sequences"] = [seq_data.padded_path]
-            data["task_name"] = task_name
             data["status_name"] = "WIP"
             data["category"] = "Image Sequence"
             data["comment"] = job.comment
