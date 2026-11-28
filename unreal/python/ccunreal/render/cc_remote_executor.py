@@ -137,13 +137,14 @@ class ControlChaosPIEExecutor(ue.MoviePipelinePIEExecutor):
                 seq_data = sequence_utils.get_sequence_data(full_path)
                 full_path = seq_data.padded_path
             else:
-                data["mov_path"] = full_path
+                data["movie_component_path"] = full_path
 
             # add additional data to the dictionary to publish
             data["file_sequences"] = [full_path]
             data["status_name"] = "WIP"
             data["category"] = "Image Sequence"
             data["comment"] = job.comment
+            ue.log_warning(f"Data: {data}")
 
             # publish the sequence to ftrack
             publish_inst = publish.FtrackPublish(data)
